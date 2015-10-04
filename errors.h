@@ -2,7 +2,8 @@
 #define ERRORS_H
 
 #include "errors.c"
-
+#include <stdio.h>
+#include <stdlib.h>
 
 enum mistakes {
     ERR_LEX = 1,
