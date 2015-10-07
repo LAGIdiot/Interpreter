@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "errors.h"
+
+#if DEBUG
 //////////////////
 // mstk_debug (int param1, param2, param3)
 // param1 - code number of mistake
@@ -10,7 +13,7 @@
 //funkcia vypise chybovu hlásku , pouzivat na debug
 /////////////////
 
-void mstk_debug ( int param1, int param2, int param3)
+void mistake_d ( int param1, int param2, int param3)
 {
   switch (param1)
   {
@@ -51,6 +54,7 @@ void mstk_debug ( int param1, int param2, int param3)
   }
    exit(param1);
 }
+#endif
 
 //////////////////
 // mistake (int param1)
@@ -73,7 +77,7 @@ void mistake (int param1)
     case 3:fprintf(stderr,"Error 3 : undefined function/variable.\n");
     break;
 
-    case 4:fprintf(stderr,"Error 4 : incompatible types \n",);
+    case 4:fprintf(stderr,"Error 4 : incompatible types \n");
     break;
 
     case 5:fprintf(stderr,"Error 5 : unknown definition of type\n");

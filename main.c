@@ -4,13 +4,9 @@
 
 main(int argc, char *argv[])
 {
-	
 #if DEBUG
-	printf("DEBUG");
-#else
-	printf("NOT DEBUG");
+	printf("Working in DEBUG mode!\n");
 #endif
 	
-
 	return 0;
 }

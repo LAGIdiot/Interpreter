@@ -1,10 +1,6 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-#include "errors.c"
-#include <stdio.h>
-#include <stdlib.h>
-
 enum mistakes {
     ERR_LEX = 1,
     ERR_SYNTAX = 2,
@@ -20,6 +16,9 @@ enum mistakes {
 };
 
 void mistake (int param1);
+
+#if DEBUG
 void mstk_debug (int param1, int param2, int param3);
+#endif
 
 #endif
