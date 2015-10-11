@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+#include "errors.h"
+//#include "lexical_analyzer.h"
+
 FILE *file_p;
 
 int main(int argc, char *argv[])
@@ -10,7 +13,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		file_p = fopen(*argv[1], "r");
+		file_p = fopen(argv[1], "r");
 		
 		if (file_p == NULL)
 		{
@@ -18,10 +21,12 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			syntaxAnalyzer();
+			//syntaxAnalyzer();
 		}
 	}
 
-	fclose(file_p);
+	if(file_p != NULL)
+		fclose(file_p);
+
 	return 0;
 }

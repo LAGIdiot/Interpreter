@@ -25,9 +25,8 @@ typedef enum
 } white_chars;
 
 //KLÍČOVÁ SLOVA
-const static char *key_words = {"auto\0", "cin\0", "cout\0", "double\0",
-	"else\0", "for\0", "if\0", "int\0", "return\0", "string\0" /*,"bool\0",
-	"do\0", "while\0", "true\0", "false\0"*/}
+const char *key_words = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"};
+/*,"bool", "do", "while", "true", "false"*/
 
 //STAVY KONEČNÉHO AUTOMATU
 typedef enum

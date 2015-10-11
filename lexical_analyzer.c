@@ -6,6 +6,9 @@ void getToken(Ttoken *token)
 	fm_states state = FM_START;
 	int read_char;
 	
+	int comment_variant = 0;
+	extern FILE *file_p;
+
 	while (state != FM_END)
 	{
 		switch (state)
@@ -84,7 +87,7 @@ void getToken(Ttoken *token)
 				if (!comment_variant)
 				{
 					read_char = fgetc(file_p);
-					if (read_char = '\') //jednořádkový komentář může být rozšířen pomocí "\"
+					if (read_char == '/') //jednořádkový komentář může být rozšířen pomocí "\"
 					{
 						fgetc(file_p); //znak konce řádku se zahodí, protože komentář pokračuje na druhém řádku
 					}
@@ -155,7 +158,7 @@ void getToken(Ttoken *token)
 				{
 					comment_variant = 0;
 				}
-				else if ((read_char = fgetc(file_p) == '*')
+				else if ((read_char = fgetc(file_p)) == '*')
 				{
 					comment_variant = 1;
 				}
@@ -241,7 +244,4 @@ void getToken(Ttoken *token)
 			default: ;break;
 		}
 	}
-	
-	return;
 }
-
