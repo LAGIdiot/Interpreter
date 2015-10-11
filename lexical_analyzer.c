@@ -1,12 +1,17 @@
 #include <stdio.h>
+
 #include "lexical_analyzer.h" // své knihovny do uvozovek
+
+//KLÍČOVÁ SLOVA
+const char *key_words[10] = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"};
+/*,"bool", "do", "while", "true", "false"*/
 
 void getToken(Ttoken *token)
 {
 	fm_states state = FM_START;
 	int read_char;
 	
-	int comment_variant = 0;
+	int comment_variant = 0; //defaultne nastaveno na nula (aby prekladac nedava  zbytecne warningy), stejne dojde drive k zapisu nez ke cteni
 	extern FILE *file_p;
 
 	while (state != FM_END)
@@ -153,7 +158,6 @@ void getToken(Ttoken *token)
 			//POZDĚJI PŘIBUDOU OSTATNÍ OPERACE
 			case FM_DIVIDE:
 			{
-				int comment_variant;
 				if ((read_char = fgetc(file_p)) == '/')
 				{
 					comment_variant = 0;

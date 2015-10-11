@@ -1,5 +1,8 @@
 // NAPSAT KOMENTÁŘE, PROČ TAM NĚCO JE!!!
 
+#ifndef LA_H
+#define LA_H
+
 typedef struct{
 	int atribute;
 	char *value;
@@ -24,10 +27,6 @@ typedef enum
 	SPACE = 32
 } white_chars;
 
-//KLÍČOVÁ SLOVA
-const char *key_words = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"};
-/*,"bool", "do", "while", "true", "false"*/
-
 //STAVY KONEČNÉHO AUTOMATU
 typedef enum
 {
@@ -38,3 +37,5 @@ typedef enum
 } fm_states;
 
 void getToken(Ttoken *token);
+
+#endif

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "errors.h"
-//#include "lexical_analyzer.h"
+#include "lexical_analyzer.h"
 
 FILE *file_p;
 
@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
 	if (argc != 2)
 	{
-		//CHYBA
+		mistake(ERR_INTERN);
 	}
 	else
 	{
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 		
 		if (file_p == NULL)
 		{
-			//CHYBA
+			mistake(ERR_INTERN);
 		}
 		else
 		{

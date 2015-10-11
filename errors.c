@@ -89,7 +89,7 @@ void mistake (int param1)
     case 7:fprintf(stderr,"Error 7 : value wasn't loaded \n");
     break;
 
-    case 8:fprintf(stderr,"Error 8 : variable wasn't inicialized\n");
+    case 8:fprintf(stderr,"Error 8 : variable wasn't initialized\n");
     break;
 
     case 9:fprintf(stderr,"Error 9 : dividing with zero\n");
