@@ -27,7 +27,13 @@ void * MM_Malloc(size_t size)
 	void * ptr = malloc(size);
 
 	if(ptr == NULL)
+	{
+#if DEBUG
+		mistake(ERR_INTERN, "Memory allocation problem");
+#else
 		mistake(ERR_INTERN);
+#endif
+	}
 
 #if DEBUG
 	printf("Allocating memory at: %d with size: %d\n", ptr, size);
@@ -43,7 +49,13 @@ void * MM_Realloc(void * ptrOld, size_t size)
 	void * ptr = realloc(ptrOld, size);
 
 	if(ptr == NULL)
+	{
+#if DEBUG
+		mistake(ERR_INTERN, "Memory reallocation problem");
+#else
 		mistake(ERR_INTERN);
+#endif
+	}
 
 #if DEBUG
 	printf("Reallocating memory from: %d to: %d with size: %d\n", ptrOld, ptr, size);

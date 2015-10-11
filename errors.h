@@ -1,5 +1,5 @@
-#ifndef ERRORS_H
-#define ERRORS_H
+#ifndef ERRORS_Header
+#define ERRORS_Header
 
 enum mistakes {
     ERR_LEX = 1,
@@ -15,10 +15,10 @@ enum mistakes {
     ERR_INTERN = 99
 };
 
-void mistake (int param1);
-
 #if DEBUG
-void mstk_debug (int param1, int param2, int param3);
-#endif
+	void mistake (int errCode, const char *message);
+#else
+	void mistake (int errCode);
+#endif //DEBUG
 
-#endif
+#endif //ERRORS_Header

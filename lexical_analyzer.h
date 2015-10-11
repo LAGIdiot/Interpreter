@@ -1,7 +1,7 @@
 // NAPSAT KOMENTÁŘE, PROČ TAM NĚCO JE!!!
 
-#ifndef LA_H
-#define LA_H
+#ifndef LA_Header
+#define LA_Header
 
 typedef struct{
 	int atribute;
@@ -38,4 +38,4 @@ typedef enum
 
 void getToken(Ttoken *token);
 
-#endif
+#endif //LA_Header
