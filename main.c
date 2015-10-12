@@ -4,7 +4,20 @@
 #include "memory_manager.h"
 #include "lexical_analyzer.h"
 
+#include "ial.h"
+
 FILE *file_p;
+
+/*testovaci funkce na projizdeni lexu */
+void test()
+{
+	while(1)
+	{
+		tTokenPtr token = T_Init();
+		T_Get(token);
+		T_Destroy(token);
+	}
+}
 
 int main(int argc, char *argv[])
 {
@@ -31,7 +44,8 @@ int main(int argc, char *argv[])
 		else
 		{
 			MM_Init(); //Initialize memory manager
-			//syntaxAnalyzer();
+
+			test();//prozatimni pro testovani
 		}
 	}
 

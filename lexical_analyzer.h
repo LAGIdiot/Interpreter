@@ -3,11 +3,6 @@
 #ifndef LA_Header
 #define LA_Header
 
-typedef struct{
-	int atribute;
-	char *value;
-} Ttoken;
-
 // ASCII hodnoty A-Z, a-z, 0-9
 typedef enum
 {
@@ -35,7 +30,5 @@ typedef enum
 	FM_ASSIGN, FM_GREATER, FM_LESS, FM_G_EQUAL, FM_L_EQUAL, FM_NOT_EQUAL,
 	FM_PERC, FM_COMMA, FM_PIPE, FM_HASH /*,FM_PLUS2, FM_MINUS2, FM_BOOL_ ... && ||*/
 } fm_states;
-
-void getToken(Ttoken *token);
 
 #endif //LA_Header

@@ -86,7 +86,7 @@ void MM_FreeAll()
 	printf("Freeing ALL memory\n");
 #endif
 
-	if(MM_Last != NULL && MM_Head != NULL) //Overi zda je vube co odstranovat
+	if(MM_Last != NULL && MM_Head != NULL) //Overi zda je vubec co odstranovat
 	{
 		MemoryBlockPtr temp = MM_Last;
 		MemoryBlockPtr tempPrev;
@@ -111,7 +111,13 @@ void MM_Add(void * ptr)
 {
 	MemoryBlockPtr newBlock = malloc(sizeof(struct MemoryBlockStruct));
 	if(newBlock == NULL)
+	{
+#if DEBUG
+		mistake(ERR_INTERN, "Nedostatek paměti");
+#else
 		mistake(ERR_INTERN);
+#endif
+	}
 
 	newBlock->dataPtr = ptr; //vlozi pointer jako data
 	newBlock->nextPtr = NULL;
@@ -150,7 +156,13 @@ void MM_Remove(void * ptr, int invalid) //invalid parametr slouzi k odstraneni z
 			while(temp->dataPtr != ptr) //prohledava MemoryBlocky od konce dokud nenarazy na ten se spravnymi daty
 			{
 				if(temp->prevPtr == NULL)
+				{
+#if DEBUG
+					mistake(ERR_INTERN, "Chyba při dealokaci - memory block nenalezen");
+#else
 					mistake(ERR_INTERN);
+#endif
+				}
 				temp = temp->nextPtr;
 			}
 

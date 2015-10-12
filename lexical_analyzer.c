@@ -1,12 +1,13 @@
 #include <stdio.h>
 
 #include "lexical_analyzer.h" // své knihovny do uvozovek
+#include "ial.h"
 
 //KLÍČOVÁ SLOVA
 const char *key_words[10] = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"};
 /*,"bool", "do", "while", "true", "false"*/
 
-void getToken(Ttoken *token)
+void T_Get(tTokenPtr token)
 {
 	fm_states state = FM_START;
 	int read_char;
