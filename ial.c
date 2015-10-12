@@ -17,8 +17,8 @@ tTokenPtr T_Init()
 
 void T_Destroy(tTokenPtr token)
 {
-	free(token->data);
-	MM_Free(token);
+	MM_Free(token->data); //pokud by doslo k sahnuti na data v tuto chvili tak by nesedeli
+	MM_Free(token);//proto tyto dve volani neposouvat
 }
 
 void T_Update(tTokenPtr token, char c)

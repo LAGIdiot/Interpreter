@@ -21,6 +21,9 @@ void test()
 
 int main(int argc, char *argv[])
 {
+#if DEBUG
+	printf("Running in DEBUG mode...\n");
+#endif
 	if (argc != 2)
 	{
 #if DEBUG
@@ -31,6 +34,9 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
+#if DEBUG
+		printf("Opening file: %s\n", argv[1]);
+#endif
 		file_p = fopen(argv[1], "r");
 		
 		if (file_p == NULL)

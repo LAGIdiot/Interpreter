@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "errors.h"
+#include "ial.h"
 
 #include "memory_manager.h"
 
@@ -79,7 +80,7 @@ void MM_Free(void * ptr)
 
 	MM_Remove(ptr, 0);
 }
-
+//Pamět je třeba mazat od poslední přidané aby nedošlo ke ztrátám (např: data v tokenu)
 void MM_FreeAll()
 {
 #if DEBUG
