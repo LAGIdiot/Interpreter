@@ -10,12 +10,9 @@ typedef struct MemoryBlockStruct{
 
 //Function prototypes
 void MM_Init();
-
 void * MM_Malloc(size_t size);
 void * MM_Realloc(void* oldPtr, size_t size);
-
 void MM_Free(void* ptr);
-
 void MM_FreeAll();
 
 #endif //MM_Header

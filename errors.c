@@ -1,3 +1,7 @@
+#if DEBUG
+#include <stdarg.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,17 +28,25 @@ const char *errMessage[11] = {
 // mistake (ErrorCode errCode, const char *message)
 // errCode - code number of mistake
 // message - pripojena zprava pro jednodusi deteminaci kde k chybe doslo
+// ... - dalsi casti message
 //////////////////
 //funkcia vypise chybovu hlásku zavola funkci na dealokaci pameti a ukončí program
 /////////////////
-void mistake(int errCode, const char *message)
+void mistake(int errCode, const char *message, ...)
 {
 	if(errCode == ERR_INTERN)
 		fprintf(stderr, "%s", errMessage[0]);
 	else
 		fprintf(stderr, "%s", errMessage[(int)errCode]);
 
-	fprintf(stderr, "%s", message);
+	va_list va;
+	va_start(va, message);
+
+	vfprintf(stderr, message, va);
+
+	va_end(va);
+
+	fprintf(stderr, "\n");
 
 	MM_FreeAll(); //Uklizeni pameti
 

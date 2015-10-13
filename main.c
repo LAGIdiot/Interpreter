@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 		if (file_p == NULL)
 		{
 #if DEBUG
-			mistake(ERR_INTERN, "Unable to open file");
+			mistake(ERR_INTERN, "Unable to open file %s", argv[1]);
 #else
 			mistake(ERR_INTERN);
 #endif

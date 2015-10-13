@@ -16,7 +16,7 @@ enum mistakes {
 };
 
 #if DEBUG
-	void mistake (int errCode, const char *message);
+	void mistake (int errCode, const char *message, ...);
 #else
 	void mistake (int errCode);
 #endif //DEBUG
