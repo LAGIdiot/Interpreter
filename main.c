@@ -4,7 +4,7 @@
 #include "memory_manager.h"
 #include "lexical_analyzer.h"
 
-#include "ial.h"
+#include "token.h"
 
 FILE *file_p;
 

@@ -10,11 +10,11 @@ all: compiler
 debug: compiler-d
 
 #linking
-compiler: main errors LA MM SA ial
-	$(CC) -o compiler main.o errors.o lexical_analyzer.o memory_manager.o syntactic_analyzer.o ial.o
+compiler: main errors LA MM SA ial token
+	$(CC) -o compiler main.o errors.o lexical_analyzer.o memory_manager.o syntactic_analyzer.o ial.o token.o
 
-compiler-d: main-d errors-d LA-d MM-d SA-d ial-d
-	$(CC) -o compiler_d main_d.o errors_d.o lexical_analyzer_d.o memory_manager_d.o syntactic_analyzer_d.o ial_d.o
+compiler-d: main-d errors-d LA-d MM-d SA-d ial-d token-d
+	$(CC) -o compiler_d main_d.o errors_d.o lexical_analyzer_d.o memory_manager_d.o syntactic_analyzer_d.o ial_d.o token_d.o
 
 #compiling
 errors: errors.c errors.h
@@ -31,6 +31,9 @@ SA: syntactic_analyzer.c syntactic_analyzer.h
 	
 ial: ial.c ial.h
 	$(CC) $(CFLAGS) -o ial.o ial.c
+	
+token: token.c token.h
+	$(CC) $(CFLAGS) -o token.o token.c
 	
 main: main.c errors.h
 	$(CC) $(CFLAGS) -o main.o main.c
@@ -51,6 +54,9 @@ SA-d: syntactic_analyzer.c syntactic_analyzer.h
 
 ial-d: ial.c ial.h
 	$(CC) $(CFLAGSD) -o ial_d.o ial.c
+	
+token-d: token.c token.h
+	$(CC) $(CFLAGSD) -o token_d.o token.c
 	
 main-d: main.c errors.h
 	$(CC) $(CFLAGSD) -o main_d.o main.c
