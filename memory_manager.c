@@ -12,6 +12,11 @@ MemoryBlockPtr MM_Last;
 void MM_Add(void * ptr);
 void MM_Remove(void * ptr, int invalid);
 
+#if DEBUG
+//DEBUG variables
+static int memoryBlocksCount;
+#endif
+
 //////////////////////////////////////////////////
 // void MM_Init()
 ////////////////////
@@ -21,6 +26,7 @@ void MM_Init()
 {
 #if DEBUG
 	printf("Initializing Memory Manager\n");
+	memoryBlocksCount = 0;
 #endif
 
 	MM_Head = NULL;
@@ -145,6 +151,8 @@ void MM_FreeAll()
 		printf("No need\n");
 	}
 	printf("Done\n");
+
+	memoryBlocksCount = 0;
 #endif
 }
 
@@ -157,7 +165,7 @@ void MM_FreeAll()
 void MM_Add(void * ptr)
 {
 #if DEBUG
-	printf("Adding pointer: %d to MM\n", ptr);
+	printf("Creating garbage block for pointer: %d\n", ptr);
 #endif
 	MemoryBlockPtr newBlock = malloc(sizeof(struct MemoryBlockStruct));
 	if(newBlock == NULL)
@@ -182,6 +190,10 @@ void MM_Add(void * ptr)
 		newBlock->prevPtr = MM_Last; //in newBlock assign prevPtr to last block
 	}
 	MM_Last = newBlock; //newBlock make available as last block
+
+#if DEBUG
+	memoryBlocksCount++;
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -194,7 +206,7 @@ void MM_Add(void * ptr)
 void MM_Remove(void * ptr, int invalid)
 {
 #if DEBUG
-	printf("Removing pointer: %d from MM - block is invalid: %s\n", ptr, invalid == 1 ? "TRUE" : "ELSE");
+	printf("Removing garbage block with pointer: %d - block is invalid: %s\n", ptr, invalid == 1 ? "TRUE" : "ELSE");
 #endif
 	if(MM_Last != NULL && MM_Head != NULL) //Check if there is any memory to free
 	{
@@ -248,4 +260,7 @@ void MM_Remove(void * ptr, int invalid)
 		mistake(ERR_INTERN);
 #endif
 	}
+#if DEBUG
+	memoryBlocksCount--;
+#endif
 }

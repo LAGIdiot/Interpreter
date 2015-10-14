@@ -22,7 +22,7 @@ void test()
 int main(int argc, char *argv[])
 {
 #if DEBUG
-	printf("Running in DEBUG mode...\n");
+	printf("I am alive...\nRunning in DEBUG mode...\n");
 #endif
 	if (argc != 2)
 	{

@@ -1,6 +1,7 @@
 #ifndef T_Header
 #define T_Header
 
+//Structures
 #if DEBUG
 typedef struct Token{
 	int typ;
@@ -15,6 +16,7 @@ typedef struct Token{
 }tTokenStruct, *tTokenPtr;
 #endif
 
+//Enums
 /*Nutno dodefinovat další dle potřeby*/
 enum TokenType{
 	TT_IDENTIFIER,
