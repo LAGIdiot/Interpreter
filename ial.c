@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ial.c"
+#include "ial.h"
 /*
 //ak to niekdo potrebuje odtestovat ,
 //tak tu je main na test
