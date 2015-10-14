@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include "memory_manager.h"
+#include "memory_manager.h"
 
-//#include <token.h>
-//#include <ial.h>
+#include <token.h>
+#include <ial.h>
 
 
 typedef struct binaryTree
