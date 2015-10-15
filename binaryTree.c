@@ -12,20 +12,20 @@ typedef struct binaryTree
 int data;
 struct binaryTree * rChild; //pravy potomok uzlu
 struct binaryTree * lChild; //lavy potomok uzlu
-} node;
+} *nodePtr;
 
-void createNode(node **, Token);
-void deleteTree(node *);
-void printPreorder(node *);
-node* search(node **, Token);
+void createNode(node *, Token);
+void deleteTree(node);
+void printPreorder(node);
+node* search(node *, Token);
 
 /*funkcia na vytvaranie node*/
-void createNode(node ** tree, Token *tTokenPtr) 
+void createNode(node * tree, Token *tTokenPtr) 
 {
-    node *temp = NULL;
+    node temp = NULL;
     if(!(*tree))
     {
-        temp = (node *)malloc(sizeof(node));
+        temp = (node)malloc(sizeof(node));
         temp->lChild = temp->rChild = NULL;
         temp->data = *tTokenPtr;
         *tree = temp;
@@ -42,8 +42,8 @@ void createNode(node ** tree, Token *tTokenPtr)
     }
 
 }
-/*skusobna funkcia na vypis stromu Preorder*/
-void printPreorder(node * tree) 
+/*skusobna funkcia na vypis stromu Preorder
+void printPreorder(node tree) 
 {
     if (tree)
     {
@@ -52,9 +52,9 @@ void printPreorder(node * tree)
         printPreorder(tree->rChild);
     }
 
-}
+}*/
 /*funkcia na vymazanie stromu s uvolnenim pamati*/
-void deleteTree(node * tree) 
+void deleteTree(node tree) 
 {
     if (tree)
     {
@@ -64,7 +64,7 @@ void deleteTree(node * tree)
     }
 }
 /*funkcia na vyhladavanie tokenu v strome*/
-node* search(node ** tree, Token *tTokenPtr) 
+node* search(node * tree, Token *tTokenPtr) 
 {
     if(!(*tree))
     {
@@ -87,8 +87,8 @@ node* search(node ** tree, Token *tTokenPtr)
 /*funkcia ktora vola ostatne funkcie, vytvara strom a hlada v nom token*/
 void treeCreation()
 {
-    node *root;
-    node *tmp;
+    node root;
+    node tmp;
     Token *tTokenPtr;
     root = NULL;
     

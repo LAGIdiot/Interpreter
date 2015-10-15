@@ -17,6 +17,34 @@ int *compute_prefix_function(char *pattern, int psize);
 ///////////
 int kmp(char *target, int tsize, char *pattern, int psize);
 
+///////////
+// štruktúra binaryTree ( štruktúra stromu )
+///////////
+typedef struct binaryTree;
 
+///////////
+// funkcia createNode ( vytvara uzol, alokuje pamat a rozhoduje o velkosti tokenov, podla nich vytvara laveho/praveho potomka )
+//node * tree - koren stromu
+//Token *tTokenPtr - hodnota tokenu
+///////////
+void createNode(node * tree, Token *tTokenPtr);
+
+///////////
+// funkcia deleteTree ( vymazava strom a uvolnuje pamat )
+//node tree - strom
+///////////
+void deleteTree(node tree);
+ 
+///////////
+// funkcia node search ( vyhladavy dany token v strome )
+//node * tree - strom
+//Token *tTokenPtr - hodnota tokenu
+///////////
+node* search(node * tree, Token *tTokenPtr);
+
+///////////
+// funkcia treeCreation ( povodny main, rozhoduje o tom ktora funkcie bude kedy zavolana/mozne vymazat a zahrnut v main )
+///////////
+void treeCreation(); 
 
 #endif //IAL_Header
