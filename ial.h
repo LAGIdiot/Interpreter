@@ -18,7 +18,7 @@ int *compute_prefix_function(char *pattern, int psize);
 int kmp(char *target, int tsize, char *pattern, int psize);
 
 ///////////
-// štruktúra binaryTree ( štruktúra stromu )
+// struktura binaryTree ( struktura stromu )
 ///////////
 typedef struct binaryTree;
 
