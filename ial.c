@@ -3,27 +3,15 @@
 #include <string.h>
 
 #include "ial.h"
-/*
-//ak to niekdo potrebuje odtestovat ,
-//tak tu je main na test
-int main(int argc, char *argv[])
-{
-	char target[] = "ABC ABCDAB ABCDABCDABDE";
-	char *ch = target;
-	char pattern[] = "ABCDABD";
-	int i;
+#include "errors.h"
+#include "memory_manager.h"
 
-	i = kmp(target, strlen(target), pattern, strlen(pattern));
-	if (i >= 0)
-		printf("matched @: %d %s\n",i ,ch + i);
-	return 0;
-}
-*/
-int *compute_prefix_function(char *pattern, int psize)
+
+int *compute_prefix_function (char *pattern, int psize)
 {
 	int k = -1;
 	int i = 1;
-	int *pi = malloc(sizeof(int)*psize);
+	int * pi = MM_Malloc(sizeof(int)*psize);			// kontrola
 	if (!pi)
 		return NULL;
 
@@ -38,23 +26,36 @@ int *compute_prefix_function(char *pattern, int psize)
 	return pi;
 }
 
-int kmp(char *target, int tsize, char *pattern, int psize)
+int find (char *target, int tsize, char *pattern, int psize)
 {
 	int i;
 	int *pi = compute_prefix_function(pattern, psize);
 	int k = -1;
 	if (!pi)
-		return -1;
+		{				//chyba v pridelovaní pamete v compute_prefix_function
+		#if DEBUG
+			char message[] = {"mistake appeared in previous function, in allocating memory\n"};
+			mistake (ERR_INTERN,message);
+		#else
+			mistake (ERR_INTERN);
+		#endif
+		}
 	for (i = 0; i < tsize; i++) {
 		while (k > -1 && pattern[k+1] != target[i])
 			k = pi[k];
 		if (target[i] == pattern[k+1])
 			k++;
 		if (k == psize - 1) {
-			free(pi);
-			return i-k;
+			MM_Free(pi);		//kontrola
+			return i-k;			//vracia poziciu
 		}
 	}
-	free(pi);
-	return -1;
+	MM_Free(pi);				//kontrola
+
+	#if DEBUG			// chyba , nenaslo to zhodu
+		char message[] = {"no results found\n"};
+		mistake (ERR_RUN_OTH,message);
+	#else
+		mistake (ERR_RUN_OTH);
+	#endif
 }
