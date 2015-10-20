@@ -10,11 +10,11 @@ all: compiler
 debug: compiler-d
 
 #linking
-compiler: main errors LA MM SA ial token
-	$(CC) -o compiler main.o errors.o lexical_analyzer.o memory_manager.o syntactic_analyzer.o ial.o token.o
+compiler: main errors LA MM SA ial token ST AC
+	$(CC) -o compiler main.o errors.o lexical_analyzer.o memory_manager.o syntactic_analyzer.o ial.o token.o symbol_table.o adress_code.o 
 
-compiler-d: main-d errors-d LA-d MM-d SA-d ial-d token-d
-	$(CC) -o compiler_d main_d.o errors_d.o lexical_analyzer_d.o memory_manager_d.o syntactic_analyzer_d.o ial_d.o token_d.o
+compiler-d: main-d errors-d LA-d MM-d SA-d ial-d token-d ST-d AC-d
+	$(CC) -o compiler_d main_d.o errors_d.o lexical_analyzer_d.o memory_manager_d.o syntactic_analyzer_d.o ial_d.o token_d.o symbol_table_d.o adress_code_d.o 
 
 #compiling
 errors: errors.c errors.h
@@ -34,6 +34,12 @@ ial: ial.c ial.h
 	
 token: token.c token.h
 	$(CC) $(CFLAGS) -o token.o token.c
+	
+ST: symbol_table.c symbol_table.h
+	$(CC) $(CFLAGS) -o symbol_table.o symbol_table.c
+	
+AC: adress_code.c adress_code.h
+	$(CC) $(CFLAGS) -o adress_code.o adress_code.c 
 	
 main: main.c errors.h
 	$(CC) $(CFLAGS) -o main.o main.c
@@ -57,6 +63,12 @@ ial-d: ial.c ial.h
 	
 token-d: token.c token.h
 	$(CC) $(CFLAGSD) -o token_d.o token.c
+	
+ST-d: symbol_table.c symbol_table.h
+	$(CC) $(CFLAGS) -o symbol_table_d.o symbol_table.c
+	
+AC-d: adress_code.c adress_code.h
+	$(CC) $(CFLAGS) -o adress_code_d.o adress_code.c 
 	
 main-d: main.c errors.h
 	$(CC) $(CFLAGSD) -o main_d.o main.c
