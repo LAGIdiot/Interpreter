@@ -1,253 +1,180 @@
 #include <stdio.h>
+#include "token.c"
+#include "lexical_analyzer.h"
 
-#include "token.h"
+FILE *file_p;
+tTokenPtr *lex_token;
 
-#include "lexical_analyzer.h" // své knihovny do uvozovek
-
-//KLÍČOVÁ SLOVA
-const char *key_words[10] = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"};
-/*,"bool", "do", "while", "true", "false"*/
-
-void T_Get(tTokenPtr token)
+tTokenPtr getToken()
 {
-	fm_states state = FM_START;
-	int read_char;
+	//T_Init();
+	int state = FM_START;
 	
-	int comment_variant = 0; //defaultne nastaveno na nula (aby prekladac nedava  zbytecne warningy), stejne dojde drive k zapisu nez ke cteni
-	extern FILE *file_p;
-
 	while (state != FM_END)
 	{
-		switch (state)
+		read_char = fgetc(file_p);
+		
+		// ROZPOZNÁVÁNÍ NAČTENÉHO ZNAKU
+		//-----------------------------------------------------------------------
+		/* větvící struktura rozlišuje jeden načtený znak a následně nastavuje
+		aktuální stav konečného automatu.*/
+		//-------------------------------------------------------------------------
+		switch (read_char)
 		{
-			case FM_START:
+			case ';':
 			{
-				if ((read_char = fgetc(file_p)) != EOF)
+				state = FM_SEMICON;
+			}
+			
+			case '+': 
+			{
+				if (state == FM_PLUS)
 				{
-					if (((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
-						|| ((read_char >= LETTER_A) && (read_char >= LETTER_Z)))
-							{
-							
-							}
-				
-				//JE ZNAK ČÍSLO?
-					else if ((read_char >= ZERO) && (read_char <= NINE))
-					{
-								
-					}
-				
-				//JE ZNAK BÍLÝ ZNAK?
-					else if ((read_char == TAB) || (read_char == NEW_LINE)
-						|| (read_char == SPACE))
-					{
-							
-					}
-					
-					else
-					{
-						switch (read_char)
-						{
-							case '#': 
-								;break;
-							case '{':
-								;break;
-							case '}':
-								;break;
-							case '(':
-								;break;
-							case ')':
-								;break;
-							case '=':
-								;break;
-							case '+': state = FM_PLUS;
-								;break;
-							case '-': state = FM_MINUS;
-								;break;
-							case '*': state = FM_STAR;
-								;break;
-							case '/': state = FM_DIVIDE;
-								;break;
-							case '!':
-								;break;
-							case ';': state = FM_SEMICON;
-								;break;
-								
-							default: ;
-						}
-					}	
+					state = FM_INCREMENT;
 				}
-					
 				else
 				{
-					state = FM_END;
-				}	
+					state = FM_PLUS;
+				}
+			} break;
+			
+			case '-':
+			{
+				if (state == FM_MINUS)
+				{
+					state = FM_DECREMENT;
+				}
+				else
+				{
+					state = FM_MINUS;
+				}
+			} break;
+			
+			case '*':
+			{
+				if (state == FM_DIVISION)
+				{
+					state = FM_COMMENT_MULTILINE;
+				}
+				else if (state == FM_COMMENT_MULTILINE)
+				{
+					
+				}
+				else
+				{
+					state = FM_STAR;
+				}
+			} break;
+			
+			case '/':
+			{
+				if (state == FM_DIVISION)
+				{
+					state = FM_COMMENT_SINGLELINE;
+				}
+				else
+				{
+					state = FM_DIVISION;
+				}
 			}break;
 			
-			
-			//ZPRACOVÁNÍ KOMENTÁŘŮ
-			/*Úsek nejprve načte další znak a následně ve zvolené větvi z FM_DIVIDE
-			dojde ke zjištění, zda jde o konec komentáře. Pokud ne, dojde k breaku
-			a FM_COMMENT je zavolán opět a načte se další znak. Je*/
-			case FM_COMMENT:
-			{			
-				//Jednořádkový
-				if (!comment_variant)
+			case '=':
+			{
+				if (state == FM_ASSIGN)
 				{
-					read_char = fgetc(file_p);
-					if (read_char == '/') //jednořádkový komentář může být rozšířen pomocí "\"
+					state = FM_EQUAL;
+				}
+				else
+				{
+					state = FM_ASSIGN;
+				}
+			}
+			
+			// ROZPOZNÁVÁNÍ "BĚŽNÝCH" ZNAKŮ
+			default:
+			{
+				if (((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
+					|| ((read_char >= LETTER_A) && (read_char >= LETTER_Z)))
+				{
+					switch ()
 					{
-						fgetc(file_p); //znak konce řádku se zahodí, protože komentář pokračuje na druhém řádku
+						case: ;break;
+						default: ;break;
 					}
-					else if (read_char == '\n')
+				}
+
+				else if ((read_char >= ZERO) && (read_char <= NINE))
+				{
+					if (state == FM_INTEGER)
+					{
+							
+					}
+					else if (state == FM_DOUBLE)
+					{
+							
+					}
+					else
+					{
+							
+					}
+				}
+			}
+			
+			// PŘEPÍNÁNÍ STAVŮ AUTOMATU A UKONČOVÁNÍ TOKENU
+			//-----------------------------------------------------------------------
+			/* Na základě stavu z předchozího switche se rozhodne, zda ukončit token
+			nebo načítat další znak*/
+			//-----------------------------------------------------------------------
+			switch (state)
+			{
+				case FM_COMMENT_SINGLELINE:
+				{
+					if (read_char == '\n')
 					{
 						state = FM_START;
-					}	
+					}
+					else if (read_char == '\\')
+					{
+						fgetc(file_p);
+					}
 				}
 				
-				//Víceřádkový
-				else if(comment_variant)
+				case FM_COMMENT_MULTILINE:
 				{
-					if (read_char == '*')
+					if (read_char == "*")
 					{
-						read_char = fgetc(file_p);
-						if (read_char == '/') //načte ještě jeden znak, pokud nejde o "/",\
-						tak nám nevadí, že se načte v dalším cyklu až další znak, \
-						protože jsou pro nás posloupnosti "*" a "něco" nepodstatné kromě "*" a "*"
+						if ((read_char = fgetc(file_p)) == '/')
 						{
 							state = FM_START;
 						}
-						else if (read_char == '*')
-						{
-							//Neprovede se žádná operace, kdyby náhodou za sadou "*" bylo "/"
-						}
-						else
-						{
-							read_char = fgetc(file_p);
-						}
 					}
 				}
-			}break;
-			
-			case FM_KEYWORDS:
-			{
-			
-			}break;
-			
-			case FM_VARIABLE:
-			{
-			
-			}break;
-			
-			case FM_SEMICON:
-			{
-			
-			}break;
-			
-			case FM_STRING:
-			{
-			
-			}break;
-			
-			case FM_ESC_SQ:
-			{
-			
-			}break;
-			
-			//ZNAK DĚLENO, PŘESMĚROVÁNÍ NA KOMENTÁŘE
-			/*Prozatím vyřešeno jen přesměrování na komentáře,
-			první varianta -> jednořádkové komentáře
-			druhá varianta -> víceřádkové*/
-			//POZDĚJI PŘIBUDOU OSTATNÍ OPERACE
-			case FM_DIVIDE:
-			{
-				if ((read_char = fgetc(file_p)) == '/')
+				
+				case FM_SEMICON:
 				{
-					comment_variant = 0;
-				}
-				else if ((read_char = fgetc(file_p)) == '*')
+					// T_Update(lex_token, read_char);
+					state = FM_END;
+				}break;
+				
+				case FM_ASSIGN:
 				{
-					comment_variant = 1;
+					
+				}break;
+				
+				case FM_EQUAL:
+				{
+					// T_Update(lex_token, read_char);
+					state = FM_END;
 				}
-			}break;
-			
-			case FM_STAR:
-			{
-			
-			}break;
-			
-			case FM_PLUS:
-			{
-			
-			}break;
-			
-			case FM_MINUS:
-			{
-			
-			}break;
-			
-			case FM_DOT:
-			{
-			
-			}break;
-			
-			case FM_EQUAL:
-			{
-			
-			}break;
-			
-			// RELAČNÍ OPERÁTORY
-			//-----------------------------------------------------------------------
-			case FM_ASSIGN:
-			{
-			
-			}break;
-			
-			case FM_GREATER:
-			{
-			
-			}break;
-			
-			case FM_LESS:
-			{
-			
-			}break;
-			case FM_G_EQUAL:
-			{
-			
-			}break;
-			
-			case FM_L_EQUAL:
-			{
-			
-			}break;
-			
-			case FM_NOT_EQUAL:
-			{
-			
-			}break;
-			
-			case FM_PERC:
-			{
-			
-			}break;
-			
-			case FM_COMMA:
-			{
-			
-			}break;
-			
-			case FM_PIPE:
-			{
-			
-			}break;
-			
-			/* DOBROVOLNÉ
-			case FM_PLUS2 ;break;
-			case FM_MINUS2 ;break;
-			case FM_BOOL_ ;break;
-			*/
-			
-			default: ;break;
+				
+				case FM_PLUS:
+				{
+					
+				}
+				default: ;break;
+			}
 		}
 	}
+	
+	return *lex_token;
 }
