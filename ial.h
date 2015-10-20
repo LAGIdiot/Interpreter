@@ -20,8 +20,13 @@ int kmp(char *target, int tsize, char *pattern, int psize);
 ///////////
 // struktura binaryTree ( struktura stromu )
 ///////////
-typedef struct binaryTree;
-
+typedef struct binaryTree
+{
+	int data;
+	struct binaryTree * rChild; //pravy potomok uzlu
+	struct binaryTree * lChild; //lavy potomok uzlu
+} *nodePtr;
+/*
 ///////////
 // funkcia createNode ( vytvara uzol, alokuje pamat a rozhoduje o velkosti tokenov, podla nich vytvara laveho/praveho potomka )
 //node * tree - koren stromu
@@ -46,5 +51,5 @@ node* search(node * tree, Token *tTokenPtr);
 // funkcia treeCreation ( povodny main, rozhoduje o tom ktora funkcie bude kedy zavolana/mozne vymazat a zahrnut v main )
 ///////////
 void treeCreation(); 
-
+*/
 #endif //IAL_Header
