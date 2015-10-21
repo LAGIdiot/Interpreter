@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "errors.h"
-
 #include "memory_manager.h"
 
 MemoryBlockPtr MM_Head;

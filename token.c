@@ -1,9 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "memory_manager.h"
-
 #include "token.h"
 
 //Private variables

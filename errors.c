@@ -1,12 +1,3 @@
-#if DEBUG
-#include <stdarg.h>
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "memory_manager.h"
-
 #include "errors.h"
 
 const char *errMessage[11] = {

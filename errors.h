@@ -1,6 +1,15 @@
 #ifndef ERRORS_Header
 #define ERRORS_Header
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#if DEBUG
+#include <stdarg.h>
+#endif
+
+#include "memory_manager.h"
+
 enum mistakes {
     ERR_LEX = 1,
     ERR_SYNTAX = 2,

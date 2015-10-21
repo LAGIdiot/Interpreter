@@ -1,18 +1,14 @@
-#include <stdio.h>
-#include "token.c"
 #include "lexical_analyzer.h"
 
 FILE *file_p;
-tTokenPtr *lex_token;
 
-tTokenPtr getToken()
+void T_Get(tTokenPtr tokenPtr)
 {
-	//T_Init();
 	int state = FM_START;
 	
 	while (state != FM_END)
 	{
-		read_char = fgetc(file_p);
+		int read_char = fgetc(file_p);
 		
 		// ROZPOZNÁVÁNÍ NAČTENÉHO ZNAKU
 		//-----------------------------------------------------------------------
@@ -96,11 +92,13 @@ tTokenPtr getToken()
 				if (((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
 					|| ((read_char >= LETTER_A) && (read_char >= LETTER_Z)))
 				{
+					/*
 					switch ()
 					{
 						case: ;break;
 						default: ;break;
 					}
+					*/
 				}
 
 				else if ((read_char >= ZERO) && (read_char <= NINE))
@@ -175,6 +173,4 @@ tTokenPtr getToken()
 			}
 		}
 	}
-	
-	return *lex_token;
 }

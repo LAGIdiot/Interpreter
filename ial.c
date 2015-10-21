@@ -1,11 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "ial.h"
-#include "errors.h"
-#include "memory_manager.h"
-
 
 int *compute_prefix_function (char *pattern, int psize)
 {

@@ -1,10 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <malloc.h>
 #include "str.h"
 
-
+/*
 int main()
 {
   string str1;
@@ -22,6 +18,7 @@ int main()
   str3 = concat(*str1,*str2);
   return 0;
 }
+*/
 
 int strInit(string *s)
 {
@@ -66,20 +63,26 @@ int strInsert(char *text, string *s)
 
 }
 
+/*
 string concat(string s1,string s2)
 {
-  int amount = s1->length + s2->length; //mnozstvo miesta potrebneho pre s3     problem s pointerom
+  int amount = s1.length + s2.length; //mnozstvo miesta potrebneho pre s3     problem s pointerom
   string s3;
   if ((s3.str = (char*) malloc(amount)) == NULL ) //allokuje to miesto
-    return NULL;
+  {
+	  mistake(ERR_INTERN); //zatim sem davam intern casem vyresit
+  }
+
   s3.str[0] = '\0';         //  nutne
   s3.length = amount;       //  nutne
   s3.allocSize = amount;    //  nutne
-  strcat(s3.str,s1->str);   //  concatenuje s1 na s3  problem s pointerom
-  strcat(s3.str,s2->str);   //  concatenuje s2 na s3  problem s pointerom
+  strcat(s3.str,s1.str);   //  concatenuje s1 na s3  problem s pointerom
+  strcat(s3.str,s2.str);   //  concatenuje s2 na s3  problem s pointerom
 
-  return *s3;   //problem s pointerom
+  return *s3;   //problem s pointerom - pokoušíš se vrátit vnitrní promenou
 }
+*/
+
 char *strGetStr(string *s)
 {
    return s->str;

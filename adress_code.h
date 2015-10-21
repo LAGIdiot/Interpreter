@@ -1,3 +1,6 @@
+#ifndef AC_Header
+#define AC_Header
+
 enum operatinType{
 	OT_ADD
 };
@@ -11,8 +14,8 @@ typedef struct AC_item{
 
 typedef struct AC_listItem{
 	AC_itemPtr data;
-	struct AC_listItemPtr Next;
-	struct AC_listItemPtr Prev;
+	struct AC_listItemStruct *Next;
+	struct AC_listItemStruct *Prev;
 }AC_listItemStruc, *AC_listItemPtr;
 
 typedef struct AC_table{
@@ -31,3 +34,4 @@ void AC_T_Activate(AC_itemPtr itemPtr);
 void AC_T_ActiveMoveUp();
 void AC_T_ActiveMoveDown();
 
+#endif //AC_Header

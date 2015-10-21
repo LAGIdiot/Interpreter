@@ -3,16 +3,8 @@
 
 #include "memory_manager.h"
 
-#include <token.h>
-#include <ial.h>
-
-
-typedef struct binaryTree
-{
-int data;
-struct binaryTree * rChild; //pravy potomok uzlu
-struct binaryTree * lChild; //lavy potomok uzlu
-} *nodePtr;
+#include "token.h"
+#include "ial.h"
 
 void createNode(node *, Token);
 void deleteTree(node);

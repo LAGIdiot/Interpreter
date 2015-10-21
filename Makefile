@@ -1,78 +1,96 @@
 #Makefile
-#Date: 07.10.2015
+#Date: 07.10.2015, 21.10.2015
 
 CC=gcc
 CFLAGS=-c -O2 -std=c99 -Wall -pedantic
 CFLAGSD=-c -g -O0 -std=c99 -DDEBUG
 
-all: compiler
+PARTS=errors.o $(MM).o token.o str.o $(LA).o $(SA).o ial.o $(AC).o $(ST).o main.o
+PARTS-d=errors-d.o $(MM)-d.o token-d.o str-d.o $(LA)-d.o $(SA)-d.o ial-d.o $(AC)-d.o $(ST)-d.o main-d.o
 
+MM=memory_manager
+LA=lexical_analyzer
+SA=syntactic_analyzer
+AC=adress_code
+ST=symbol_table
+
+.PHONY: all
+.PHONY: debug
+.PHONY: clean
+
+all: compiler
 debug: compiler-d
 
 #linking
-compiler: main errors LA MM SA ial token ST AC
-	$(CC) -o compiler main.o errors.o lexical_analyzer.o memory_manager.o syntactic_analyzer.o ial.o token.o symbol_table.o adress_code.o 
+compiler: $(PARTS)
+	$(CC) -o compiler $(PARTS)
 
-compiler-d: main-d errors-d LA-d MM-d SA-d ial-d token-d ST-d AC-d
-	$(CC) -o compiler_d main_d.o errors_d.o lexical_analyzer_d.o memory_manager_d.o syntactic_analyzer_d.o ial_d.o token_d.o symbol_table_d.o adress_code_d.o 
+compiler-d: $(PARTS-d)
+	$(CC) -o compiler-d $(PARTS-d)
 
 #compiling
-errors: errors.c errors.h
+main.o: main.c errors.o $(MM).o $(SA).h
+	$(CC) $(CFLAGS) -o main.o main.c
+
+errors.o: errors.c errors.h
 	$(CC) $(CFLAGS) -I/ -o errors.o errors.c
 
-LA: lexical_analyzer.c lexical_analyzer.h
-	$(CC) $(CFLAGS) -o lexical_analyzer.o lexical_analyzer.c
+$(MM).o: $(MM).c $(MM).h errors.h
+	$(CC) $(CFLAGS) -o $(MM).o $(MM).c
 
-MM: memory_manager.c memory_manager.h
-	$(CC) $(CFLAGS) -o memory_manager.o memory_manager.c
-	
-SA: syntactic_analyzer.c syntactic_analyzer.h
-	$(CC) $(CFLAGS) -o syntactic_analyzer.o syntactic_analyzer.c
-	
-ial: ial.c ial.h
-	$(CC) $(CFLAGS) -o ial.o ial.c
-	
-token: token.c token.h
+token.o: token.c token.h $(MM).h
 	$(CC) $(CFLAGS) -o token.o token.c
-	
-ST: symbol_table.c symbol_table.h
-	$(CC) $(CFLAGS) -o symbol_table.o symbol_table.c
-	
-AC: adress_code.c adress_code.h
-	$(CC) $(CFLAGS) -o adress_code.o adress_code.c 
-	
-main: main.c errors.h
-	$(CC) $(CFLAGS) -o main.o main.c
+
+$(SA).o: $(SA).c $(SA).h errors.h str.h
+	$(CC) $(CFLAGS) -o $(SA).o $(SA).c
+
+$(LA).o: $(LA).c $(LA).h errors.h token.h
+	$(CC) $(CFLAGS) -o $(LA).o $(LA).c
+
+ial.o: ial.c ial.h errors.h $(MM).h
+	$(CC) $(CFLAGS) -o ial.o ial.c
+
+$(AC).o: $(AC).c $(AC).h
+	$(CC) $(CFLAGS) -o $(AC).o $(AC).c
+
+str.o: str.c str.h errors.h
+	$(CC) $(CFLAGS) -o str.o str.c
+
+$(ST).o: $(ST).c $(ST).h $(MM).h
+	$(CC) $(CFLAGS) -o $(ST).o $(ST).c
 
 #Pomyslna delici cara mezi normal a debug
 
-errors-d: errors.c errors.h
-	$(CC) $(CFLAGSD) -I/ -o errors_d.o errors.c
+main-d.o: main.c errors.h $(MM).h $(SA).h
+	$(CC) $(CFLAGSD) -o main-d.o main.c
 
-LA-d: lexical_analyzer.c lexical_analyzer.h
-	$(CC) $(CFLAGSD) -o lexical_analyzer_d.o lexical_analyzer.c
+errors-d.o: errors.c errors.h
+	$(CC) $(CFLAGSD) -I/ -o errors-d.o errors.c
 
-MM-d: memory_manager.c memory_manager.h
-	$(CC) $(CFLAGSD) -o memory_manager_d.o memory_manager.c
+$(MM)-d.o: $(MM).c $(MM).h errors.h
+	$(CC) $(CFLAGSD) -o $(MM)-d.o $(MM).c
 
-SA-d: syntactic_analyzer.c syntactic_analyzer.h
-	$(CC) $(CFLAGSD) -o syntactic_analyzer_d.o syntactic_analyzer.c
+token-d.o: token.c token.h $(MM).h
+	$(CC) $(CFLAGSD) -o token-d.o token.c
 
-ial-d: ial.c ial.h
-	$(CC) $(CFLAGSD) -o ial_d.o ial.c
-	
-token-d: token.c token.h
-	$(CC) $(CFLAGSD) -o token_d.o token.c
-	
-ST-d: symbol_table.c symbol_table.h
-	$(CC) $(CFLAGS) -o symbol_table_d.o symbol_table.c
-	
-AC-d: adress_code.c adress_code.h
-	$(CC) $(CFLAGS) -o adress_code_d.o adress_code.c 
-	
-main-d: main.c errors.h
-	$(CC) $(CFLAGSD) -o main_d.o main.c
+$(SA)-d.o: $(SA).c $(SA).h errors.h str.h
+	$(CC) $(CFLAGSD) -o $(SA)-d.o $(SA).c
+
+$(LA)-d.o: $(LA).c $(LA).h errors.h token.h
+	$(CC) $(CFLAGSD) -o $(LA)-d.o $(LA).c
+
+ial-d.o: ial.c ial.h errors.h $(MM).h
+	$(CC) $(CFLAGSD) -o ial-d.o ial.c
+
+$(AC)-d.o: $(AC).c $(AC).h
+	$(CC) $(CFLAGSD) -o $(AC)-d.o $(AC).c
+
+str-d.o: str.c str.h errors.h
+	$(CC) $(CFLAGSD) -o str-d.o str.c
+
+$(ST)-d.o: $(ST).c $(ST).h $(MM).h
+	$(CC) $(CFLAGSD) -o $(ST)-d.o $(ST).c
 
 #clean
 clean:
-	rm -f compiler compiler_d *.o
+	rm -f compiler compiler-d *.o

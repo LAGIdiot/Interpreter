@@ -2,22 +2,9 @@
 
 #include "errors.h"
 #include "memory_manager.h"
-#include "lexical_analyzer.h"
-
-#include "token.h"
+#include "syntactic_analyzer.h"
 
 FILE *file_p;
-
-/*testovaci funkce na projizdeni lexu */
-void test()
-{
-	while(1)
-	{
-		tTokenPtr token = T_Init();
-		T_Get(token);
-		T_Destroy(token);
-	}
-}
 
 int main(int argc, char *argv[])
 {
@@ -51,7 +38,7 @@ int main(int argc, char *argv[])
 		{
 			MM_Init(); //Initialize memory manager
 
-			test();//prozatimni pro testovani
+			parse();
 		}
 	}
 

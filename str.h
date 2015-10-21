@@ -1,5 +1,12 @@
 #ifndef STRING_Header
 #define STRING_Header
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "errors.h"
+
 typedef struct
 {
   char* str;		// misto pro dany retezec ukonceny znakem '\0'
@@ -17,4 +24,5 @@ string concat(string s1,string s2);
 
 char *strGetStr(string *s);
 int strGetLength(string *s);
+
 #endif

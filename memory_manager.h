@@ -1,6 +1,11 @@
 #ifndef MM_Header
 #define MM_Header
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "errors.h"
+
 //Structures
 typedef struct MemoryBlockStruct{
 	void * dataPtr;
