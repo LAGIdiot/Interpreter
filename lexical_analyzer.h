@@ -3,9 +3,7 @@
 #ifndef LA_Header
 #define LA_Header
 
-#include <stdio.h>
-
-#include "token.h"
+tTokenPtr getToken(void);
 
 // ASCII hodnoty A-Z, a-z, 0-9
 // Zavedení názvů pro znaky pro lepší orientaci
@@ -58,19 +56,12 @@ typedef enum
 	FM_PIPE,
 	FM_HASH, 
 	FM_DECREMENT,
-	FM_INCREMENT,
-
-	FM_DIVISION,
-	FM_DOUBLE,
-	FM_INTEGER
+	FM_INCREMENT
 	/*, FM_BOOL_ ... && ||*/
 } fm_states;
 
 const static char *key_words = {"auto", "cin", "cout", "double",
-	"else", "for", "if", "int", "return", "string"};
-/*,"bool", "do", "while", "true", "false"*/
-
-//Function prototypes
-void T_Get(tTokenPtr tokenPtr);
+	"else", "for", "if", "int", "return", "string" /*,"bool",
+	"do", "while", "true", "false"*/}
 
 #endif //LA_Header
