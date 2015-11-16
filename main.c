@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
 			MM_Init(); //Initialize memory manager
 
 			parse();
+
+			MM_FreeAll(); //FIXME: prozatimni pro zabraneni ztrate pameti
 		}
 	}
 

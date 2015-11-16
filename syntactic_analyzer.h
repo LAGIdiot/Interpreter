@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "str.h"
 #include "symbol_table.h"
+#include "token.h"
 
 enum SA_tree_id_type{
 	PROTOTYP,

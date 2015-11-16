@@ -8,10 +8,9 @@
 
 //Structures
 typedef struct MemoryBlockStruct{
-	void * dataPtr;
-	void * nextPtr;
 	void * prevPtr;
-}MemoryBlock, *MemoryBlockPtr;
+	void * dataPtr;
+}*MemoryBlockPtr;
 
 //Function prototypes
 void MM_Init();

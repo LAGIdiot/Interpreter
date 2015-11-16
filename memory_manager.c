@@ -1,7 +1,6 @@
 #include "memory_manager.h"
 
-MemoryBlockPtr MM_Head;
-MemoryBlockPtr MM_Last;
+MemoryBlockPtr MM_Top;
 
 //Function prototypes - private
 void MM_Add(void * ptr);
@@ -15,8 +14,9 @@ static int memoryBlocksCount;
 //////////////////////////////////////////////////
 // void MM_Init()
 ////////////////////
-// Initialize memory manager - set its head and last member to NULL
+// Initialize memory manager - set its top member to NULL
 //////////////////////////////////////////////////
+
 void MM_Init()
 {
 #if DEBUG
@@ -24,8 +24,7 @@ void MM_Init()
 	memoryBlocksCount = 0;
 #endif
 
-	MM_Head = NULL;
-	MM_Last = NULL;
+	MM_Top = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -112,7 +111,7 @@ void MM_Free(void * ptr)
 ////////////////////
 // Free all memory blocks stored in MM
 ////////////////////
-// note: memory must be deleted from last added block - otherwise there will be loses (e. g.: data in Token)
+// note: memory must be deleted from last added block - otherwise there will be lost (e.g.: data in Token)
 //////////////////////////////////////////////////
 void MM_FreeAll()
 {
@@ -120,9 +119,9 @@ void MM_FreeAll()
 	printf("Freeing ALL memory\n");
 #endif
 
-	if(MM_Last != NULL && MM_Head != NULL) //Check if there is any memory to free
+	if(MM_Top != NULL) //Check if there is any memory to free
 	{
-		MemoryBlockPtr temp = MM_Last;
+		MemoryBlockPtr temp = MM_Top;
 		MemoryBlockPtr tempPrev;
 
 		/*Store penultimate member, delete data from last one, delete last one, penultimate == last one*/
@@ -136,9 +135,8 @@ void MM_FreeAll()
 			temp = tempPrev;
 		}
 
-		//reseting MM_Head & MM_Last
-		MM_Head = NULL;
-		MM_Last = NULL;
+		//reseting MM_Top
+		MM_Top = NULL;
 	}
 #if DEBUG
 	else
@@ -173,18 +171,13 @@ void MM_Add(void * ptr)
 	}
 
 	newBlock->dataPtr = ptr; //ptr is data for MM container
-	newBlock->nextPtr = NULL;
 	newBlock->prevPtr = NULL;
 
-	if(MM_Head == NULL) //only for first run
-		MM_Head = newBlock;
-
-	if(MM_Last != NULL)
+	if(MM_Top != NULL)
 	{
-		MM_Last->nextPtr = newBlock; //in last block assign nextPtr to newBlock
-		newBlock->prevPtr = MM_Last; //in newBlock assign prevPtr to last block
+		newBlock->prevPtr = MM_Top; //in newBlock assign prevPtr to last block
 	}
-	MM_Last = newBlock; //newBlock make available as last block
+	MM_Top = newBlock; //newBlock make available as last block
 
 #if DEBUG
 	memoryBlocksCount++;
@@ -203,21 +196,20 @@ void MM_Remove(void * ptr, int invalid)
 #if DEBUG
 	printf("Removing garbage block with pointer: %d - block is invalid: %s\n", ptr, invalid == 1 ? "TRUE" : "ELSE");
 #endif
-	if(MM_Last != NULL && MM_Head != NULL) //Check if there is any memory to free
+	if(MM_Top != NULL) //Check if there is any memory to free
 	{
-		MemoryBlockPtr temp = MM_Last->prevPtr; //get penultimate block
+		MemoryBlockPtr temp = MM_Top->prevPtr; //get penultimate block
+		MemoryBlockPtr afterData = NULL;	//block that is on top of wanted block
 
 		/*There is big chance that we will be removing last added block first*/
-		if(MM_Last->dataPtr == ptr)
+		if(MM_Top->dataPtr == ptr)
 		{
 			if(invalid == 1)
-				free(MM_Last->dataPtr);
+				free(MM_Top->dataPtr);
 
-			free(MM_Last); //remove last block
+			free(MM_Top); //remove top block
 
-			MM_Last = temp; //last block  = penultimate
-			MM_Last->nextPtr = NULL; //invalidation of nextPtr in last block
-
+			MM_Top = temp; //top block  = penultimate
 		}
 		else
 		{
@@ -232,14 +224,12 @@ void MM_Remove(void * ptr, int invalid)
 					mistake(ERR_INTERN);
 #endif
 				}
-				temp = temp->nextPtr;
+				afterData = temp;
+				temp = temp->prevPtr;
 			}
 
 			/*Pointer re-wiring*/
-			MemoryBlockPtr tempPrev = temp->prevPtr;
-			MemoryBlockPtr tempNext = temp->nextPtr;
-			tempPrev->nextPtr = tempNext;
-			tempNext->prevPtr = tempPrev;
+			afterData->prevPtr = temp->prevPtr;
 
 			if(invalid == 1)
 				free(temp->dataPtr);

@@ -9,17 +9,17 @@
 
 //Structures
 #if DEBUG
-typedef struct Token{
+typedef struct TokenStruct{
 	int typ;
 	int row;
 	int column;
 	char *data;
-}tTokenStruct, *tTokenPtr;
+}*tTokenPtr;
 #else
-typedef struct Token{
+typedef struct TokenStruct{
 	int typ;
 	char *data;
-}tTokenStruct, *tTokenPtr;
+}*tTokenPtr;
 #endif
 
 //Enums

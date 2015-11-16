@@ -16,7 +16,7 @@ static int tokenCount;
 //////////////////////////////////////////////////
 tTokenPtr T_Init()
 {
-	tTokenPtr token = MM_Malloc(sizeof(tTokenStruct));
+	tTokenPtr token = MM_Malloc(sizeof(struct TokenStruct));
 
 	sizeMax = 2;
 

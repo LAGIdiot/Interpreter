@@ -1,15 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-#include "token.c"
 #include "lexical_analyzer.h"
 
-FILE *file_p;
-tTokenPtr *lex_token;
-
-tTokenPtr getToken()
+void T_Get(tTokenPtr tokenPtr)
 {
-	//T_Init();
 	int state = FM_START;
+	int read_char;
 	
 	while (state != FM_END)
 	{
@@ -27,10 +21,10 @@ tTokenPtr getToken()
 			{
 				if (state == FM_INTEGER)
 				{
-					T_Update(lex_token, read_char);
+					T_Update(tokenPtr, read_char);
 					state = FM_DOUBLE;
 				}
-			}
+			}break;
 			case '_':
 			{
 				if (state == FM_START)
@@ -38,14 +32,14 @@ tTokenPtr getToken()
 					state = FM_VARIABLE;
 				}
 				
-				T_Update(lex_token, read_char);
-			}
+				T_Update(tokenPtr, read_char);
+			}break;
 			
 			case ';':
 			{
-				T_Update(lex_token, read_char);
+				T_Update(tokenPtr, read_char);
 				state = FM_SEMICON;
-			}
+			}break;
 			
 			case '+': 
 			{
@@ -58,7 +52,7 @@ tTokenPtr getToken()
 					state = FM_PLUS;
 				}
 				
-				T_Update(lex_token, read_char);
+				T_Update(tokenPtr, read_char);
 			} break;
 			
 			case '-':
@@ -72,7 +66,7 @@ tTokenPtr getToken()
 					state = FM_MINUS;
 				}
 				
-				T_Update(lex_token, read_char);
+				T_Update(tokenPtr, read_char);
 			} break;
 			
 			case '*':
@@ -84,7 +78,7 @@ tTokenPtr getToken()
 				else if (state == FM_START)
 				{
 					state = FM_STAR;
-					T_Update(lex_token, read_char);
+					T_Update(tokenPtr, read_char);
 				}
 			} break;
 			
@@ -97,7 +91,7 @@ tTokenPtr getToken()
 				else if (state == FM_START)
 				{
 					state = FM_DIVISION;
-					T_Update(lex_token, read_char);
+					T_Update(tokenPtr, read_char);
 				}
 			}break;
 			
@@ -112,8 +106,8 @@ tTokenPtr getToken()
 					state = FM_ASSIGN;
 				}
 				
-				T_Update(lex_token, read_char);
-			}
+				T_Update(tokenPtr, read_char);
+			}break;
 			/////////////////////////////////////////////////////////////////////////
 			// ROZPOZNÁVÁNÍ "BĚŽNÝCH" ZNAKŮ
 			/*-----------------------------------------------------------------------
@@ -130,12 +124,12 @@ tTokenPtr getToken()
 					{
 						case FM_ASSIGN:
 						{
-							ungetc(c, file_p);	
+							ungetc(read_char, file_p);
 						} break;
 						
 						default:
 						{
-							T_Update(lex_token, read_char);
+							T_Update(tokenPtr, read_char);
 							/////////////////////////////////////////////////////////////////
 							// POROVNÁNÍ OBSAHU TOKENU S KLÍČOVÝMI SLOVY
 							/* --------------------------------------------------------------
@@ -144,14 +138,14 @@ tTokenPtr getToken()
 								 nejedná o proměnnou. Jakmile řetězec pokračuje, jde o proměnnou,
 								 pokud ne, jde o klíčové slovo a je přečtený znak vrácen souboru.
 							*////////////////////////////////////////////////////////////////
-							if ((strlen(lex_token->data) == 2) || (strlen(lex_token->data) == 3)
-								|| (strlen(lex_token->data) == 4) || (strlen(lex_token->data) == 5))
+							if ((strlen(tokenPtr->data) == 2) || (strlen(tokenPtr->data) == 3)
+								|| (strlen(tokenPtr->data) == 4) || (strlen(tokenPtr->data) == 5))
 							{
-								if ((strcmp(lex_token->data, "auto") != 0) || (strcmp(lex_token->data, "cin") != 0)
-									|| (strcmp(lex_token->data, "cout") != 0) || (strcmp(lex_token->data, "double") != 0)
-									|| (strcmp(lex_token->data, "else") != 0) || (strcmp(lex_token->data, "for") != 0)
-									|| (strcmp(lex_token->data, "if") != 0) || (strcmp(lex_token->data, "int") != 0)
-									|| (strcmp(lex_token->data, "return") != 0) || (strcmp(lex_token->data, "string") != 0))
+								if ((strcmp(tokenPtr->data, "auto") != 0) || (strcmp(tokenPtr->data, "cin") != 0)
+									|| (strcmp(tokenPtr->data, "cout") != 0) || (strcmp(tokenPtr->data, "double") != 0)
+									|| (strcmp(tokenPtr->data, "else") != 0) || (strcmp(tokenPtr->data, "for") != 0)
+									|| (strcmp(tokenPtr->data, "if") != 0) || (strcmp(tokenPtr->data, "int") != 0)
+									|| (strcmp(tokenPtr->data, "return") != 0) || (strcmp(tokenPtr->data, "string") != 0))
 								{
 									read_char = fgetc(file_p);
 									if (((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
@@ -189,7 +183,7 @@ tTokenPtr getToken()
 					}
 					else if (state == FM_VARIABLE)
 					{
-						T_Update(lex_token, read_char);
+						T_Update(tokenPtr, read_char);
 					}
 				}
 			}
@@ -210,7 +204,7 @@ tTokenPtr getToken()
 					{
 						fgetc(file_p);
 					}
-				}
+				}break;
 				
 				case FM_COMMENT_MULTILINE:
 				{
@@ -221,7 +215,7 @@ tTokenPtr getToken()
 							state = FM_START;
 						}
 					}
-				}
+				}break;
 				
 				case FM_SEMICON:
 				{
@@ -250,7 +244,7 @@ tTokenPtr getToken()
 				case FM_INCREMENT:
 				{
 					state = FM_END;
-				} braek;
+				} break;
 				
 				case FM_MINUS:
 				{
@@ -294,5 +288,4 @@ tTokenPtr getToken()
 		}
 	}
 	
-	return *lex_token;
 }
