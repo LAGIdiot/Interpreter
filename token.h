@@ -29,6 +29,8 @@ enum TokenType{
 	TT_KEYWORD,
 
 	TT_EOF,
+	TT_SEMICOLN,
+	TT_HASH,
 
 	TT_PAR_L, 		/* ( */
 	TT_PAR_R, 		/* ) */
@@ -60,13 +62,18 @@ enum TokenType{
 
 	TT_LESS,		/* < */
 	TT_GREATER,		/* > */
+
+	TT_UNRECOGNIZED,
 }Typ;
 
 //Function prototypes
 tTokenPtr T_Init();
-void T_Update(tTokenPtr tokenPtr, char nextChar);
+void T_Update(char c);
 void T_Destroy(tTokenPtr tokenPtr);
 void T_Finish(tTokenPtr tokenPtr);
+
+void T_SystemInit();
+void T_SystemTerminate();
 
 extern void T_Get(tTokenPtr tokenPtr);
 

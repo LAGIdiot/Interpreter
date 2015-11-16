@@ -5,10 +5,69 @@ void T_Get(tTokenPtr tokenPtr)
 	int state = FM_START;
 	int read_char;
 	
+	int whiteSpace;
+
 	while (state != FM_END)
 	{
 		read_char = fgetc(file_p);
+		whiteSpace = isspace(read_char);
 		
+		if(read_char == EOF)
+		{
+			tokenPtr->typ = TT_EOF;
+			state = FM_END;
+			break;
+		}
+		if(whiteSpace)
+		{
+			if(state == FM_START)
+				continue;
+			else
+				break;
+		}
+
+
+		switch (state)
+		{
+			case FM_START:
+				switch(read_char)
+				{
+					case ';':
+						state = FM_SEMICOLN;
+						break;
+					case '#':
+						state = FM_HASH;
+						break;
+					default:	//special case
+						T_Update(read_char);
+
+						state = FM_UNRECOGNIZED;
+						break;
+				}	//switch
+				break;
+				case FM_SEMICOLN:
+					tokenPtr->typ = TT_SEMICOLN;
+
+					ungetc(read_char, file_p);
+
+					state = FM_END;
+					break;
+				case FM_HASH:
+					tokenPtr->typ = TT_HASH;
+
+					ungetc(read_char, file_p);
+
+					state = FM_END;
+					break;
+			default:	//special case - zatim nezaregistrovany znaky -> system je bude flusat po jednom ven;
+				tokenPtr->typ = TT_UNRECOGNIZED;
+				T_Update(read_char);
+
+				break;
+		}	//switch
+
+#if just_using_this_for_storing_code_that_needs_to_be_rewriten_but_must_not_be_compiled
+
 		///////////////////////////////////////////////////////////////////////////
 		// ROZPOZNÁVÁNÍ NAČTENÉHO ZNAKU
 		/*------------------------------------------------------------------------- 
@@ -286,6 +345,7 @@ void T_Get(tTokenPtr tokenPtr)
 				default: ;break;
 			}
 		}
-	}
-	
-}
+#endif
+	}	//while
+	T_Finish(tokenPtr);
+}	//T_Get

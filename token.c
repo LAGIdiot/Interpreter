@@ -3,25 +3,50 @@
 //Private variables
 static size_t sizeMax;
 
+static char *data;
+
 #if DEBUG
 //DEBUG variables
 static int tokenCount;
 #endif
 
 //////////////////////////////////////////////////
+// void T_SystemInit()
+////////////////////
+// Allocate internal buffer for T_Update
+//////////////////////////////////////////////////
+void T_SystemInit()
+{
+#if DEBUG
+	tokenCount = 0;
+	printf("Token static data buffer allocated\n");
+#endif
+
+	sizeMax = 2;
+
+		if(data == NULL)
+			data = MM_Malloc(sizeof(char) * sizeMax);
+}
+
+//////////////////////////////////////////////////
+// void T_SystemTerminate()
+////////////////////
+// Free internal buffer used by T_Update
+//////////////////////////////////////////////////
+void T_SystemTerminate()
+{
+	MM_Free(data);
+}
+
+//////////////////////////////////////////////////
 // tTokenPtr T_Init()
 // return - tTokenPtr pointer
 ////////////////////
-// Let allocate memory for token and its data (data size is 2 and data are: "/0X" - where X is unused char), returning token pointer
+// Let allocate memory for token only, returning token pointer
 //////////////////////////////////////////////////
 tTokenPtr T_Init()
 {
 	tTokenPtr token = MM_Malloc(sizeof(struct TokenStruct));
-
-	sizeMax = 2;
-
-	token->data = MM_Malloc(sizeof(char) * sizeMax);
-	token->data[0] = '\0';
 
 #if DEBUG
 	printf("Token initialized at: %d \n", token);
@@ -50,43 +75,40 @@ void T_Destroy(tTokenPtr token)
 }
 
 //////////////////////////////////////////////////
-// void T_Update(tTokenPtr token, char c)
-// token - pointer to token that wants data update
+// void T_Update(char c)
 // c - char that will be add to token data
 ////////////////////
-// Let allocate memory for data if needed and add char to this data
+// Add char c to static buffer data
 //////////////////////////////////////////////////
-void T_Update(tTokenPtr token, char c)
+void T_Update(char c)
 {
-	size_t size = strlen(token->data) + 1;// + 1 is for \0
-	if(size == sizeMax) //Check if in data is NO space - reallocating more
+	size_t size = strlen(data) + 1;// + 1 is for \0
+
+	if(size == sizeMax)
 	{
 		sizeMax *= 2; //Reallocating is done by 2x size of previous space - therefore there is no need to reallocate for every char
-		token->data = MM_Realloc(token->data, sizeof(char) * sizeMax);
+		data = MM_Realloc(data, sizeof(char) * sizeMax);
 	}
 
-	/*Adding char c to data and char \0 to the end of data string*/
-	token->data[(int)size] = c;
-	token->data[(int)size + 1] = '\0';
-
-#if DEBUG
-	printf("Token updated at: %d \n", token);
-#endif
+	strcat(data, &c);
 }
 
 //////////////////////////////////////////////////
 // void T_Finish(tTokenPtr token)
 // token - pointer to token that wants to be finished
 ////////////////////
-// Let deallocate surplus memory for data if needed
+// Allocate memory in token for data
 //////////////////////////////////////////////////
 void T_Finish(tTokenPtr token)
 {
-	size_t size = strlen(token->data) + 1;// + 1 is for \0
-	if(size != sizeMax)
-	{
-		token->data = MM_Realloc(token->data, sizeof(char) * size);
-	}
+	size_t size = strlen(data) + 1;// + 1 is for \0
+
+	token->data = MM_Malloc(sizeof(char)*size);
+
+	memcpy((void*)token->data,data,size);
+
+	strcpy(data,""); //nahradi obsah dat za "" - priprava na dalsi token
+
 #if DEBUG
 	printf("Token finished at: %d \n", token);
 #endif

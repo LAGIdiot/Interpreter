@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "token.h"
 
@@ -38,8 +39,14 @@ typedef enum
 typedef enum
 {
 	FM_START,
-	FM_STAR,
 	FM_END,
+
+	FM_SEMICOLN,
+	FM_HASH,
+
+	FM_UNRECOGNIZED,
+
+	FM_STAR,
 	FM_COMMENT_SINGLELINE,
 	FM_COMMENT_MULTILINE,
 	FM_PLUS,
@@ -47,7 +54,6 @@ typedef enum
 	FM_DIVIDE,
 	FM_KEYWORDS,
 	FM_EQUAL,
-	FM_SEMICON,
 	FM_DOT,
 	FM_VARIABLE,
 	FM_STRING,
@@ -61,15 +67,13 @@ typedef enum
 	FM_PERC,
 	FM_COMMA,
 	FM_PIPE,
-	FM_HASH, 
+
 	FM_DECREMENT,
 	FM_INCREMENT,
 
 	FM_INTEGER,
 	FM_DOUBLE,
 	FM_DIVISION,
-
-	FM_UNRECOGNIZED,
 	/*, FM_BOOL_ ... && ||*/
 } fm_states;
 
