@@ -1,69 +1,84 @@
 #include "str.h"
 
-/*
-int main()
+const size_t stringSizeBase = 8;
+
+string strInit()
 {
-  string str1;
-  char text[]= "praca";
-  strInit(&(str1));
-  strInsert(text,&(str1));
-  printf("%s \n",str1.str);
+#if DEBUG
+	printf("Creating string container\n");
+#endif
+	string s = MM_Malloc(sizeof(struct stringStruct));
 
-  string str2;
-  strInit(&(str2));
-  strInsert(text,&(str2));
-  printf("%s \n",str2.str);
+	s->str = MM_Malloc(sizeof(char)*stringSizeBase);
 
-  string str3;
-  str3 = concat(*str1,*str2);
-  return 0;
-}
-*/
-
-//FIXME: Tahle funkce by asi mela initializovat cely string ne pouze jeho obsah
-//Doporuceni zmenit na: string strInit(); || string strInit(char *str);
-void strInit(string s)
-{
-
-   if ((s->str = (char*) malloc(8)) == NULL)
-      return;
-   s->str[0] = '\0';
-   s->length = 0;
-   s->allocSize = 8;
-   return;
+	s->length = 0;
+	s->allocSize = stringSizeBase;
+	return s;
 }
 
 void strFree(string s)
-
 {
-   free(s->str);
+#if DEBUG
+	printf("Removing string container\n");
+#endif
+	MM_Free(s->str);
+	MM_Free(s);
 }
 
+//Nemusi byt vzdy nejlepsim resenim, zanechava bordel...
 void strClear(string s)
 {
+#if DEBUG
+	printf("Clearing content of string container\n");
+#endif
    s->str[0] = '\0';
    s->length = 0;
 }
 
-int strInsert(char *text, string s)
+//TODO:Test this, may have problems with + 1 sizes
+int strInsert(string s, char *text)
 {
-  int amount = s->length;
-  if (s->str[0] == '\0' )   //ak je prazdna , musi byt
-  {
-    if (strlen(text) > amount ) //ak je mala , moze nastat
-    {
-      if((s->str = (char*) realloc(s->str, amount + 1)) != NULL ) //realloc miesta
-      {
-        s->allocSize = amount + 1; //ulozenie mnozstva
-      }
-      else return 99;
-    }
-    //toto sa stane ak je vsetko OK
-    s->str=text;
-    return 0;
-  }
-  else return 99;
+#if DEBUG
+	printf("Inserting content to string container\n");
+#endif
+  size_t length = strlen(text);
 
+  if(s->length == 0)
+  {
+	  if(length + 1 > s->allocSize)
+		  s->str = MM_Realloc(s->str, sizeof(char) * (length + 1));
+
+	  s->length = length;
+	  s->allocSize = length + 1;
+
+	  s->str = text;
+
+	  return 0;
+  }
+  else
+	  return -1; //standartni praktikou je vracet -1 v pripade chyby tohoto typu
+}
+
+//TODO: Re-implement this string concatenation (puvodni implementace ponechana v dolni casti souboru)
+string concat (string s1, string s2)
+{
+	return NULL;
+}
+
+//TODO: Implement this string compare
+int strCompare(string s1, string s2)
+{
+	return 0;
+}
+
+char *strGetStr(string s)
+{
+   return s->str;
+}
+
+size_t strGetLength(string s)
+{
+   return s->length;
 }
 
 #if jen_vypoznamkovavam_tohle_abych_to_mohl_prelozit
@@ -85,13 +100,3 @@ string concat(string s1,string s2)
   return *s3;   //problem s pointerom - pokoušíš se vrátit vnitrní promenou
 }
 #endif
-
-char *strGetStr(string s)
-{
-   return s->str;
-}
-
-int strGetLength(string s)
-{
-   return s->length;
-}

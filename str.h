@@ -11,19 +11,21 @@
 typedef struct stringStruct
 {
   char* str;		// misto pro dany retezec ukonceny znakem '\0'
-  int length;		// skutecna delka retezce
-  int allocSize;	// velikost alokovane pameti
+  size_t length;		// skutecna delka retezce
+  size_t allocSize;	// velikost alokovane pameti
 } *string;
 
 
-void strInit(string s);
+string strInit();
 void strFree(string s);
 
 void strClear(string s);
-int strInsert(char *text, string s);
+int strInsert(string s, char *text);
 string concat(string s1,string s2);
 
 char *strGetStr(string s);
-int strGetLength(string s);
+size_t strGetLength(string s);
+
+int strCompare(string s1, string s2);
 
 #endif
