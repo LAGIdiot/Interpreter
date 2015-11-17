@@ -35,6 +35,10 @@ void T_SystemInit()
 //////////////////////////////////////////////////
 void T_SystemTerminate()
 {
+#if DEBUG
+	tokenCount = 0;
+	printf("Token static data buffer deallocated\n");
+#endif
 	MM_Free(data);
 }
 

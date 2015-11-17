@@ -12,20 +12,19 @@ void T_Get(tTokenPtr tokenPtr)
 		read_char = fgetc(file_p);
 		whiteSpace = isspace(read_char);
 		
+		//Odchyceni bilych znaku zde aby se usetri na rychlosti
+		if(whiteSpace && state == FM_START)
+		{
+			continue;
+		}
+
+		//Odchyceni konce souboru zde protoze switch nechape EOF konstantu
 		if(read_char == EOF)
 		{
 			tokenPtr->typ = TT_EOF;
 			state = FM_END;
 			break;
 		}
-		if(whiteSpace)
-		{
-			if(state == FM_START)
-				continue;
-			else
-				break;
-		}
-
 
 		switch (state)
 		{
@@ -38,7 +37,19 @@ void T_Get(tTokenPtr tokenPtr)
 					case '#':
 						state = FM_HASH;
 						break;
-					default:	//special case
+					case '*':
+						state = FM_STAR;
+						break;
+					case '+':
+						state = FM_PLUS;
+						break;
+					case '-':
+						state = FM_MINUS;
+						break;
+					case '/':
+						state = FM_DIVIDE;
+						break;
+					default:	//special case - pro nezaregistrovany znaky (casem by nemel byt zadny...)
 						T_Update(read_char);
 
 						state = FM_UNRECOGNIZED;
@@ -49,20 +60,118 @@ void T_Get(tTokenPtr tokenPtr)
 					tokenPtr->typ = TT_SEMICOLN;
 
 					ungetc(read_char, file_p);
-
 					state = FM_END;
+
 					break;
 				case FM_HASH:
 					tokenPtr->typ = TT_HASH;
 
 					ungetc(read_char, file_p);
-
 					state = FM_END;
-					break;
-			default:	//special case - zatim nezaregistrovany znaky -> system je bude flusat po jednom ven;
-				tokenPtr->typ = TT_UNRECOGNIZED;
-				T_Update(read_char);
 
+					break;
+				case FM_STAR:
+					tokenPtr->typ = TT_STAR;
+
+					if(read_char == '=')
+						state = FM_STAR_ASSIGN;
+					else
+					{
+						ungetc(read_char, file_p);
+						state = FM_END;
+					}
+					break;
+				case FM_STAR_ASSIGN:
+					tokenPtr->typ = TT_ASSIGN_MUL;
+
+					ungetc(read_char, file_p);
+					state = FM_END;
+
+					break;
+				case FM_PLUS:
+					tokenPtr->typ = TT_PLUS;
+					if(read_char == '=')
+						state = FM_PLUS_ASSIGN;
+//TODO: ++
+					else
+					{
+						ungetc(read_char, file_p);
+						state = FM_END;
+					}
+					break;
+				case FM_PLUS_ASSIGN:
+					tokenPtr->typ = TT_ASSIGN_ADD;
+
+					ungetc(read_char, file_p);
+					state = FM_END;
+
+					break;
+				case FM_MINUS:
+					tokenPtr->typ = TT_MINUS;
+					if(read_char == '=')
+						state = FM_MINUS_ASSIGN;
+//TODO: --
+					else
+					{
+						ungetc(read_char, file_p);
+						state = FM_END;
+					}
+					break;
+				case FM_MINUS_ASSIGN:
+					tokenPtr->typ = TT_ASSIGN_SUB;
+
+					ungetc(read_char, file_p);
+					state = FM_END;
+
+					break;
+				case FM_DIVIDE:
+					tokenPtr->typ = TT_DIVIDE;
+
+					if(read_char == '=')
+						state = FM_DIVIDE_ASSIGN;
+					else if(read_char == '/')
+						state = FM_COMMENT_SINGLELINE;
+					else if(read_char == '*')
+						state = FM_COMMENT_MULTILINE;
+					else
+					{
+						ungetc(read_char, file_p);
+						state = FM_END;
+					}
+					break;
+				case FM_DIVIDE_ASSIGN:
+					tokenPtr->typ = TT_ASSIGN_DIV;
+
+					ungetc(read_char, file_p);
+					state = FM_END;
+
+					break;
+				case FM_COMMENT_SINGLELINE:
+					tokenPtr->typ = TT_UNDEFINED;
+
+					if(read_char == NEW_LINE)
+						state = FM_START;
+
+					break;
+				case FM_COMMENT_MULTILINE:
+					tokenPtr->typ = TT_UNDEFINED;
+
+					if(read_char == '*')
+						state = FM_COMMENT_MULTILINE_END;
+
+					break;
+				case FM_COMMENT_MULTILINE_END:
+					if(read_char == '/')
+						state = FM_START;
+
+					break;
+			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
+				tokenPtr->typ = TT_UNRECOGNIZED;
+
+				if(!whiteSpace)
+					T_Update(read_char);
+				else
+					state = FM_END;
 				break;
 		}	//switch
 
@@ -92,66 +201,6 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				
 				T_Update(tokenPtr, read_char);
-			}break;
-			
-			case ';':
-			{
-				T_Update(tokenPtr, read_char);
-				state = FM_SEMICON;
-			}break;
-			
-			case '+': 
-			{
-				if (state == FM_PLUS)
-				{
-					state = FM_INCREMENT;
-				}
-				else if (state == FM_START)
-				{
-					state = FM_PLUS;
-				}
-				
-				T_Update(tokenPtr, read_char);
-			} break;
-			
-			case '-':
-			{
-				if (state == FM_MINUS)
-				{
-					state = FM_DECREMENT;
-				}
-				else if(state == FM_START)
-				{
-					state = FM_MINUS;
-				}
-				
-				T_Update(tokenPtr, read_char);
-			} break;
-			
-			case '*':
-			{
-				if (state == FM_DIVISION)
-				{
-					state = FM_COMMENT_MULTILINE;
-				}
-				else if (state == FM_START)
-				{
-					state = FM_STAR;
-					T_Update(tokenPtr, read_char);
-				}
-			} break;
-			
-			case '/':
-			{
-				if (state == FM_DIVISION)
-				{
-					state = FM_COMMENT_SINGLELINE;
-				}
-				else if (state == FM_START)
-				{
-					state = FM_DIVISION;
-					T_Update(tokenPtr, read_char);
-				}
 			}break;
 			
 			case '=':

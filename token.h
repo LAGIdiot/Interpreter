@@ -25,12 +25,24 @@ typedef struct TokenStruct{
 //Enums
 /*Nutno dodefinovat další dle potřeby*/
 enum TokenType{
+	TT_UNDEFINED,	/* zatim vyuzito jen u komentaru - nikdy by nemelo byt vraceno*/
+	TT_EOF,			/* EOF	*/
+	TT_SEMICOLN,	/* ;	*/
+	TT_HASH,		/* #	*/
+	TT_STAR,		/* *	*/
+	TT_PLUS,		/* +	*/
+	TT_MINUS,		/* -	*/
+	TT_DIVIDE,		/* /	*/
+
+	TT_ASSIGN_MUL,	/* *=	*/
+	TT_ASSIGN_ADD,	/* +=	*/
+	TT_ASSIGN_SUB,	/* -=	*/
+	TT_ASSIGN_DIV,	/* /=	*/
+
+
+
 	TT_IDENTIFIER,
 	TT_KEYWORD,
-
-	TT_EOF,
-	TT_SEMICOLN,
-	TT_HASH,
 
 	TT_PAR_L, 		/* ( */
 	TT_PAR_R, 		/* ) */
@@ -44,16 +56,10 @@ enum TokenType{
 	TT_STRING,
 	TT_CHAR,
 
-	TT_OP_ADD,		/* + */
-	TT_OP_SUB,		/* - */
-	TT_OP_DIV,		/* / */
-	TT_OP_MUL,		/* * */
-
 	TT_ASSIGN,		/* = */
-	TT_ASSIGN_ADD,	/* += */
-	TT_ASSIGN_SUB,	/* -= */
-	TT_ASSIGN_DIV,	/* /= */
-	TT_ASSIGN_MUL,	/* *= */
+
+
+
 
 	TT_EQUALS,		/* == */
 	TT_EQUALS_NOT,	/* != */

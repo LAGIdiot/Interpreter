@@ -43,15 +43,23 @@ typedef enum
 
 	FM_SEMICOLN,
 	FM_HASH,
+	FM_STAR,
+	FM_STAR_ASSIGN,
+	FM_PLUS,
+	FM_PLUS_ASSIGN,
+	FM_MINUS,
+	FM_MINUS_ASSIGN,
+	FM_DIVIDE,
+	FM_DIVIDE_ASSIGN,
+
+	FM_COMMENT_SINGLELINE,
+	FM_COMMENT_MULTILINE,
+	FM_COMMENT_MULTILINE_END,
 
 	FM_UNRECOGNIZED,
 
-	FM_STAR,
-	FM_COMMENT_SINGLELINE,
-	FM_COMMENT_MULTILINE,
-	FM_PLUS,
-	FM_MINUS,
-	FM_DIVIDE,
+
+
 	FM_KEYWORDS,
 	FM_EQUAL,
 	FM_DOT,
@@ -78,6 +86,6 @@ typedef enum
 } fm_states;
 
 const static char *key_words[10] = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"};
-/*,"bool","do", "while", "true", "false"*/
+//TODO: /*,"bool","do", "while", "true", "false"*/
 
 #endif //LA_Header
