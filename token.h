@@ -34,12 +34,13 @@ enum TokenType{
 	TT_MINUS,		/* -	*/
 	TT_DIVIDE,		/* /	*/
 
+	TT_ASSIGN,		/* = */
 	TT_ASSIGN_MUL,	/* *=	*/
 	TT_ASSIGN_ADD,	/* +=	*/
 	TT_ASSIGN_SUB,	/* -=	*/
 	TT_ASSIGN_DIV,	/* /=	*/
 
-
+	TT_EQUAL,		/* ==	*/
 
 	TT_IDENTIFIER,
 	TT_KEYWORD,
@@ -56,15 +57,10 @@ enum TokenType{
 	TT_STRING,
 	TT_CHAR,
 
-	TT_ASSIGN,		/* = */
-
-
-
-
-	TT_EQUALS,		/* == */
-	TT_EQUALS_NOT,	/* != */
-	TT_EQUALS_LESS,	/* <= */
-	TT_EQUALS_GREATER,	/* >= */
+			/* == */
+	TT_EQUAL_NOT,	/* != */
+	TT_EQUAL_LESS,	/* <= */
+	TT_EQUAL_GREATER,	/* >= */
 
 	TT_LESS,		/* < */
 	TT_GREATER,		/* > */

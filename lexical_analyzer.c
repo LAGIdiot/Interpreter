@@ -28,6 +28,8 @@ void T_Get(tTokenPtr tokenPtr)
 
 		switch (state)
 		{
+//TODO: prerovnat stavy atomatu at je nabeh co nejrychlejsi
+//TODO: doplnit dalsi stavy a rozpoznani tokenu
 			case FM_START:
 				switch(read_char)
 				{
@@ -48,6 +50,9 @@ void T_Get(tTokenPtr tokenPtr)
 						break;
 					case '/':
 						state = FM_DIVIDE;
+						break;
+					case '=':
+						state = FM_ASSIGN;
 						break;
 					default:	//special case - pro nezaregistrovany znaky (casem by nemel byt zadny...)
 						T_Update(read_char);
@@ -165,6 +170,23 @@ void T_Get(tTokenPtr tokenPtr)
 						state = FM_START;
 
 					break;
+				case FM_ASSIGN:
+					tokenPtr->typ = TT_ASSIGN;
+					if(read_char == '=')
+						state = FM_EQUAL;
+					else
+					{
+						ungetc(read_char, file_p);
+						state = FM_END;
+					}
+					break;
+				case FM_EQUAL:
+					tokenPtr->typ = TT_EQUAL;
+
+					ungetc(read_char, file_p);
+					state = FM_END;
+
+					break;
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
 				tokenPtr->typ = TT_UNRECOGNIZED;
 
@@ -202,20 +224,7 @@ void T_Get(tTokenPtr tokenPtr)
 				
 				T_Update(tokenPtr, read_char);
 			}break;
-			
-			case '=':
-			{
-				if (state == FM_ASSIGN)
-				{
-					state = FM_EQUAL;
-				}
-				else
-				{
-					state = FM_ASSIGN;
-				}
-				
-				T_Update(tokenPtr, read_char);
-			}break;
+
 			/////////////////////////////////////////////////////////////////////////
 			// ROZPOZNÁVÁNÍ "BĚŽNÝCH" ZNAKŮ
 			/*-----------------------------------------------------------------------
@@ -230,11 +239,6 @@ void T_Get(tTokenPtr tokenPtr)
 				{
 					switch (state)
 					{
-						case FM_ASSIGN:
-						{
-							ungetc(read_char, file_p);
-						} break;
-						
 						default:
 						{
 							T_Update(tokenPtr, read_char);
@@ -302,90 +306,6 @@ void T_Get(tTokenPtr tokenPtr)
 			*////////////////////////////////////////////////////////////////////////
 			switch (state)
 			{
-				case FM_COMMENT_SINGLELINE:
-				{
-					if (read_char == '\n')
-					{
-						state = FM_START;
-					}
-					else if (read_char == '\\')
-					{
-						fgetc(file_p);
-					}
-				}break;
-				
-				case FM_COMMENT_MULTILINE:
-				{
-					if (read_char == '*')
-					{
-						if ((read_char = fgetc(file_p)) == '/')
-						{
-							state = FM_START;
-						}
-					}
-				}break;
-				
-				case FM_SEMICON:
-				{
-					state = FM_END;
-				}break;
-				
-				case FM_ASSIGN:
-				{
-					
-				}break;
-				
-				case FM_EQUAL:
-				{
-					state = FM_END;
-				} break;
-				
-				case FM_PLUS:
-				{
-					if ((read_char = fgetc(file_p)) != '+')
-					{
-						ungetc(read_char, file_p);
-						state = FM_END;
-					}
-				} break;
-				
-				case FM_INCREMENT:
-				{
-					state = FM_END;
-				} break;
-				
-				case FM_MINUS:
-				{
-					if ((read_char = fgetc(file_p)) != '-')
-					{
-						ungetc(read_char, file_p);
-						state = FM_END;
-					}
-				} break;
-				
-				case FM_DECREMENT:
-				{
-					state = FM_END;
-				} break;
-				
-				case FM_STAR:
-				{
-					if ((read_char = fgetc(file_p)) != '/')
-					{
-						ungetc(read_char, file_p);
-						state = FM_END;
-					}
-				} break;
-				
-				case FM_DIVISION:
-				{
-					if ((read_char = fgetc(file_p)) != '/')
-					{
-						ungetc(read_char, file_p);
-						state = FM_END;
-					}
-				} break;
-				
 				case FM_KEYWORDS:
 				{
 					state = FM_END;
