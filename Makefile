@@ -47,7 +47,7 @@ $(SA).o: $(SA).c $(SA).h errors.h $(MM).h str.h $(ST).h token.h
 $(LA).o: $(LA).c $(LA).h errors.h token.h $(MM).h
 	$(CC) $(CFLAGS) -o $(LA).o $(LA).c
 
-ial.o: ial.c ial.h errors.h $(MM).h
+ial.o: ial.c ial.h errors.h $(MM).h str.h
 	$(CC) $(CFLAGS) -o ial.o ial.c
 
 $(AC).o: $(AC).c $(AC).h
@@ -79,7 +79,7 @@ $(SA)-d.o: $(SA).c $(SA).h errors.h $(MM).h str.h $(ST).h token.h
 $(LA)-d.o: $(LA).c $(LA).h errors.h token.h $(MM).h
 	$(CC) $(CFLAGSD) -o $(LA)-d.o $(LA).c
 
-ial-d.o: ial.c ial.h errors.h $(MM).h
+ial-d.o: ial.c ial.h errors.h $(MM).h str.h
 	$(CC) $(CFLAGSD) -o ial-d.o ial.c
 
 $(AC)-d.o: $(AC).c $(AC).h

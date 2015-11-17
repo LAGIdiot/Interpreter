@@ -7,7 +7,16 @@
 
 #include "errors.h"
 #include "memory_manager.h"
+#include "str.h"
 
+int find(string s, string search);
+
+string sort(string s);
+
+//Funkce pro praci se stromem
+
+
+#if tohle_to_tu_nema_vubec_co_byt_potreba_preimplementovat_a_zakryt
 ///////////
 // funkcia *compute_prefix_function ( urobi si tabulku pismen  a nastavi hodnoty, vytvori pamet pre tabulku )
 //char *pattern - pattern je hladani vzor , pole
@@ -24,6 +33,7 @@ int *compute_prefix_function(char *pattern, int psize);
 ///////////
 int find(char *target, int tsize, char *pattern, int psize);
 
+#endif
 
 ///////////
 // struktura binaryTree ( struktura stromu )

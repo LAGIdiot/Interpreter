@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
 			T_SystemTerminate();
 
-			MM_FreeAll(); //FIXME: prozatimni pro zabraneni ztrate pameti
+			MM_FreeAll(); //TODO: Vymyslet lepsi provedeni na vymazani pameti po ukonceni programu
 		}
 	}
 

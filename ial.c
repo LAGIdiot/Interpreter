@@ -1,5 +1,8 @@
 #include "ial.h"
 
+//TODO: presunout implementaci binarniho stromu sem
+
+#if tohle_to_tu_nema_vubec_co_byt_potreba_preimplementovat_a_zakryt
 int *compute_prefix_function (char *pattern, int psize)
 {
 	int k = -1;
@@ -52,3 +55,7 @@ int find (char *target, int tsize, char *pattern, int psize)
 		mistake (ERR_RUN_OTH);
 	#endif
 }
+
+#endif
+
+

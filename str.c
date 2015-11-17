@@ -20,29 +20,32 @@ int main()
 }
 */
 
-int strInit(string *s)
+//FIXME: Tahle funkce by asi mela initializovat cely string ne pouze jeho obsah
+//Doporuceni zmenit na: string strInit(); || string strInit(char *str);
+void strInit(string s)
 {
+
    if ((s->str = (char*) malloc(8)) == NULL)
-      return -1;
+      return;
    s->str[0] = '\0';
    s->length = 0;
    s->allocSize = 8;
-   return 0;
+   return;
 }
 
-void strFree(string *s)
+void strFree(string s)
 
 {
    free(s->str);
 }
 
-void strClear(string *s)
+void strClear(string s)
 {
    s->str[0] = '\0';
    s->length = 0;
 }
 
-int strInsert(char *text, string *s)
+int strInsert(char *text, string s)
 {
   int amount = s->length;
   if (s->str[0] == '\0' )   //ak je prazdna , musi byt
@@ -63,7 +66,7 @@ int strInsert(char *text, string *s)
 
 }
 
-/*
+#if jen_vypoznamkovavam_tohle_abych_to_mohl_prelozit
 string concat(string s1,string s2)
 {
   int amount = s1.length + s2.length; //mnozstvo miesta potrebneho pre s3     problem s pointerom
@@ -81,14 +84,14 @@ string concat(string s1,string s2)
 
   return *s3;   //problem s pointerom - pokoušíš se vrátit vnitrní promenou
 }
-*/
+#endif
 
-char *strGetStr(string *s)
+char *strGetStr(string s)
 {
    return s->str;
 }
 
-int strGetLength(string *s)
+int strGetLength(string s)
 {
    return s->length;
 }
