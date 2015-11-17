@@ -2,8 +2,6 @@
 #define IAL_Header
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "errors.h"
 #include "memory_manager.h"

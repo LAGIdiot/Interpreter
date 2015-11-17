@@ -18,13 +18,14 @@ typedef struct stringStruct
 
 string strInit();
 void strFree(string s);
-
 void strClear(string s);
 int strInsert(string s, char *text);
-string concat(string s1,string s2);
-
 char *strGetStr(string s);
 size_t strGetLength(string s);
+
+//Vestavene funkce - dle zadani
+string concat(string s1,string s2);
+string substr(string s, int i, int n);
 
 int strCompare(string s1, string s2);
 

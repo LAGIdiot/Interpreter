@@ -65,6 +65,12 @@ string concat (string s1, string s2)
 	return NULL;
 }
 
+//TODO: Implement this substring
+string substr(string s, int i, int n)
+{
+	return NULL;
+}
+
 //TODO: Implement this string compare
 int strCompare(string s1, string s2)
 {
