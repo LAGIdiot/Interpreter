@@ -23,7 +23,7 @@ enum symbolType{
  * function - string s poznamenanym poradim parametru a navratovym typem (pozice 0 = navrat)
  * jump (navesti) - adresa skoku*/
 typedef struct symbolItem{
-	string key;					// nazev promene
+	string key;					// nazev promene .. u nekterych bude potreba generovat
 	int symbol;
 	int inicializovano;
 #if DEBUG

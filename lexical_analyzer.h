@@ -81,7 +81,6 @@ typedef enum
 
 	FM_INTEGER,
 	FM_DOUBLE,
-	FM_DIVISION,
 	/*, FM_BOOL_ ... && ||*/
 } fm_states;
 

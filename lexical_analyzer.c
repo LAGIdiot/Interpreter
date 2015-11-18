@@ -168,6 +168,8 @@ void T_Get(tTokenPtr tokenPtr)
 				case FM_COMMENT_MULTILINE_END:
 					if(read_char == '/')
 						state = FM_START;
+					else
+						state = FM_COMMENT_MULTILINE;
 
 					break;
 				case FM_ASSIGN:
