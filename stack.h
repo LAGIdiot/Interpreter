@@ -14,16 +14,18 @@ typedef struct stackContainerStruct{
 typedef struct stackStruct{
 	void * last;
 #if DEBUG
-	uint member_counter;
+	int member_counter;
 #endif
 }*Stack;
 
-Stack Init();
+Stack S_Init();
+void S_Terminate(Stack stack);
 
-void Push(Stack stack, void * data);
-void *Pop(Stack stack);
-void *Top(Stack stack);
+void S_Push(Stack stack, void * data);
+void S_PushSecond(Stack stack, void * data);
+void *S_Pop(Stack stack);
+void *S_Top(Stack stack);
 
-int Empty(Stack stack);
+int S_Empty(Stack stack);
 
 #endif
