@@ -15,15 +15,9 @@ string sort(string s);
 
 
 #if tohle_to_tu_nema_vubec_co_byt_potreba_preimplementovat_a_zakryt
-///////////
-// funkcia *compute_prefix_function ( urobi si tabulku pismen  a nastavi hodnoty, vytvori pamet pre tabulku )
-//char *pattern - pattern je hladani vzor , pole
-//int psize - dlzka vzoru
-///////////
-int *compute_prefix_function(char *pattern, int psize);
 
 ///////////
-// funkcia kmp ( algoritmus na vyhladavanie v retazcoch podretazec, vzor, vrati poziciu prveho vyskytu prveho pismenka vzoru )
+// funkcia (kmp) find ( algoritmus na vyhladavanie v retazcoch podretazec, vzor, vrati poziciu prveho vyskytu prveho pismenka vzoru )
 //char *target - target je cielovy retazec, pole
 //int tsize - dlzka cieloveho retazca, pola
 //char *pattern - pattern je hladani vzor , pole

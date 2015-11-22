@@ -3,29 +3,11 @@
 //TODO: presunout implementaci binarniho stromu sem
 
 #if tohle_to_tu_nema_vubec_co_byt_potreba_preimplementovat_a_zakryt
-int *compute_prefix_function (char *pattern, int psize)
-{
-	int k = -1;
-	int i = 1;
-	int * pi = MM_Malloc(sizeof(int)*psize);			// kontrola
-	if (!pi)
-		return NULL;
-
-	pi[0] = k;
-	for (i = 1; i < psize; i++) {
-		while (k > -1 && pattern[k+1] != pattern[i])
-			k = pi[k];
-		if (pattern[i] == pattern[k+1])
-			k++;
-		pi[i] = k;
-	}
-	return pi;
-}
 
 int find (char *target, int tsize, char *pattern, int psize)
 {
 	int i;
-	int *pi = compute_prefix_function(pattern, psize);
+	int *pi = prefix_to_FIND(pattern, psize);
 	int k = -1;
 	if (!pi)
 		{				//chyba v pridelovaní pamete v compute_prefix_function
@@ -57,5 +39,3 @@ int find (char *target, int tsize, char *pattern, int psize)
 }
 
 #endif
-
-

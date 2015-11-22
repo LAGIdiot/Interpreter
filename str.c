@@ -62,51 +62,118 @@ int strInsert(string s, char *text)
 
 string concat (string s1, string s2)
 {
+	string s3;
+	s3 = strInit();
 
-	int amount = s1->length + s2->length;
-  string s3;
-  if ((s3->str = (char*) malloc(amount)) == NULL )
+	char * pom;
+	int dlzka = s1->length + s2->length + 1 ;
+	pom = MM_Malloc(sizeof(char*)*dlzka);
 
-  s3->str[0] = '\0';
-  s3->length = amount;
-  s3->allocSize = amount;
-
-  strcat(s3->str,s1->str);
-  strcat(s3->str,s2->str);
-
-  return s3;
-
+	int i = 0;
+	for ( i ; i != s1->length; i++ )
+		{
+			pom[i] = s1->str[i];
+		}
+	for (int j = 0; j != s2->length; j++ )
+		{
+			pom[i] = s2->str[j];
+			i++;
+		}
+	if( strInsert(s3, pom) == -1 )
+		{
+			#if DEBUG
+				mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
+			#else
+				mistake (ERR_INTERN);
+			#endif
+		}
+	MM_Free(pom);
+	return s3;
 }
 
 string substr(string s, int i, int n)
 {
-	if ( s->length == i ) //generuj prazdny string
-	{
-		// string * substr = strInit();
-		return ( strInit() );
-	}
-	if ( s->length < i ) return NULL;
-
-	string sub = MM_Malloc(sizeof(struct stringStruct));
-
-	if ( s-> length - i > n )
+if ( s->length == i ) //generuj prazdny string
 		{
-			sub->length = n;
+			return  strInit();
 		}
-	else
+if ( s->length < i ) return NULL; //out of range
 
-		if ( s-> length - i < n )
+if ( s->length < i+n )
+		{
+			char * pom;
+			int dlzka = s->length - i + 1 ;
+			pom = MM_Malloc(sizeof(char)*dlzka); //alokacia miesta
+			for ( int x = 0 ; x != dlzka ; x++ )
+				{
+					pom[x] = s->str[i+x];		//zapis na pomocnu
+				}
+			string substr = strInit();
+			if( strInsert(substr,pom) == -1 )
 			{
-				//sub->length = n - (s->length - i);
+				#if DEBUG
+					mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
+				#else
+					mistake (ERR_INTERN);
+				#endif
+			}
+			MM_Free(pom);
+		}
+else if ( s->length > i+n )
+			{
+
+					char * pom;
+					pom = MM_Malloc(sizeof(char)*n); //alokacia miesta
+					for ( int x = 0 ; x != n ; x++ )
+					{
+						pom[x] = s->str[i+x];		//zapis na pomocnu
+					}
+					string substr = strInit();
+					if( strInsert(substr,pom) == -1 )
+					{
+							#if DEBUG
+							mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
+							#else
+							mistake (ERR_INTERN);
+							#endif
+					}
+					MM_Free(pom);
 			}
 
-	sub->allocSize = stringSizeBase;
-	sub->str = MM_Malloc(sizeof(char)*sub->length);
-	for (int j = 0 ; j < sub->length ; j++)
-	{
-		sub->str[j] = s->str[i+j];
-	}
-	return sub;
+return substr;
+}
+
+double charToDouble(char * c)
+{
+	double cislo;
+	int chyba;
+	chyba = sscanf(c , "%lf", &cislo);
+	if (chyba != 1 )
+		{
+			//pozor na chyby , moze to byt syntakticka , semanticka alebo lexikalne
+			#if DEBUG
+			mistake (ERR_SEM_OTH,"char to double: EOF, or less/more variables are used\n");
+			#else
+			mistake (ERR_SEM_OTH);
+			#endif
+		}
+	return cislo;
+}
+
+int charToInt(char * c)
+{
+	int  cislo, chyba;
+	chyba = sscanf(c , "%i", &cislo);
+	if (chyba != 1 )
+		{
+			//pozor na chyby , moze to byt syntakticka , semanticka alebo lexikalne
+			#if DEBUG
+			mistake (ERR_SEM_OTH,"char to double: EOF, or less/more variables are used\n");
+			#else
+			mistake (ERR_SEM_OTH);
+			#endif
+		}
+	return cislo;
 }
 
 
@@ -131,4 +198,38 @@ char *strGetStr(string s)
 size_t strGetLength(string s)
 {
    return s->length;
+}
+string charToStr (char c)
+{
+	string s;
+	s = strInit();
+	int i = strInsert(s , &c);
+	if ( i != 0 )
+	{
+		#if DEBUG
+		mistake (ERR_INTERN,"\n");
+		#else
+		mistake (ERR_INTERN);
+		#endif
+	}
+	return s;
+}
+
+int *prefix_to_FIND (char *pattern, int psize)
+{
+	int k = -1;
+	int i = 1;
+	int * pi = MM_Malloc(sizeof(int)*psize);			// kontrola
+	if (!pi)
+		return NULL;
+
+	pi[0] = k;
+	for (i = 1; i < psize; i++) {
+		while (k > -1 && pattern[k+1] != pattern[i])
+			k = pi[k];
+		if (pattern[i] == pattern[k+1])
+			k++;
+		pi[i] = k;
+	}
+	return pi;
 }

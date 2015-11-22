@@ -15,14 +15,22 @@ typedef struct stringStruct
   size_t allocSize;	// velikost alokovane pameti
 } *string;
 
-
+///////////
+// funkcia *prefix_to_FIND( urobi si tabulku pismen  a nastavi hodnoty, vytvori pamet pre tabulku )
+//char *pattern - pattern je hladani vzor , pole
+//int psize - dlzka vzoru
+///////////
+int *prefix_to_FIND(char *pattern, int psize);
+// lets dooooo dis :D
+string charToStr (char c);
 string strInit();
 void strFree(string s);
 void strClear(string s);
 int strInsert(string s, char *text);
 char *strGetStr(string s);
 size_t strGetLength(string s);
-
+double charToDouble(char * c);
+int charToInt(char * c);
 //Vestavene funkce - dle zadani
 string concat(string s1,string s2);
 string substr(string s, int i, int n);
