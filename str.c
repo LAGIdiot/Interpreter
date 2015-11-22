@@ -80,7 +80,7 @@ string concat (string s1, string s2)
 
 string substr(string s, int i, int n)
 {
-	if ( s->length = i ) //generuj prazdny string
+	if ( s->length == i ) //generuj prazdny string
 	{
 		// string * substr = strInit();
 		return ( strInit() );
@@ -97,7 +97,7 @@ string substr(string s, int i, int n)
 
 		if ( s-> length - i < n )
 			{
-				sub->length = n - (s->length - i));
+				//sub->length = n - (s->length - i);
 			}
 
 	sub->allocSize = stringSizeBase;
