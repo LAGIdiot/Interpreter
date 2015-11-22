@@ -30,30 +30,58 @@ void T_Get(tTokenPtr tokenPtr)
 		{
 //TODO: prerovnat stavy atomatu at je nabeh co nejrychlejsi
 //TODO: doplnit dalsi stavy a rozpoznani tokenu
+			//-----------------------------------------------------------------------
 			case FM_START:
 				switch(read_char)
 				{
 					case ';':
 						state = FM_SEMICOLN;
 						break;
+						
 					case '#':
 						state = FM_HASH;
 						break;
+						
 					case '*':
 						state = FM_STAR;
 						break;
+						
 					case '+':
 						state = FM_PLUS;
 						break;
+						
 					case '-':
 						state = FM_MINUS;
 						break;
+						
 					case '/':
 						state = FM_DIVIDE;
 						break;
+						
 					case '=':
 						state = FM_ASSIGN;
 						break;
+						
+					case '.':
+						state = FM_DOT;
+						break;
+						
+					case ',':
+						state = FM_COMMA;
+						break;
+						
+					case '|':
+						state = FM_PIPE;
+						break;
+						
+					case '>':
+						state = FM_GREATER;
+						break;
+						
+					case '<':
+						state = FM_LESS;
+						break;
+						
 					default:	//special case - pro nezaregistrovany znaky (casem by nemel byt zadny...)
 						T_Update(read_char);
 
@@ -61,6 +89,8 @@ void T_Get(tTokenPtr tokenPtr)
 						break;
 				}	//switch
 				break;
+			//-----------------------------------------------------------------------
+				
 				case FM_SEMICOLN:
 					tokenPtr->typ = TT_SEMICOLN;
 
@@ -189,6 +219,71 @@ void T_Get(tTokenPtr tokenPtr)
 					state = FM_END;
 
 					break;
+					
+				case FM_DOT:
+					tokenPtr->typ = TT_DOT;
+					
+					ungetc(read_char, file_p);
+					state = FM_END;
+					
+					break;
+					
+				case FM_COMMA:
+					tokenPtr->typ = TT_COMMA;
+					
+					ungetc(read_char, file_p);
+					state = FM_END;
+					
+					break;
+					
+				case FM_PIPE:
+					tokenPtr->typ = TT_PIPE;
+					
+					ungetc(read_char, file_p);
+					state = FM_END;
+					
+					break;
+					
+				case FM_GREATER:
+					tokenPtr->typ = TT_GREATER;
+					
+					if (read_char == '=')
+						state = FM_G_EQUAL;
+					else
+					{
+						ungetc(read_char, file_p);
+						state = FM_END;
+					}
+					
+				case FM_G_EQUAL:
+					tokenPtr->typ = TT_G_EQUAL;
+					
+					ungetc(read_char, file_p);
+					state = FM_END;
+					
+					break;
+					
+				case FM_LESS:
+					tokenPtr->typ = TT_LESS;
+					
+					if (read_char == '=')
+						state = FM_L_EQUAL;
+					else
+					{
+						ungetc(read_char, file_p);
+						state = FM_END;
+					}
+					
+					break;
+					
+				case FM_L_EQUAL;
+					tokenPtr->typ = TT_L_EQUAL;
+					
+					ungetc(read_char, file_p);
+					state = FM_END;
+					
+					break;
+					
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
 				tokenPtr->typ = TT_UNRECOGNIZED;
 
