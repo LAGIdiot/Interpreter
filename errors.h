@@ -12,7 +12,7 @@
 
 enum mistakes {
     ERR_LEX = 1,
-    ERR_SYNTAX = 2,
+    ERR_SYN = 2,
     ERR_SEM_UND = 3,
     ERR_SEM_COMP = 4,
     ERR_SEM_TYP = 5,

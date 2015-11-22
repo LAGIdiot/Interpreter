@@ -254,9 +254,10 @@ void T_Get(tTokenPtr tokenPtr)
 						ungetc(read_char, file_p);
 						state = FM_END;
 					}
+					break;
 					
 				case FM_G_EQUAL:
-					tokenPtr->typ = TT_G_EQUAL;
+					tokenPtr->typ = TT_EQUAL_GREATER;
 					
 					ungetc(read_char, file_p);
 					state = FM_END;
@@ -276,8 +277,8 @@ void T_Get(tTokenPtr tokenPtr)
 					
 					break;
 					
-				case FM_L_EQUAL;
-					tokenPtr->typ = TT_L_EQUAL;
+				case FM_L_EQUAL:
+					tokenPtr->typ = TT_EQUAL_LESS;
 					
 					ungetc(read_char, file_p);
 					state = FM_END;

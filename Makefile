@@ -95,7 +95,7 @@ $(ST)-d.o: $(ST).c $(ST).h $(MM).h errors.h str.h
 	$(CC) $(CFLAGSD) -o $(ST)-d.o $(ST).c
 	
 stack-d.o: stack.c stack.h errors.h $(MM).h
-	$(CC) $(CFLAGS) -o stack-d.o stack.c
+	$(CC) $(CFLAGSD) -o stack-d.o stack.c
 
 #clean
 clean:

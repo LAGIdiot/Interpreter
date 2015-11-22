@@ -146,6 +146,7 @@ Stack S_Init()
 
 #if DEBUG
 	printf("Stack initialized at: %d\n", stack);
+	stack->member_counter = 0;
 #endif
 	return stack;
 }
@@ -176,6 +177,9 @@ void S_Terminate(Stack stack)
 		}
 		MM_Free(stack);
 	}
+#if DEBUG
+	stack->member_counter = 0;
+#endif
 }
 
 //////////////////////////////////////////////////

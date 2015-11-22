@@ -117,3 +117,14 @@ void T_Finish(tTokenPtr token)
 	printf("Token finished at: %d \n", token);
 #endif
 }
+
+//////////////////////////////////////////////////
+// char * T_GetData()
+// return pointer to data that are ready for T_Finish
+////////////////////
+// Return pointer to data
+//////////////////////////////////////////////////
+char * T_GetData()
+{
+	return data;
+}

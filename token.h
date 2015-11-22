@@ -32,6 +32,15 @@ enum TokenType{
 	TT_ASSIGN_DIV,	/* /=	*/
 
 	TT_EQUAL,		/* ==	*/
+	TT_EQUAL_LESS,	/* <=	*/
+	TT_EQUAL_GREATER,	/* >=	*/
+
+	TT_LESS,		/* <	*/
+	TT_GREATER,		/* >	*/
+
+	TT_DOT,			/* .	*/
+	TT_PIPE,		/* |	*/
+	TT_COMMA,		/* ,	*/
 
 
 
@@ -49,14 +58,14 @@ enum TokenType{
 	TT_DOUBLE,
 	TT_STRING,
 	TT_CHAR,
+	TT_VOID,
 
-			/* == */
 	TT_EQUAL_NOT,	/* != */
-	TT_EQUAL_LESS,	/* <= */
-	TT_EQUAL_GREATER,	/* >= */
 
-	TT_LESS,		/* < */
-	TT_GREATER,		/* > */
+
+
+	TT_SPECIAL_DOLLARS,
+	TT_SPECIAL_DOLLARS2,
 
 	TT_UNRECOGNIZED,
 }Typ;
@@ -66,6 +75,8 @@ tTokenPtr T_Init();
 void T_Update(char c);
 void T_Destroy(tTokenPtr tokenPtr);
 void T_Finish(tTokenPtr tokenPtr);
+
+char * T_GetData();
 
 void T_SystemInit();
 void T_SystemTerminate();
