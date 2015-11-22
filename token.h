@@ -8,24 +8,15 @@
 #include "memory_manager.h"
 
 //Structures
-#if DEBUG
-typedef struct TokenStruct{
-	int typ;
-	int row;
-	int column;
-	char *data;
-}*tTokenPtr;
-#else
 typedef struct TokenStruct{
 	int typ;
 	char *data;
 }*tTokenPtr;
-#endif
 
 //Enums
 /*Nutno dodefinovat další dle potřeby*/
 enum TokenType{
-	TT_UNDEFINED,	/* zatim vyuzito jen u komentaru - nikdy by nemelo byt vraceno*/
+	TT_UNDEFINED,	/* nikdy by nemelo byt vraceno*/
 	TT_EOF,			/* EOF	*/
 	TT_SEMICOLN,	/* ;	*/
 	TT_HASH,		/* #	*/
@@ -34,13 +25,15 @@ enum TokenType{
 	TT_MINUS,		/* -	*/
 	TT_DIVIDE,		/* /	*/
 
-	TT_ASSIGN,		/* = */
+	TT_ASSIGN,		/* = 	*/
 	TT_ASSIGN_MUL,	/* *=	*/
 	TT_ASSIGN_ADD,	/* +=	*/
 	TT_ASSIGN_SUB,	/* -=	*/
 	TT_ASSIGN_DIV,	/* /=	*/
 
 	TT_EQUAL,		/* ==	*/
+
+
 
 	TT_IDENTIFIER,
 	TT_KEYWORD,

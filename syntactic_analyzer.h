@@ -7,23 +7,11 @@
 #include "str.h"
 #include "symbol_table.h"
 #include "token.h"
+#include "stack.h"
 
-enum SA_tree_id_type{
-	PROTOTYP,
-	FUNCTION,
-	MAIN
-};
 
-typedef struct SA_tree_root{
+void Test_parse();
 
-};
-
-typedef struct SA_tree_node{
-	int type;
-	string key; //nazev funkce
-	string data; //zde je ulozen navratovy typ a typ parametru funkce
-};
-
-void parse();
+void Parse();
 
 #endif //SA_Header

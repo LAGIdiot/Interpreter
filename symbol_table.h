@@ -16,7 +16,6 @@ enum symbolType{
 	ST_JUMP,
 }symbols;
 
-
 /* data obsahuji pointer na data:
  * int double char - data samotny
  * string - struct string obsahuji string
@@ -26,10 +25,10 @@ typedef struct symbolItem{
 	string key;					// nazev promene .. u nekterych bude potreba generovat
 	int symbol;
 	int inicializovano;
+	void * data;
 #if DEBUG
 	int used;
 #endif
-	void * data;
 }symbolItemStruct, *symbolItemPtr;
 
 //Function prototypes - vetsina je ulozena v ial.h (ty k binarnimu stromu)

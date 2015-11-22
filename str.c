@@ -59,21 +59,67 @@ int strInsert(string s, char *text)
 	  return -1; //standartni praktikou je vracet -1 v pripade chyby tohoto typu
 }
 
-//TODO: Re-implement this string concatenation (puvodni implementace ponechana v dolni casti souboru)
+
 string concat (string s1, string s2)
 {
-	return NULL;
+
+	int amount = s1->length + s2->length;
+  string s3;
+  if ((s3->str = (char*) malloc(amount)) == NULL )
+
+  s3->str[0] = '\0';
+  s3->length = amount;
+  s3->allocSize = amount;
+
+  strcat(s3->str,s1->str);
+  strcat(s3->str,s2->str);
+
+  return s3;
+
 }
 
-//TODO: Implement this substring
 string substr(string s, int i, int n)
 {
-	return NULL;
+	if ( s->length = i ) //generuj prazdny string
+	{
+		// string * substr = strInit();
+		return ( strInit() );
+	}
+	if ( s->length < i ) return NULL;
+
+	string sub = MM_Malloc(sizeof(struct stringStruct));
+
+	if ( s-> length - i > n )
+		{
+			sub->length = n;
+		}
+	else
+
+		if ( s-> length - i < n )
+			{
+				sub->length = n - (s->length - i));
+			}
+
+	sub->allocSize = stringSizeBase;
+	sub->str = MM_Malloc(sizeof(char)*sub->length);
+	for (int j = 0 ; j < sub->length ; j++)
+	{
+		sub->str[j] = s->str[i+j];
+	}
+	return sub;
 }
 
-//TODO: Implement this string compare
+
 int strCompare(string s1, string s2)
 {
+	if ( s1->length == s2->length )
+	for( int i = 0 ; i < s1->length; i++ )
+		{
+			if ( s1->str[i] > s2->str[i] ) return -1;
+			else if ( s1->str[i] < s2->str[i] ) return 1;
+		}
+	else if ( s1->length > s2->length) return -1;
+			else return 1;
 	return 0;
 }
 
@@ -86,23 +132,3 @@ size_t strGetLength(string s)
 {
    return s->length;
 }
-
-#if jen_vypoznamkovavam_tohle_abych_to_mohl_prelozit
-string concat(string s1,string s2)
-{
-  int amount = s1.length + s2.length; //mnozstvo miesta potrebneho pre s3     problem s pointerom
-  string s3;
-  if ((s3.str = (char*) malloc(amount)) == NULL ) //allokuje to miesto
-  {
-	  mistake(ERR_INTERN); //zatim sem davam intern casem vyresit
-  }
-
-  s3.str[0] = '\0';         //  nutne
-  s3.length = amount;       //  nutne
-  s3.allocSize = amount;    //  nutne
-  strcat(s3.str,s1.str);   //  concatenuje s1 na s3  problem s pointerom
-  strcat(s3.str,s2.str);   //  concatenuje s2 na s3  problem s pointerom
-
-  return *s3;   //problem s pointerom - pokoušíš se vrátit vnitrní promenou
-}
-#endif
