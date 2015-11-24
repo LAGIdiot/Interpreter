@@ -70,7 +70,7 @@ string concat (string s1, string s2)
 	pom = MM_Malloc(sizeof(char*)*dlzka);
 
 	int i = 0;
-	for ( i ; i != s1->length; i++ )
+	for (; i != s1->length; i++ )
 		{
 			pom[i] = s1->str[i];
 		}

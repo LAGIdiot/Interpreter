@@ -114,67 +114,16 @@ void Parse()
 		case 1:
 			next = 0;
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SPECIAL_FUNKCE;
-
-			break;
-		case 2:
-			next = 0;
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SPECIAL_STAT;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_R;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SPECIAL_FUNKCE_P;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_L;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = tokenLast->typ; //Zde pouziju trik aby typ indentifikatoru byl stejny jako typ tokenu - tohle resi az semantika
-			S_Push(stack, tokenTemp);
-
-			break;
-		case 3:
-			next = 0;
+			//znici nejvyssi TT_SPECIAL (krome $, osetreno jinde)
 
 			tokenTemp = S_Pop(stack);
 			T_Destroy(tokenTemp);
 
 			break;
-		case 4:
+		case 2:
 			next = 0;
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = tokenLast->typ;
-			S_Push(stack, tokenTemp);
-
-			break;
-		case 5:
-			next = 0;
-
-			tokenTemp = S_Pop(stack); //Popnu si FUNKCE_P
-
-			break;
-		case 6:
-			next = 0;
-
-			//STAT se pushovat nemusi protoze uz na zasobniku je
+			//STAT jiz na zasobniku
 
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_PAR_R;
@@ -193,8 +142,22 @@ void Parse()
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 7:
+		case 3:
 			next = 0;
+
+			//STAT jiz na zasobniku
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORLD_ELSE;
+			S_Push(stack, tokenTemp);
+
+			break;
+		case 4:
+			next = 0;
+
+			//odebere STAT ze zasobniku
+			tokenTemp = S_Pop(stack);
+			T_Destroy(tokenTemp);
 
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_SPECIAL_STAT;
@@ -233,23 +196,22 @@ void Parse()
 			S_Push(stack, tokenTemp);
 
 			break;
-
-		case 8:
+		case 5:
 			next = 0;
 
-			//STAT uz na zasobniku je ale potrebuju dostat } pred nej
+			//STAT_LS jiz na zasobniku
 
 			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_R;
-			S_PushSecond(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_L;
+			tokenTemp->typ = TT_SPECIAL_STAT;
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 9:
+		case 6:
 			next = 0;
+
+			//odebere STAT ze zasobniku
+			tokenTemp = S_Pop(stack);
+			T_Destroy(tokenTemp);
 
 			tokenTemp = S_Pop(stack);
 			tokenTemp->typ = TT_SEMICOLN;
@@ -264,38 +226,11 @@ void Parse()
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 10:
+		case 7:
 			next = 0;
 
+			//odebere STAT ze zasobniku a rovnou ho nahradi
 			tokenTemp = S_Pop(stack);
-			tokenTemp->typ = TT_SEMICOLN;
-			S_Push(stack, tokenTemp);
-
-			break;
-		case 11:
-			next = 0;
-
-			tokenTemp = S_Pop(stack);
-			tokenTemp->typ = TT_SEMICOLN;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SPECIAL_EXP;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_ASSIGN; //Tady budou problemy...protoze je zde moc druhu assignu //FIXME:ASSIGNS
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(stack, tokenTemp);
-
-			break;
-		case 12:
-			next = 0;
-
-			tokenTemp = S_Pop(stack); //pop STAT
 			tokenTemp->typ = TT_SPECIAL_CIN_LS;
 			S_Push(stack, tokenTemp);
 
@@ -304,10 +239,11 @@ void Parse()
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 13:
+		case 8:
 			next = 0;
 
-			tokenTemp = S_Pop(stack); //pop STAT
+			//odebere STAT ze zasobniku a rovnou ho nahradi
+			tokenTemp = S_Pop(stack);
 			tokenTemp->typ = TT_SPECIAL_COUT_LS;
 			S_Push(stack, tokenTemp);
 
@@ -316,92 +252,46 @@ void Parse()
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 14:
+		case 9:
 			next = 0;
 
-			//STAT jiz na zasobniku je takze pridam pouze else
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORLD_ELSE;
-			S_Push(stack, tokenTemp);
-
-			break;
-		case 15:	//SPECIAL CASE - EXP: slouzi k praci na podminkach a vyrazech
-			next = 0;
-
-			//FIXME: Vymyslet a zvolit optimalnejsi a mene cheatujici kod
-			cheat_exp = 1;
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = tokenLast->typ;
-			S_Push(stack, tokenTemp);
-
-			break;
-		case 16:
-			next = 0;
-
-			tokenTemp = S_Pop(stack); //pop EXP
+			//odebere STAT ze zasobniku
+			tokenTemp = S_Pop(stack);
 			T_Destroy(tokenTemp);
 
-			break;
-//17 - 19 neexistuje
-		case 20:
-			next = 0;
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_R;
+			S_Push(stack, tokenTemp);
 
 			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SPECIAL_FUNKCE_LS;
+			tokenTemp->typ = TT_SPECIAL_STAT_LS;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_L;
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 21:
+		case 10:
 			next = 0;
+
+			//FUNKCE_P jiz na zasobniku
 
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_COMMA;
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-		case 27:
-		case 28:
+		case 11:
 			next = 0;
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SPECIAL_STAT;
-			S_Push(stack, tokenTemp);
-
-			break;
-		case 29:
-			next = 0;
-
+			//odebere STAT ze zasobniku a rovnou ho nahradi
 			tokenTemp = S_Pop(stack);
-			T_Destroy(tokenTemp);
-
-			break;
-		case 30:
-			next = 0;
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(stack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_EXTRACTION;
+			tokenTemp->typ = TT_SEMICOLN;
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 31:
-			next = 0;
-
-			tokenTemp = S_Pop(stack); //pop CIN_LS
-			T_Destroy(tokenTemp);
-
-			break;
-		case 32:
+		case 12:
 			next = 0;
 
 			tokenTemp = T_Init();
@@ -413,11 +303,104 @@ void Parse()
 			S_Push(stack, tokenTemp);
 
 			break;
-		case 33:
+		case 13:
 			next = 0;
 
-			tokenTemp = S_Pop(stack); //pop COUT_LS
-			T_Destroy(tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_EXTRACTION;
+			S_Push(stack, tokenTemp);
+
+			break;
+		case 14:
+			next = 0;
+
+			tokenTemp = S_Pop(stack);
+			tokenTemp->typ = TT_SEMICOLN;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SPECIAL_EXP;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_ASSIGN; //Tady budou problemy...protoze je k dispozici moc druhu assignu //FIXME:ASSIGNS
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(stack, tokenTemp);
+
+			break;
+		case 15:
+			next = 0;
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SPECIAL_FUNKCE_LS;
+			S_Push(stack, tokenTemp);
+
+			break;
+		case 16:
+			next = 0;
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SPECIAL_FUNKCE;
+
+			break;
+		case 17:
+			next = 0;
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SPECIAL_STAT;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_R;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SPECIAL_FUNKCE_P;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_L;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = tokenLast->typ; //Zde pouziju trik aby typ indentifikatoru byl stejny jako typ tokenu - tohle resi az semantika
+			S_Push(stack, tokenTemp);
+
+			break;
+		case 18:
+			next = 0;
+
+			//pozor tady se FUNKCE_P nechava na zasobniku protoze nepouziva svuj list
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(stack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = tokenLast->typ;
+			S_Push(stack, tokenTemp);
+
+			break;
+		case 19:	//SPECIAL CASE - EXP: slouzi k praci na podminkach a vyrazech
+			next = 0;
+
+			//FIXME: Vymyslet a zvolit optimalnejsi a mene cheatujici kod
+			cheat_exp = 1;
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = tokenLast->typ;
+			S_Push(stack, tokenTemp);
 
 			break;
 		default:
@@ -458,74 +441,83 @@ int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
 		case TT_SPECIAL_FUNKCE_P:
 			row += 4;
 			break;
-		case TT_SPECIAL_STAT:
+		case TT_SPECIAL_STAT_LS:
 			row += 5;
 			break;
-		case TT_SPECIAL_CIN_LS:
+		case TT_SPECIAL_STAT:
 			row += 6;
 			break;
-		case TT_SPECIAL_COUT_LS:
+		case TT_SPECIAL_CIN_LS:
 			row += 7;
 			break;
-		case TT_SPECIAL_EXP:
+		case TT_SPECIAL_COUT_LS:
 			row += 8;
+			break;
+		case TT_SPECIAL_EXP:
+			row += 9;
 			break;
 	}
 
 	switch(lastToken->typ)
 	{
-		case TT_KEYWORLD_INT:
-		case TT_KEYWORLD_DOUBLE:
-		case TT_KEYWORLD_STRING:
-		case TT_KEYWORLD_CHAR:
-		case TT_KEYWORLD_VOID:
+		case TT_EOF:
 			column += 1;
 			break;
 		case TT_KEYWORLD_IF:
 			column += 2;
 			break;
-		case TT_KEYWORLD_FOR:
+		case TT_KEYWORLD_ELSE:
 			column += 3;
 			break;
-		case TT_BRACE_L:
+		case TT_KEYWORLD_FOR:
 			column += 4;
 			break;
-		case TT_PAR_R:
+		case TT_KEYWORLD_RETURN:
 			column += 5;
 			break;
-		case TT_KEYWORLD_ELSE:
+		case TT_KEYWORLD_CIN:
 			column += 6;
 			break;
-		case TT_KEYWORLD_RETURN:
+		case TT_KEYWORLD_COUT:
 			column += 7;
 			break;
-		case TT_SEMICOLN:
+		case TT_BRACE_L:
 			column += 8;
 			break;
-		case TT_IDENTIFIER:
+		case TT_BRACE_R:
 			column += 9;
 			break;
-		case TT_EXTRACTION:
+		case TT_PAR_R:
 			column += 10;
 			break;
-		case TT_INSERTION:
+		case TT_COMMA:
 			column += 11;
 			break;
-		case TT_COMMA:
+		case TT_SEMICOLN:
+			column += 12;
+			break;
+		case TT_INSERTION:
 			column += 13;
 			break;
-		case TT_STRING:
+		case TT_EXTRACTION:
 			column += 14;
 			break;
-		case TT_EOF:
+		case TT_IDENTIFIER:
 			column += 15;
 			break;
-		default:
-			column += 12;
+		case TT_KEYWORLD_INT:
+		case TT_KEYWORLD_DOUBLE:
+		case TT_KEYWORLD_STRING:
+		case TT_KEYWORLD_CHAR:
+		case TT_KEYWORLD_VOID:
+			column += 16;
+			break;
+		default:	//default case for exp
+			column += 17;
 			break;
 	}
 
-	if(row < 0 || row > 8 || column < 0 || column > 15)
+	if(row < 0 || row > LL_TABLE_ROWS || column < 0 || column > LL_TABLE_COLUMNS)
 		return 0;
 	else
 		return LL_TABLE[row][column];
