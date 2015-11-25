@@ -80,13 +80,7 @@ string concat (string s1, string s2)
 			i++;
 		}
 	if( strInsert(s3, pom) == -1 )
-		{
-			#if DEBUG
-				mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
-			#else
-				mistake (ERR_INTERN);
-			#endif
-		}
+			mistake (ERR_INTERN,"Intern error in substr function in str.c after strInsert\n");
 	MM_Free(pom);
 	return s3;
 }
@@ -110,13 +104,8 @@ if ( s->length < i+n )
 				}
 			string substr = strInit();
 			if( strInsert(substr,pom) == -1 )
-			{
-				#if DEBUG
-					mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
-				#else
-					mistake (ERR_INTERN);
-				#endif
-			}
+				mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
+
 			MM_Free(pom);
 		}
 else if ( s->length > i+n )
@@ -130,13 +119,8 @@ else if ( s->length > i+n )
 					}
 					string substr = strInit();
 					if( strInsert(substr,pom) == -1 )
-					{
-							#if DEBUG
-							mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
-							#else
-							mistake (ERR_INTERN);
-							#endif
-					}
+						mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
+
 					MM_Free(pom);
 			}
 
@@ -149,14 +133,10 @@ double charToDouble(char * c)
 	int chyba;
 	chyba = sscanf(c , "%lf", &cislo);
 	if (chyba != 1 )
-		{
-			//pozor na chyby , moze to byt syntakticka , semanticka alebo lexikalne
-			#if DEBUG
-			mistake (ERR_SEM_OTH,"char to double: EOF, or less/more variables are used\n");
-			#else
-			mistake (ERR_SEM_OTH);
-			#endif
-		}
+	{
+		//pozor na chyby , moze to byt syntakticka , semanticka alebo lexikalne
+		mistake (ERR_SEM_OTH,"char to double: EOF, or less/more variables are used\n");
+	}
 	return cislo;
 }
 
@@ -167,11 +147,7 @@ int charToInt(char * c)
 	if (chyba != 1 )
 		{
 			//pozor na chyby , moze to byt syntakticka , semanticka alebo lexikalne
-			#if DEBUG
 			mistake (ERR_SEM_OTH,"char to double: EOF, or less/more variables are used\n");
-			#else
-			mistake (ERR_SEM_OTH);
-			#endif
 		}
 	return cislo;
 }
@@ -205,13 +181,7 @@ string charToStr (char c)
 	s = strInit();
 	int i = strInsert(s , &c);
 	if ( i != 0 )
-	{
-		#if DEBUG
-		mistake (ERR_INTERN,"\n");
-		#else
-		mistake (ERR_INTERN);
-		#endif
-	}
+		mistake (ERR_INTERN,"Problem with casting char to string\n");
 	return s;
 }
 

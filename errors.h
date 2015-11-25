@@ -3,10 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#if DEBUG
 #include <stdarg.h>
-#endif
 
 #include "memory_manager.h"
 
@@ -24,10 +21,6 @@ enum mistakes {
     ERR_INTERN = 99
 };
 
-#if DEBUG
-	void mistake (int errCode, const char *message, ...);
-#else
-	void mistake (int errCode);
-#endif //DEBUG
+void mistake (int errCode, const char *message, ...);
 
 #endif //ERRORS_Header

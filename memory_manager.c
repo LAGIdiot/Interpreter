@@ -39,13 +39,7 @@ void * MM_Malloc(size_t size)
 	void * ptr = malloc(size);
 
 	if(ptr == NULL)
-	{
-#if DEBUG
 		mistake(ERR_INTERN, "Not enough memory\n");
-#else
-		mistake(ERR_INTERN);
-#endif
-	}
 
 #if DEBUG
 	printf("Allocating memory at: %d with size: %d\n", ptr, size);
@@ -69,13 +63,7 @@ void * MM_Realloc(void * ptrOld, size_t size)
 	void * ptr = realloc(ptrOld, size);
 
 	if(ptr == NULL)
-	{
-#if DEBUG
 		mistake(ERR_INTERN, "Memory reallocation problem");
-#else
-		mistake(ERR_INTERN);
-#endif
-	}
 
 #if DEBUG
 	printf("Reallocating memory from: %d to: %d with size: %d\n", ptrOld, ptr, size);
@@ -151,21 +139,14 @@ void MM_Add(void * ptr)
 #endif
 	MemoryBlockPtr newBlock = malloc(sizeof(struct MemoryBlockStruct));
 	if(newBlock == NULL)
-	{
-#if DEBUG
 		mistake(ERR_INTERN, "Not enough memory\n");
-#else
-		mistake(ERR_INTERN);
-#endif
-	}
 
 	newBlock->dataPtr = ptr; //ptr is data for MM container
 	newBlock->prevPtr = NULL;
 
 	if(MM_Top != NULL)
-	{
 		newBlock->prevPtr = MM_Top; //in newBlock assign prevPtr to last block
-	}
+
 	MM_Top = newBlock; //newBlock make available as last block
 
 #if DEBUG
@@ -206,13 +187,8 @@ void MM_Remove(void * ptr, int valid)
 			while(temp->dataPtr != ptr)
 			{
 				if(temp->prevPtr == NULL)
-				{
-#if DEBUG
 					mistake(ERR_INTERN, "Memory block not found\n");
-#else
-					mistake(ERR_INTERN);
-#endif
-				}
+
 				tempNext = temp;
 				temp = temp->prevPtr;
 			}
@@ -227,13 +203,8 @@ void MM_Remove(void * ptr, int valid)
 		}
 	}
 	else
-	{
-#if DEBUG
 		mistake(ERR_INTERN, "MM was not Initialized\n");
-#else
-		mistake(ERR_INTERN);
-#endif
-	}
+
 #if DEBUG
 	memoryBlocksCount--;
 #endif

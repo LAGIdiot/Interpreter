@@ -105,11 +105,7 @@ void Parse()
 				T_Destroy(tokenLast);
 			}
 			else
-#if DEBUG
 				mistake(ERR_SYN,"There was problem with applying RULE 0, on stack was %d but token was %d\n",stackTop->typ,tokenLast->typ);
-#else
-				mistake(ERR_SYN);
-#endif
 			break;
 		case 1:
 			next = 0;
@@ -404,11 +400,7 @@ void Parse()
 
 			break;
 		default:
-#if DEBUG
 			mistake(ERR_SYN,"There is no rule for this operation");
-#else
-			mistake(ERR_SYN);
-#endif
 			break;
 		}
 	}

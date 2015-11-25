@@ -14,7 +14,6 @@ const char *errMessage[11] = {
 	"Error : mistake in interpreter\n"
 };
 
-#if DEBUG
 //////////////////
 // mistake (ErrorCode errCode, const char *message)
 // errCode - code number of mistake
@@ -30,6 +29,7 @@ void mistake(int errCode, const char *message, ...)
 	else
 		fprintf(stderr, "%s", errMessage[(int)errCode]);
 
+#if DEBUG
 	va_list va;
 	va_start(va, message);
 
@@ -39,27 +39,10 @@ void mistake(int errCode, const char *message, ...)
 
 	fprintf(stderr, "\n");
 
+#endif
+
 	MM_FreeAll(); //Uklizeni pameti
 
 	exit((int)errCode);
 }
-#else
-//////////////////
-// mistake (ErrorCode errCode)
-// errCode - code number of mistake
-//////////////////
-//funkcia vypise chybovu hlásku zavola funkci na dealokaci pameti a ukončí program
-/////////////////
-void mistake(int errCode)
-{
-	if(errCode == ERR_INTERN)
-		fprintf(stderr, "%s", errMessage[0]);
-	else
-		fprintf(stderr, "%s", errMessage[errCode]);
-
-	MM_FreeAll(); //Uklizeni pameti
-
-	exit(errCode);
-}
-#endif
 
