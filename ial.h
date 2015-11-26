@@ -6,6 +6,7 @@
 #include "errors.h"
 #include "memory_manager.h"
 #include "str.h"
+#include "symbol_table.h"
 
 int find(string s, string search);
 
@@ -26,41 +27,48 @@ string sort(string s);
 int find(char *target, int tsize, char *pattern, int psize);
 
 #endif
+///////////
+// struktura bKey ( struktura klucu char pre vyhladavanie v strome )
+///////////
+typedef char *bKey;
 
 ///////////
 // struktura binaryTree ( struktura stromu )
 ///////////
 typedef struct binaryTree
 {
-int data;
+char key;
+symbolItemStruct data;
 struct binaryTree * rChild; //pravy potomok uzlu
 struct binaryTree * lChild; //lavy potomok uzlu
 } *nodePtr;
 
-/*
 ///////////
-// funkcia createNode ( vytvara uzol, alokuje pamat a rozhoduje o velkosti tokenov, podla nich vytvara laveho/praveho potomka )
-//node * tree - koren stromu
-//Token *tTokenPtr - hodnota tokenu
+// funkcia treeInit ( inicializuje strom pred jeho použitím )
+//nodePtr* RootPtr - koren stromu ktory sa inicializuje
 ///////////
-void createNode(node * tree, Token *tTokenPtr);
+void treeInit (noodePtr*)
+
+///////////
+// funkcia nodeInsert ( vytvara uzol, alokuje pamat a rozhoduje o velkosti symbolov, podla nich vytvara laveho/praveho potomka )
+//nodePtr* Root - uzol podla ktoreho sa vklada dalsi uzol
+//bkey key - nazov podla ktoreho sa uklada uzol do stromo
+//symbolItemStruct symbol - symbol ktory sa do stromu vklada
+///////////
+void nodeInsert (nodePtr* , bKey, symbolItemStruct)
 
 ///////////
 // funkcia deleteTree ( vymazava strom a uvolnuje pamat )
-//node tree - strom
+//nodePtr * Root - strom ktory sa vymazava
 ///////////
-void deleteTree(node tree);
+void deleteTree(nodePtr*);
 
 ///////////
-// funkcia node search ( vyhladavy dany token v strome )
-//node * tree - strom
-//Token *tTokenPtr - hodnota tokenu
+// funkcia searchNode ( vyhladavy dany symbol v strome )
+//nodePtr Root - strom v ktorom sa vyhladava
+//bKey key - kluc resp. nazov podla ktoreho vyhladava
 ///////////
-node* search(node * tree, Token *tTokenPtr);
+nodePtr searchNode(nodePtr, bKey);
 
-///////////
-// funkcia treeCreation ( povodny main, rozhoduje o tom ktora funkcie bude kedy zavolana/mozne vymazat a zahrnut v main )
-///////////
-void treeCreation();
-*/
+
 #endif //IAL_Header
