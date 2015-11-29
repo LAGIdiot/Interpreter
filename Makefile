@@ -5,13 +5,13 @@ CC=gcc
 CFLAGS=-c -O2 -std=c99 -Wall -pedantic
 CFLAGSD=-c -g -O0 -std=c99 -DDEBUG
 
-PARTS=errors.o $(MM).o token.o str.o $(LA).o $(SA).o ial.o $(AC).o $(ST).o main.o stack.o
-PARTS-d=errors-d.o $(MM)-d.o token-d.o str-d.o $(LA)-d.o $(SA)-d.o ial-d.o $(AC)-d.o $(ST)-d.o main-d.o stack-d.o
+PARTS=errors.o $(MM).o token.o str.o $(LA).o $(SA).o ial.o $(AC).o $(ST).o main.o deque.o
+PARTS-d=errors-d.o $(MM)-d.o token-d.o str-d.o $(LA)-d.o $(SA)-d.o ial-d.o $(AC)-d.o $(ST)-d.o main-d.o deque-d.o
 
 MM=memory_manager
 LA=lexical_analyzer
 SA=syntactic_analyzer
-AC=adress_code
+AC=address_code
 ST=symbol_table
 
 .PHONY: all
@@ -59,8 +59,8 @@ str.o: str.c str.h errors.h $(MM).h
 $(ST).o: $(ST).c $(ST).h $(MM).h errors.h str.h
 	$(CC) $(CFLAGS) -o $(ST).o $(ST).c
 	
-stack.o: stack.c stack.h errors.h $(MM).h
-	$(CC) $(CFLAGS) -o stack.o stack.c
+deque.o: deque.c deque.h errors.h $(MM).h
+	$(CC) $(CFLAGS) -o deque.o deque.c
 
 #Pomyslna delici cara mezi normal a debug
 
@@ -94,8 +94,8 @@ str-d.o: str.c str.h errors.h $(MM).h
 $(ST)-d.o: $(ST).c $(ST).h $(MM).h errors.h str.h
 	$(CC) $(CFLAGSD) -o $(ST)-d.o $(ST).c
 	
-stack-d.o: stack.c stack.h errors.h $(MM).h
-	$(CC) $(CFLAGSD) -o stack-d.o stack.c
+deque-d.o: deque.c deque.h errors.h $(MM).h
+	$(CC) $(CFLAGSD) -o deque-d.o deque.c
 
 #clean
 clean:

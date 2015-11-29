@@ -175,11 +175,11 @@ size_t strGetLength(string s)
 {
    return s->length;
 }
-string charToStr (char c)
+string charToStr (char *c)
 {
 	string s;
 	s = strInit();
-	int i = strInsert(s , &c);
+	int i = strInsert(s , c);
 	if ( i != 0 )
 		mistake (ERR_INTERN,"Problem with casting char to string\n");
 	return s;
@@ -202,4 +202,36 @@ int *prefix_to_FIND (char *pattern, int psize)
 		pi[i] = k;
 	}
 	return pi;
+}
+
+//TODO:Test this! Mozny problem s praci s pointery
+void strConcatChar(string s1, char * s2)
+{
+	string temp = strInit();
+	strInsert(temp, s2);
+
+	string final = concat(s1, temp);
+
+	strFree(temp);
+	strFree(s1);
+
+	s1 = final;
+}
+string strRNG(size_t size)
+{
+	char rng[size + 1];
+
+	for(int i = 0; i < size; i++)
+	{
+		srand(time(NULL));
+		rng[i] = rand() % 26 + 97; //generuje pouze maly pismena
+	}
+
+	rng[size +1] = '\0';
+
+	string str = charToStr(rng);
+
+	//TODO: Write some kind of verifiing mechanism
+
+	return str;
 }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "errors.h"
 #include "memory_manager.h"
@@ -22,7 +23,7 @@ typedef struct stringStruct
 ///////////
 int *prefix_to_FIND(char *pattern, int psize);
 // lets dooooo dis :D
-string charToStr (char c);
+string charToStr (char *c);
 string strInit();
 void strFree(string s);
 void strClear(string s);
@@ -31,8 +32,12 @@ char *strGetStr(string s);
 size_t strGetLength(string s);
 double charToDouble(char * c);
 int charToInt(char * c);
+
+void strConcatChar(string s1, char * s2);
+string strRNG(size_t size);
+
 //Vestavene funkce - dle zadani
-string concat(string s1,string s2);
+string concat(string s1, string s2);
 string substr(string s, int i, int n);
 
 int strCompare(string s1, string s2);

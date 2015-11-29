@@ -1,9 +1,12 @@
 #include "syntactic_analyzer.h"
 
+Deque stack = NULL;
+
 int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop);
 
 void PutItInTree();
 void CheckSEM(tTokenPtr token);
+void ParseExp();
 
 void Test_parse()
 {
@@ -32,6 +35,27 @@ void Test_parse()
 	//Inicializace globalni tabulky symbolu
 }
 
+void ParseExp()
+{
+	tTokenPtr tokenLast = NULL;
+	int exp = 1;
+
+	do
+	{
+		tokenLast = T_Init();
+		T_Get(tokenLast);
+
+		//Zpracovani
+//TODO: Zpracovani EXP
+
+
+		if(tokenLast->typ == TT_SEMICOLN)
+			exp = 0;
+
+		T_Destroy(tokenLast);
+	}while(exp);
+}
+
 void Parse()
 {
 #if DEBUG
@@ -43,12 +67,12 @@ void Parse()
 	//bool flag pro nacteni tokenu - 0 pokud se provadi vnitri operace
 	int next = 1;
 
-	//bool flag cheat
-	int cheat_exp = 0;
+	//level zanoreni - vzdy by mel byt kladny nebo 0
+	int level = 0;
 
 	int rule;
 
-	Stack stack = S_Init();
+	stack = S_Init();
 
 	tTokenPtr tokenFirst = NULL;
 	tTokenPtr tokenLast = NULL;
@@ -75,8 +99,6 @@ void Parse()
 		stackTop = S_Top(stack);
 
 		rule = LL_TableRule(tokenLast, stackTop);
-		if(cheat_exp == 1 && rule == 0)
-			rule = 15;
 
 
 #if DEBUG
@@ -109,6 +131,8 @@ void Parse()
 			break;
 		case 1:
 			next = 0;
+
+			level--; //dochazi k vynoreni
 
 			//znici nejvyssi TT_SPECIAL (krome $, osetreno jinde)
 
@@ -389,14 +413,8 @@ void Parse()
 
 			break;
 		case 19:	//SPECIAL CASE - EXP: slouzi k praci na podminkach a vyrazech
-			next = 0;
 
-			//FIXME: Vymyslet a zvolit optimalnejsi a mene cheatujici kod
-			cheat_exp = 1;
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = tokenLast->typ;
-			S_Push(stack, tokenTemp);
+			ParseExp();
 
 			break;
 		default:

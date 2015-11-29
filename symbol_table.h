@@ -6,37 +6,52 @@
 #include "memory_manager.h"
 
 enum symbolType{
+	ST_VARIABLE,
+	ST_FUNCTION,
+}symbols;
+
+enum variableType{
 	ST_INT,
 	ST_DOUBLE,
 	ST_CHAR,
 	ST_STRING,
 	ST_AUTO,
 
-	ST_FUNCTION,
-	ST_JUMP,
-}symbols;
+	ST_UNDEFINED,
+}variables;
 
-/* data obsahuji pointer na data:
- * int double char - data samotny
- * string - struct string obsahuji string
- * function - string s poznamenanym poradim parametru a navratovym typem (pozice 0 = navrat)
- * jump (navesti) - adresa skoku*/
-typedef struct symbolItem{
+typedef struct symbolFunctionStruct{
+	int returnType;
+	string  paramTypes;
+	int defined;
+	int declared;	//prototyp
+	void * symbolTable;
+}*symbolFunctionPtr;
+
+typedef struct symbolVariableStruct{
+	int type;		//variableType
+	int defined; 	//defined
+	void *data;		//pointer to memory
+}*symbolVariablePtr;
+
+typedef struct symbolPackegeStruct{
 	string key;					// nazev promene .. u nekterych bude potreba generovat
-	int symbol;
-	int inicializovano;
-	void * data;
-#if DEBUG
-	int used;
-#endif
-}symbolItemStruct, *symbolItemPtr;
+	int typ;		//symbolType
+	void * data;	//samotna struktura obsahujici symbol
+}*symbolPackagePtr;
 
-//Function prototypes - vetsina je ulozena v ial.h (ty k binarnimu stromu)
-void ST_I_Destroy(symbolItemPtr itemPtr);
-symbolItemPtr ST_I_Create(string key, int symbolCode, void  * data);
+symbolPackagePtr ST_PackeageCreate(string key, int typ, void * symbol);
+void ST_PackageDestroy(symbolPackagePtr symbol);
 
-//TODO: pockat na strCompare od Adama a napsat porovnani
-int ST_I_Compare(symbolItemPtr itemPtr1, symbolItemPtr itemPtr);
+symbolFunctionPtr ST_FunctionCreate();
+void ST_FunctionDestroy(symbolFunctionPtr symbol);
+void ST_FunctionAddParam(symbolFunctionPtr symbol, int variableType);
 
+symbolVariablePtr ST_VariableCreate();
+void ST_VariableDestroy(symbolVariablePtr symbol);
+
+string ST_RandomKeyGenerator();
+
+int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2);
 
 #endif //ST_Header

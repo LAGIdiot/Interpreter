@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
 			MM_Init(); //Initialize memory manager
 			T_SystemInit();
 
+
+
 			//Test_parse();
 
 			Parse();
