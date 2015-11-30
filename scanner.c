@@ -1,5 +1,7 @@
 #include "scanner.h"
 
+static int keyword_type = 0;
+
 //Function prototypes - private
 void T_Get(tTokenPtr tokenPtr);
 int IsKeyword(void);
@@ -171,7 +173,7 @@ void T_Get(tTokenPtr tokenPtr)
 						}
 						else
 						{
-							state = FM_UNRECOGNIZED;
+							state = FM_UNDEFINED;
 						}
 						T_Update(read_char);
 					}
@@ -478,7 +480,7 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
-					if (!IsKeyword())
+					if (IsKeyword())
 					{
 						state = FM_KEYWORDS;
 					}
@@ -512,7 +514,9 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			case FM_KEYWORDS:
 			{
-				tokenPtr->typ = TT_KEYWORD;
+				tokenPtr->typ = keyword_type;
+				
+				keyword_type = 0;
 				
 				ungetc(read_char, file_p);
 				state = FM_END;
@@ -732,7 +736,7 @@ int IsKeyword()
 	if (strlen(token_content) > LONGEST_KEYWORD)
 	{
 		// je delší než nejdelší keyword, nemá cenu řešit dál
-		return 1;
+		return 0;
 	}
 	else
 	{
@@ -742,11 +746,12 @@ int IsKeyword()
 			{
 				if (!strcmp(key_words[i], token_content))
 				{
-					return 0;
+					keyword_type = i + KEYWORD_SHIFT;
+					return keyword_type;
 				}
 			}
 		}
-		return 1;
+		return 0;
 	}
 }
 
