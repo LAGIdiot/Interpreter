@@ -146,7 +146,7 @@ void T_Get(tTokenPtr tokenPtr)
 						state = FM_NUM_BASE;
 						break;
 						
-					case '"':
+					case '\"':
 						state = FM_STRING;
 						break;
 						
