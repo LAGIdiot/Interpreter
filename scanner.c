@@ -87,14 +87,6 @@ void T_Get(tTokenPtr tokenPtr)
 					case '}':
 						state = FM_BRACE_R;
 						break;
-						
-					case '[':
-						state = FM_BRACKET_L;
-						break;
-						
-					case ']':
-						state = FM_BRACKET_R;
-						break;
 				
 					case ';':
 						state = FM_SEMICOLON;
@@ -229,27 +221,9 @@ void T_Get(tTokenPtr tokenPtr)
 			} break;
 			//-----------------------------------------------------------------------
 			
-			case FM_BRACKET_L:
-			{
-				tokenPtr->typ = TT_BRACKET_L;
-				
-				ungetc(read_char, file_p);
-				state = FM_END;
-			} break;
-			//-----------------------------------------------------------------------
-			
-			case FM_BRACKET_R:
-			{
-				tokenPtr->typ = TT_BRACKET_R;
-				
-				ungetc(read_char, file_p);
-				state = FM_END;
-			} break;
-			//-----------------------------------------------------------------------
-			
 			case FM_SEMICOLON:
 			{
-				tokenPtr->typ = TT_SEMICOLN;
+				tokenPtr->typ = TT_SEMICOLON;
 
 				ungetc(read_char, file_p);
 				state = FM_END;
@@ -599,7 +573,7 @@ void T_Get(tTokenPtr tokenPtr)
 			}break;
 			//-----------------------------------------------------------------------
 			
-			case FM_INTEGER:
+			case FM_INT:
 			{
 				tokenPtr->typ = TT_INT;
 				
