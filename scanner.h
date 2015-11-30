@@ -68,7 +68,6 @@ typedef enum FM_STATES{
 	FM_OR,
 	FM_AND,
 	FM_STRING,
-	FM_ESC_SQ,
 	FM_INT,
 	FM_DOUBLE,
 	FM_NUMBER,

@@ -681,10 +681,6 @@ void T_Get(tTokenPtr tokenPtr)
 					tokenPtr->typ = TT_STRING;
 					state = FM_END;
 				}
-				else if (read_char == '\\')
-				{
-					state = FM_ESC_SQ;
-				}
 				else
 				{
 					T_Update(read_char);
@@ -692,23 +688,6 @@ void T_Get(tTokenPtr tokenPtr)
 			}break;
 			//-----------------------------------------------------------------------
 			
-			//TODO - dodělat escape sekvence a k tomu příslušící stavy
-			case FM_ESC_SQ:
-			{
-				switch (read_char)
-				{
-					case 'n':
-						;break;
-					case '\\':
-						;break;
-					case 't':
-						;break;
-					case 'x':
-						;break;
-				}
-				
-			}break;
-			//-----------------------------------------------------------------------
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
 			{
 				tokenPtr->typ = TT_UNDEFINED;
