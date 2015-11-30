@@ -1,11 +1,5 @@
 #include "scanner.h"
 
-#define LONGEST_KEYWORD 6
-#define KEYWORD_COUNT 15
-#define EON_COUNT 6
-
-static const char eon[EON_COUNT] = {'+', '-', '/', '*', ';', ' '};
-
 //Function prototypes - private
 void T_Get(tTokenPtr tokenPtr);
 int IsKeyword(void);
@@ -26,7 +20,7 @@ void Scann(Deque tokenQueue)
 
 		D_PushBack(tokenQueue, token);
 #if DEBUG
-		printf("%s",tokenNames[token->typ]);
+		printf("%s\n",tokenNames[token->typ]);
 		scannedTokens++;
 #endif
 		if(token->typ == TT_EOF)
@@ -34,6 +28,7 @@ void Scann(Deque tokenQueue)
 	}
 #if DEBUG
 	printf("Scanning done %d tokens done\n"), scannedTokens;
+#endif
 }
 
 void T_Get(tTokenPtr tokenPtr)
@@ -146,18 +141,18 @@ void T_Get(tTokenPtr tokenPtr)
 						break;
 						
 					case '_':
-						state = FM_VARIABLE;
+						state = FM_IDENTIFIER;
 						break;
 					
 					case '!':
 						state = FM_NOT_EQUAL;
 						break;
 						
-					case '\':
+					case '\\':
 						state = FM_NUM_BASE;
 						break;
 						
-					case '"'
+					case '"':
 						state = FM_STRING;
 						break;
 						
@@ -186,7 +181,7 @@ void T_Get(tTokenPtr tokenPtr)
 						{
 							state = FM_UNRECOGNIZED;
 						}
-						T_Update(read_char, file_p);
+						T_Update(read_char);
 					}
 					break;
 						
@@ -301,7 +296,7 @@ void T_Get(tTokenPtr tokenPtr)
 					
 				ungetc(read_char, file_p);
 				state = FM_END;
-			}
+			}break;
 			//-----------------------------------------------------------------------
 				
 			case FM_MINUS:
@@ -454,7 +449,7 @@ void T_Get(tTokenPtr tokenPtr)
 					
 				if (read_char == '=')
 					state = FM_G_EQUAL;
-				else if (read_char == ">")
+				else if (read_char == '>')
 				{
 					state = FM_EXTRACTION;
 				}
@@ -511,7 +506,7 @@ void T_Get(tTokenPtr tokenPtr)
 					T_Update(read_char);
 				}
 				else if (((read_char >= ZERO) && (read_char <= NINE))
-					|| (read_char = '_'))
+					|| (read_char == '_'))
 				{
 					T_Update(read_char);
 					state = FM_IDENTIFIER;
@@ -536,7 +531,7 @@ void T_Get(tTokenPtr tokenPtr)
 				if (((read_char >= LETTER_A) && (read_char <= LETTER_Z))
 					|| ((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
 					|| ((read_char >= ZERO) && (read_char <= NINE))
-					|| (read_char = '_'))
+					|| (read_char == '_'))
 				{
 					T_Update(read_char);
 				}
@@ -556,7 +551,7 @@ void T_Get(tTokenPtr tokenPtr)
 				
 				ungetc(read_char, file_p);
 				state = FM_END;
-			}
+			}break;
 			//-----------------------------------------------------------------------
 					
 			case FM_EXTRACTION:
@@ -572,7 +567,7 @@ void T_Get(tTokenPtr tokenPtr)
 			{
 				tokenPtr->typ = TT_INSERTION;
 						
-				ungetc(read_char);
+				ungetc(read_char, file_p);
 				state = FM_END;		
 			} break;
 			//-----------------------------------------------------------------------
@@ -601,7 +596,7 @@ void T_Get(tTokenPtr tokenPtr)
 					}
 					
 				}
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			case FM_INTEGER:
@@ -610,7 +605,7 @@ void T_Get(tTokenPtr tokenPtr)
 				
 				ungetc(read_char, file_p);
 				state = FM_END;
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			case FM_DOUBLE:
@@ -631,7 +626,7 @@ void T_Get(tTokenPtr tokenPtr)
 						// TODO ERROR
 					}
 				}
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			case FM_NUM_BASE:
@@ -659,7 +654,7 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			case FM_HEX_NUM:
 			{
-				tokenPtr->type = TT_HEX_NUM;
+				tokenPtr->typ = TT_HEX_NUM;
 				
 				if (((read_char >= LETTER_A) && (read_char <= LETTER_Z))
 					|| ((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
@@ -672,7 +667,7 @@ void T_Get(tTokenPtr tokenPtr)
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			case FM_OCT_NUM:
@@ -689,7 +684,7 @@ void T_Get(tTokenPtr tokenPtr)
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			case FM_BIN_NUM:
@@ -706,16 +701,16 @@ void T_Get(tTokenPtr tokenPtr)
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			case FM_STRING:
 			{
-				if (read_char == '"')
+				if (read_char == '\"')
 				{
 					state = FM_END;
 				}
-				else if (read_char == '\')
+				else if (read_char == '\\')
 				{
 					state = FM_ESC_SQ;
 				}
@@ -723,7 +718,7 @@ void T_Get(tTokenPtr tokenPtr)
 				{
 					T_Update(read_char);
 				}
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			//TODO - dodělat escape sekvence a k tomu příslušící stavy
@@ -733,7 +728,7 @@ void T_Get(tTokenPtr tokenPtr)
 				{
 					case 'n':
 						;break;
-					case '\':
+					case '\\':
 						;break;
 					case 't':
 						;break;
@@ -741,7 +736,7 @@ void T_Get(tTokenPtr tokenPtr)
 						;break;
 				}
 				
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
 			{
@@ -782,16 +777,9 @@ int IsKeyword()
 				{
 					return 0;
 				}
-				else
-				{
-					return 1;
-				}
-			}
-			else
-			{
-				return 1;
 			}
 		}
+		return 1;
 	}
 }
 
@@ -800,12 +788,7 @@ int EndOfNumber(char c)
 	for (int i = 0; i < EON_COUNT; i++)
 	{
 		if (c == eon[i])
-		{
 			return 0;
-		}
-		else
-		{
-			return 1;
-		}
 	}
+	return 1;
 }

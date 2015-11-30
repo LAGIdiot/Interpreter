@@ -2,12 +2,18 @@
 #define SCANNER_Header
 
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "errors.h"
 #include "token.h"
 #include "deque.h"
 
 #define TOKEN_COUNT 30
+
+#define LONGEST_KEYWORD 6
+#define KEYWORD_COUNT 15
+#define EON_COUNT 6
 
 //Externs
 extern FILE * file_p;
@@ -33,8 +39,7 @@ typedef enum
 
 // STAVY KONEČNÉHO AUTOMATU
 // Popis stavů konečného automatu, mezi nimiž program přechází
-typedef enum
-{
+typedef enum FM_STATES{
 	FM_START,
 	FM_END,
 
@@ -74,14 +79,18 @@ typedef enum
 	FM_DECREMENT,
 	FM_INCREMENT,
 
+	FM_EXTRACTION,
+	FM_INSERTION,
+	FM_NUM_BASE,
+
 	FM_COMMENT_SINGLELINE,
 	FM_COMMENT_MULTILINE,
 	FM_COMMENT_MULTILINE_END,
 
-	FM_UNRECOGNIZED,
+	FM_UNRECOGNIZED
 	//---------------------------------------------------------------------------
 
-	/*, FM_BOOL_ ... && ||*/
+	/*, FM_BOOL_ ... && || */
 } fm_states;
 
 //Functions
@@ -91,6 +100,8 @@ static const char *key_words[KEYWORD_COUNT] = {"auto", "cin", "cout", "double",
  "else", "for", "if", "int", "return", "string", "bool", "do", "while",
  "true", "false"};
 
+static const char eon[EON_COUNT] = {'+', '-', '/', '*', ';', ' '};
+
 #if DEBUG
 static const char *tokenNames[TOKEN_COUNT] =
 	{"UNDEFINED", "EOF", "SEMICOLN", "STAR", "PLUS", "MINUS", "DEVIDE", "ASSIGN", "EQUEAL", "EQUAL_LESS",
@@ -98,5 +109,7 @@ static const char *tokenNames[TOKEN_COUNT] =
 		"EXTRACTION", "INT", "DOUBLE", "CHAR", "KEYWORLD_STRING", "KEYWORLD_INT", "KEYWORLD_DOUBLE", "KEYWORLD_CHAR", "KEYWORLD_STRING", "KEYWORLD_VOID",
 		};
 #endif
+
+void T_Get(tTokenPtr tokenPtr);
 
 #endif

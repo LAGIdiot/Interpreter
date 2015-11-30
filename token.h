@@ -79,6 +79,17 @@ enum TokenType{
 	TT_EXTRACTION,	/* >>	*/
 	TT_INSERTION,	/* <<	*/
 
+	TT_AND,
+	TT_OR,
+	TT_INCREMENT,
+	TT_DECREMENT,
+	TT_NOT_EQUAL,
+	TT_HEX_NUM,
+	TT_OCT_NUM,
+	TT_BIN_NUM,
+
+	TT_KEYWORD,
+
 
 /* Zde si budu uchovavat specialni tokeny pro SYN*/
 	TT_SPECIAL_DOLLAR,

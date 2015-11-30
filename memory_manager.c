@@ -70,12 +70,14 @@ void * MM_Realloc(void * ptrOld, size_t size)
 #endif
 
 	/*re-map member if needed*/
+	//FIXME: Spatne rozpoznavani mrtvych bloku
+	/*
 	if(ptr != ptrOld)
 	{
 		MM_Remove(ptrOld, 0);
 		MM_Add(ptr);
 	}
-
+*/
 	return ptr;
 }
 
@@ -187,7 +189,12 @@ void MM_Remove(void * ptr, int valid)
 			while(temp->dataPtr != ptr)
 			{
 				if(temp->prevPtr == NULL)
+				{
+					//FIXME: Problem s hledanim bloku
+					//break;
 					mistake(ERR_INTERN, "Memory block not found\n");
+				}
+
 
 				tempNext = temp;
 				temp = temp->prevPtr;
@@ -198,7 +205,7 @@ void MM_Remove(void * ptr, int valid)
 
 			if(valid)
 				free(temp->dataPtr);
-
+//FIXME: Memory freeing
 			free(temp);
 		}
 	}

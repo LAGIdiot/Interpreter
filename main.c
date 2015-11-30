@@ -2,7 +2,9 @@
 
 #include "errors.h"
 #include "memory_manager.h"
-#include "syntactic_analyzer.h"
+#include "scanner.h"
+#include "parser.h"
+#include "interpret.h"
 #include "deque.h"
 #include "ial.h"
 
@@ -32,14 +34,14 @@ int main(int argc, char *argv[])
 			//Token Queue
 			Deque tokenQueue = D_Init();
 
-			//Scann(tokenQueue);
+			Scann(tokenQueue);
 
 			//BT of global symbols
 			nodePtr globalSymbolTree;
-			treeInit(globalSymbolTree);
+			treeInit(&globalSymbolTree);
 
 			//Dequeu of intern code
-//			Deque internCode = Parse(tokenQueue, &globalSymbolTree);
+			Deque internCode = Parse(tokenQueue, &globalSymbolTree);
 
 
 //			Interpret(internCode, globalSymbolTree);
