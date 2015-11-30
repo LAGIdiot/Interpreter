@@ -9,7 +9,13 @@
 
 #include "token.h"
 
+#define LONGEST_KEYWORD 6
+#define KEYWORD_COUNT 15
+#define EON_COUNT 6
+
 void T_Get(tTokenPtr tokenPtr);
+int IsKeyword(void);
+int EndOfNumber(char c);
 
 extern FILE * file_p;
 
@@ -41,7 +47,7 @@ typedef enum
 	FM_START,
 	FM_END,
 
-	FM_SEMICOLN,
+	FM_SEMICOLON, // ;
 	FM_HASH,
 	FM_STAR,
 	FM_STAR_ASSIGN,
@@ -53,38 +59,51 @@ typedef enum
 	FM_DIVIDE_ASSIGN,
 	FM_ASSIGN,
 	FM_EQUAL,
+	//FM_DOT,
+	FM_GREATER,
+	FM_LESS,
+	FM_G_EQUAL,
+	FM_L_EQUAL,
+	FM_NOT_EQUAL,
+	FM_COMMA,
+	//FM_PIPE,
+	FM_CODEWORD,
+	FM_KEYWORDS,
+	FM_IDENTIFIER,
+	FM_PAR_L,
+	FM_PAR_R,
+	FM_BRACE_L,
+	FM_BRACE_R,
+	FM_BRACKET_L,
+	FM_BRACKET_R,
+	FM_OR,
+	FM_AND,
 
 	FM_COMMENT_SINGLELINE,
 	FM_COMMENT_MULTILINE,
 	FM_COMMENT_MULTILINE_END,
 
 	FM_UNRECOGNIZED,
-
-
-
-	FM_KEYWORDS,
-	FM_DOT,
-	FM_VARIABLE,
+	//---------------------------------------------------------------------------
+	
 	FM_STRING,
 	FM_ESC_SQ,
-	FM_GREATER,
-	FM_LESS,
-	FM_G_EQUAL,
-	FM_L_EQUAL,
-	FM_NOT_EQUAL,
 	FM_PERC,
-	FM_COMMA,
-	FM_PIPE,
+
 
 	FM_DECREMENT,
 	FM_INCREMENT,
 
 	FM_INTEGER,
 	FM_DOUBLE,
+	FM_NUMBER,
+	FM_OCT_NUM,
+	FM_HEX_NUM,
 	/*, FM_BOOL_ ... && ||*/
 } fm_states;
 
-const static char *key_words[10] = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"};
-//TODO: /*,"bool","do", "while", "true", "false"*/
+static const char eon[EON_COUNT] = {'+', '-', '/', '*', ';', ' '};
+
+static const char *key_words[KEYWORD_COUNT] = {"auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string", "bool", "do", "while", "true", "false"};
 
 #endif //LA_Header
