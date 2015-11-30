@@ -230,15 +230,6 @@ void T_Get(tTokenPtr tokenPtr)
 			} break;
 			//-----------------------------------------------------------------------
 				
-			case FM_HASH:
-			{
-				tokenPtr->typ = TT_HASH;
-
-				ungetc(read_char, file_p);
-				state = FM_END;
-			} break;
-			//-----------------------------------------------------------------------
-				
 			case FM_STAR:
 			{
 				tokenPtr->typ = TT_STAR;
@@ -561,7 +552,7 @@ void T_Get(tTokenPtr tokenPtr)
 				{
 					if (!EndOfNumber(read_char))
 					{
-						state = FM_INTEGER;
+						state = FM_INT;
 						ungetc(read_char, file_p);
 					}
 					else
@@ -592,6 +583,7 @@ void T_Get(tTokenPtr tokenPtr)
 				{
 					if (!EndOfNumber(read_char))
 					{
+						tokenPtr->typ = TT_DOUBLE;
 						ungetc(read_char, file_p);
 						state = FM_END;
 					}
@@ -682,6 +674,7 @@ void T_Get(tTokenPtr tokenPtr)
 			{
 				if (read_char == '\"')
 				{
+					tokenPtr->typ = TT_STRING;
 					state = FM_END;
 				}
 				else if (read_char == '\\')
@@ -714,7 +707,7 @@ void T_Get(tTokenPtr tokenPtr)
 			//-----------------------------------------------------------------------
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
 			{
-				tokenPtr->typ = TT_UNRECOGNIZED;
+				tokenPtr->typ = TT_UNDEFINED;
 
 				if(!whiteSpace)
 					T_Update(read_char);
