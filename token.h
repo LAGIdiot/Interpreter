@@ -63,9 +63,10 @@ enum TokenType{
 	TT_PAR_R, 		/* ) */
 	TT_BRACE_L, 	/* { */
 	TT_BRACE_R,		/* { */
-	TT_BRACKET_L,	/* [ */
-	TT_BRACKET_R,	/* ] */
 
+
+	TT_BRACKET_L,	/* [ */
+	TT_BRACKET_R,	/* ] */ //o polich nebylo nic receno
 
 
 	TT_INT,

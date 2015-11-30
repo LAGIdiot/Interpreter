@@ -3,6 +3,8 @@
 #include "errors.h"
 #include "memory_manager.h"
 #include "syntactic_analyzer.h"
+#include "deque.h"
+#include "ial.h"
 
 FILE *file_p;
 
@@ -27,11 +29,25 @@ int main(int argc, char *argv[])
 			MM_Init(); //Initialize memory manager
 			T_SystemInit();
 
+			//Token Queue
+			Deque tokenQueue = D_Init();
+
+			//Scann(tokenQueue);
+
+			//BT of global symbols
+			nodePtr globalSymbolTree;
+			treeInit(globalSymbolTree);
+
+			//Dequeu of intern code
+//			Deque internCode = Parse(tokenQueue, &globalSymbolTree);
 
 
-			//Test_parse();
+//			Interpret(internCode, globalSymbolTree);
 
-			Parse();
+
+//			D_Terminate(tokenQueue);
+//			D_Terminate(internCode);
+//			deleteTree(globalSymbolTree);
 
 
 			T_SystemTerminate();

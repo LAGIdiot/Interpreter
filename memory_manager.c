@@ -41,7 +41,7 @@ void * MM_Malloc(size_t size)
 	if(ptr == NULL)
 		mistake(ERR_INTERN, "Not enough memory\n");
 
-#if DEBUG
+#if DEBUG2
 	printf("Allocating memory at: %d with size: %d\n", ptr, size);
 #endif
 
@@ -65,7 +65,7 @@ void * MM_Realloc(void * ptrOld, size_t size)
 	if(ptr == NULL)
 		mistake(ERR_INTERN, "Memory reallocation problem");
 
-#if DEBUG
+#if DEBUG2
 	printf("Reallocating memory from: %d to: %d with size: %d\n", ptrOld, ptr, size);
 #endif
 
@@ -87,7 +87,7 @@ void * MM_Realloc(void * ptrOld, size_t size)
 //////////////////////////////////////////////////
 void MM_Free(void * ptr)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Freeing memory from: %d\n", ptr);
 #endif
 
@@ -134,7 +134,7 @@ void MM_FreeAll()
 //////////////////////////////////////////////////
 void MM_Add(void * ptr)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Creating garbage block for pointer: %d\n", ptr);
 #endif
 	MemoryBlockPtr newBlock = malloc(sizeof(struct MemoryBlockStruct));
@@ -163,7 +163,7 @@ void MM_Add(void * ptr)
 //////////////////////////////////////////////////
 void MM_Remove(void * ptr, int valid)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Removing garbage block for pointer: %d - block is valid: %s\n", ptr, valid == 1 ? "TRUE" : "FALSE");
 #endif
 	if(MM_Top != NULL) //Check if there is any memory to free

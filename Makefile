@@ -7,6 +7,7 @@ CFLAGSD=-c -g -O0 -std=c99 -DDEBUG
 
 PARTS=errors.o $(MM).o token.o str.o $(LA).o $(SA).o ial.o $(AC).o $(ST).o main.o deque.o
 PARTS-d=errors-d.o $(MM)-d.o token-d.o str-d.o $(LA)-d.o $(SA)-d.o ial-d.o $(AC)-d.o $(ST)-d.o main-d.o deque-d.o
+PARTS-d2=errors-d.o $(MM)-d2.o token-d.o str-d.o $(LA)-d.o $(SA)-d.o ial-d.o $(AC)-d.o $(ST)-d.o main-d.o deque-d.o
 
 MM=memory_manager
 LA=lexical_analyzer
@@ -16,10 +17,12 @@ ST=symbol_table
 
 .PHONY: all
 .PHONY: debug
+.PHONY: debug2
 .PHONY: clean
 
 all: compiler
 debug: compiler-d
+debug2: compiler-d2
 
 #linking
 compiler: $(PARTS)
@@ -27,6 +30,9 @@ compiler: $(PARTS)
 
 compiler-d: $(PARTS-d)
 	$(CC) -o compiler-d $(PARTS-d)
+	
+compiler-d2: $(PARTS-d2)
+	$(CC) -o compiler-d $(PARTS-d2)
 
 #compiling
 main.o: main.c errors.h $(MM).h $(SA).h str.h $(ST).h token.h
@@ -96,6 +102,10 @@ $(ST)-d.o: $(ST).c $(ST).h $(MM).h errors.h str.h
 	
 deque-d.o: deque.c deque.h errors.h $(MM).h
 	$(CC) $(CFLAGSD) -o deque-d.o deque.c
+	
+#debug 2
+$(MM)-d2.o: $(MM).c $(MM).h errors.h
+	$(CC) $(CFLAGSD) -DDEBUG2 -o $(MM)-d2.o $(MM).c
 
 #clean
 clean:
