@@ -18,33 +18,41 @@ typedef struct TokenStruct{
 enum TokenType{
 	TT_UNDEFINED,	/* nikdy by nemelo byt vraceno*/
 	TT_EOF,			/* EOF	*/
-	TT_SEMICOLN,	/* ;	*/
-	TT_HASH,		/* #	*/
+
+	TT_SEMICOLON,	/* ;	*/
+
 	TT_STAR,		/* *	*/
 	TT_PLUS,		/* +	*/
 	TT_MINUS,		/* -	*/
 	TT_DIVIDE,		/* /	*/
 
 	TT_ASSIGN,		/* = 	*/
-	TT_ASSIGN_MUL,	/* *=	*/
-	TT_ASSIGN_ADD,	/* +=	*/
-	TT_ASSIGN_SUB,	/* -=	*/
-	TT_ASSIGN_DIV,	/* /=	*/
-
 	TT_EQUAL,		/* ==	*/
 	TT_EQUAL_LESS,	/* <=	*/
 	TT_EQUAL_GREATER,	/* >=	*/
+	TT_NOT_EQUAL,	/* !=	*/
 
 	TT_LESS,		/* <	*/
 	TT_GREATER,		/* >	*/
 
-	TT_DOT,			/* .	*/
-	TT_PIPE,		/* |	*/
 	TT_COMMA,		/* ,	*/
 
+	TT_EXTRACTION,	/* >>	*/
+	TT_INSERTION,	/* <<	*/
 
+	TT_AND,			/* &&	*/
+	TT_OR,			/* ||	*/
+	TT_INCREMENT,	/* ++	*/
+	TT_DECREMENT,	/* --	*/
+
+	TT_PAR_L, 		/* (	*/
+	TT_PAR_R, 		/* )	*/
+	TT_BRACE_L, 	/* {	*/
+	TT_BRACE_R,		/* {	*/
 
 	TT_IDENTIFIER,
+
+//S timhle dolu se nesmi pohybovat
 	TT_KEYWORLD_IF,
 	TT_KEYWORLD_ELSE,
 	TT_KEYWORLD_FOR,
@@ -58,32 +66,11 @@ enum TokenType{
 	TT_KEYWORLD_CHAR,
 	TT_KEYWORLD_VOID,
 
-
-	TT_PAR_L, 		/* ( */
-	TT_PAR_R, 		/* ) */
-	TT_BRACE_L, 	/* { */
-	TT_BRACE_R,		/* { */
-
-
-	TT_BRACKET_L,	/* [ */
-	TT_BRACKET_R,	/* ] */ //o polich nebylo nic receno
-
-
 	TT_INT,
 	TT_DOUBLE,
 	TT_STRING,
 	TT_CHAR,
-	TT_VOID,
 
-	TT_EQUAL_NOT,	/* != */
-	TT_EXTRACTION,	/* >>	*/
-	TT_INSERTION,	/* <<	*/
-
-	TT_AND,
-	TT_OR,
-	TT_INCREMENT,
-	TT_DECREMENT,
-	TT_NOT_EQUAL,
 	TT_HEX_NUM,
 	TT_OCT_NUM,
 	TT_BIN_NUM,
@@ -103,7 +90,7 @@ enum TokenType{
 	TT_SPECIAL_COUT_LS,
 	TT_SPECIAL_EXP,
 
-	TT_UNRECOGNIZED,
+	TT_UNRECOGNIZED, //TODO Smazat az ready
 }Typ;
 
 //Function prototypes

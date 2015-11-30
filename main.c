@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 			Deque internCode = Parse(tokenQueue, &globalSymbolTree);
 
 
-//			Interpret(internCode, globalSymbolTree);
+			Interpret(internCode, globalSymbolTree);
 
 
 //			D_Terminate(tokenQueue);
