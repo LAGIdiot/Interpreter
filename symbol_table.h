@@ -5,19 +5,20 @@
 #include "errors.h"
 #include "memory_manager.h"
 
+#include "token.h"
+
 enum symbolType{
 	ST_VARIABLE,
 	ST_FUNCTION,
 }symbols;
 
 enum variableType{
+	ST_UNDEFINED,
+
 	ST_INT,
 	ST_DOUBLE,
-	ST_CHAR,
 	ST_STRING,
 	ST_AUTO,
-
-	ST_UNDEFINED,
 }variables;
 
 typedef struct symbolFunctionStruct{
@@ -31,6 +32,7 @@ typedef struct symbolFunctionStruct{
 typedef struct symbolVariableStruct{
 	int type;		//variableType
 	int defined; 	//defined
+	string labelPlatnosti; //label ve kterem nejpozdeji plati dana promena
 	void *data;		//pointer to memory
 }*symbolVariablePtr;
 
@@ -40,7 +42,7 @@ typedef struct symbolPackegeStruct{
 	void * data;	//samotna struktura obsahujici symbol
 }*symbolPackagePtr;
 
-symbolPackagePtr ST_PackeageCreate(string key, int typ, void * symbol);
+symbolPackagePtr ST_PackageCreate(string key, int typ, void * symbol);
 void ST_PackageDestroy(symbolPackagePtr symbol);
 
 symbolFunctionPtr ST_FunctionCreate();
@@ -53,5 +55,7 @@ void ST_VariableDestroy(symbolVariablePtr symbol);
 string ST_RandomKeyGenerator();
 
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2);
+
+int ST_Remap(int tokenTyp);
 
 #endif //ST_Header

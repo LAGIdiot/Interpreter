@@ -5,8 +5,8 @@ CC=gcc
 CFLAGS=-c -O2 -std=c99 -Wall -pedantic
 CFLAGSD=-c -g -O0 -std=c99 -DDEBUG
 
-PARTS=errors.o $(MM).o token.o str.o scanner.o parser.o ial.o $(AC).o $(ST).o main.o deque.o interpret.o
-PARTS-d=errors-d.o $(MM)-d.o token-d.o str-d.o scanner-d.o parser-d.o ial-d.o $(AC)-d.o $(ST)-d.o main-d.o deque-d.o interpret-d.o
+PARTS=errors.o $(MM).o token.o str.o deque.o ial.o $(AC).o $(ST).o scanner.o parser.o interpret.o main.o 
+PARTS-d=errors-d.o $(MM)-d.o token-d.o str-d.o deque-d.o ial-d.o $(AC)-d.o $(ST)-d.o scanner-d.o parser-d.o interpret-d.o main-d.o
 PARTS-d2=errors-d.o $(MM)-d2.o token-d.o str-d.o scanner-d.o parser-d.o ial-d.o $(AC)-d.o $(ST)-d.o main-d.o deque-d.o interpret-d.o
 
 MM=memory_manager
@@ -83,7 +83,7 @@ $(MM)-d.o: $(MM).c $(MM).h errors.h
 token-d.o: token.c token.h $(MM).h errors.h
 	$(CC) $(CFLAGSD) -o token-d.o token.c
 
-parser-d.o: parser.c parser.h errors.h $(MM).h str.h $(ST).h token.h 
+parser-d.o: parser.c parser.h errors.h  str.h $(ST).h token.h deque.h ial.h
 	$(CC) $(CFLAGSD) -o parser-d.o parser.c
 
 scanner-d.o: scanner.c scanner.h errors.h token.h $(MM).h

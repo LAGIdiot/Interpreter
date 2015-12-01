@@ -22,14 +22,14 @@ void Scann(Deque tokenQueue)
 
 		D_PushBack(tokenQueue, token);
 #if DEBUG
-		printf("%s\n",tokenNames[token->typ]);
 		scannedTokens++;
+		printf("%s\n",tokenNames[token->typ]);
 #endif
 		if(token->typ == TT_EOF)
 			scann = 0;
 	}
 #if DEBUG
-	printf("Scanning done %d tokens done\n"), scannedTokens;
+	printf("Scanning done %d tokens done\n",scannedTokens);
 #endif
 }
 

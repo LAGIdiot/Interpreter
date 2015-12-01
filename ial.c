@@ -5,34 +5,34 @@ void treeInit (nodePtr *Root)
 	*Root = NULL;	
 }
 
-nodePtr searchNodeBySymbol (nodePtr Root, symbolPackagePtr symbol)
+nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol)
 {
 
 	if(Root != NULL)
 	{
-		int i = ST_Compare(Root->data, symbol);
+		int i = ST_Compare((*Root)->data, symbol);
 		if(i == 0)
-			return Root;
+			return *Root;
 		else if(i < 0)
-			return searchNodeBySymbol(Root->lChild, symbol);
+			return searchNodeBySymbol(&(*Root)->lChild, symbol);
 		else
-			return searchNodeBySymbol(Root->rChild, symbol);
+			return searchNodeBySymbol(&(*Root)->rChild, symbol);
 	}
 	else
 		return NULL;
 }
 
-nodePtr searchNodeByKey (nodePtr Root, string key)
+nodePtr searchNodeByKey (nodePtr *Root, string key)
 {
 	if(Root != NULL)
 	{
-		int i = strCompare(Root->data->key, key);
+		int i = strCompare((*Root)->data->key, key);
 		if(i == 0)
-			return Root;
+			return *Root;
 		else if(i < 0)
-			return searchNodeByKey(Root->lChild, key);
+			return searchNodeByKey(&(*Root)->lChild, key);
 		else
-			return searchNodeByKey(Root->rChild, key);
+			return searchNodeByKey(&(*Root)->rChild, key);
 	}
 	else
 		return NULL;

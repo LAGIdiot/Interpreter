@@ -8,6 +8,7 @@
 #include "memory_manager.h"
 
 #define KEYWORD_SHIFT 26
+#define TOKEN_COUNT 52
 
 //Structures
 typedef struct TokenStruct{
@@ -85,16 +86,23 @@ enum TokenType{
 	TT_OCT_NUM,
 	TT_BIN_NUM,
 
-/* Zde si budu uchovavat specialni tokeny pro SYN*/
-	TT_SPECIAL_DOLLAR,
-	TT_SPECIAL_FUNKCE_LS,
-	TT_SPECIAL_FUNKCE,
-	TT_SPECIAL_FUNKCE_P,
-	TT_SPECIAL_STAT_LS,
-	TT_SPECIAL_STAT,
+/* Zde si budu uchovavat specialni tokeny pro parser*/
+	TT_S_DOLLAR,
+	TT_S_FUNKCE_LS,
+	TT_S_FUNKCE_HEAD,
+	TT_S_FUNKCE_HEAD_END,
+	TT_S_FUNKCE_P,
+	TT_S_STAT_LS,
+	TT_S_STAT,
+	TT_S_VAR_END,
+
+
+	TT_S_EXP,
+	TT_S_TYP_UNIVERSAL,
+
+
 	TT_SPECIAL_CIN_LS,
 	TT_SPECIAL_COUT_LS,
-	TT_SPECIAL_EXP,
 }Typ;
 
 //Function prototypes
@@ -108,6 +116,15 @@ char * T_GetData();
 void T_SystemInit();
 void T_SystemTerminate();
 
-extern void T_Get(tTokenPtr tokenPtr);
+#if DEBUG
+static const char *tokenNames[TOKEN_COUNT] =
+	{"UNDEFINED", "EOF", "SEMICOLON", "STAR", "PLUS", "MINUS", "DEVIDE", "ASSIGN", "EQUEAL", "EQUAL_LESS",
+		"EQUAL_GREATER","NOT_EQUEAL", "LESS", "GREATER", "COMMA", "EXTRACTION", "INSERTION", "AND", "OR", "INCREMENT",
+		"DECREMENT", "PAR_L", "PAR_R", "BRACE_L", "BRACE_R", "IDENTIFIER","AUTO","CIN","COUT","DOUBLE",
+		"ELSE", "FOR", "IF", "INT", "RETURN", "STRING", "BOOL", "DO", "WHILE", "TRUE",
+		"FALSE", "LENGHT", "SUBSTR", "CONCAT", "FIND", "SORT", "INT_NUM", "DOUBLE_NUM", "STRING", "HEX_NUM",
+		"OCT_NUM", "BIN_NUM",
+	};
+#endif
 
 #endif //T_Header

@@ -42,6 +42,8 @@ Deque D_Init();
 void D_Terminate(Deque deque);
 
 void D_PushBack(Deque deque, void * data);
+void D_PushFront(Deque deque, void * data);
+
 void * D_PopFront(Deque deque);
 void * D_TopFront(Deque deque);
 

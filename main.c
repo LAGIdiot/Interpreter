@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
 			Interpret(internCode, globalSymbolTree);
 
 
-//			D_Terminate(tokenQueue);
-//			D_Terminate(internCode);
-//			deleteTree(globalSymbolTree);
+			D_Terminate(tokenQueue);
+			AC_Terminate(internCode);
+			deleteTree(globalSymbolTree);
 
 
 			T_SystemTerminate();
