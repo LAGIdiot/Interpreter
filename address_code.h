@@ -7,19 +7,22 @@
 #include "symbol_table.h"
 #include "deque.h"
 
-enum operatinType{
-	OT_OP_ADD,
-	OT_OP_SUBB,
-	OT_OP_DIV,
-	OT_OP_MUL,
+static const char * DUMMY = "#dummy";
 
-	OT_LABEL,
-	OT_JUMP,
-	OT_JUMP_GREATER,
-	OT_JUMP_GREATER_EQUAL,
-	OT_JUMP_LESS,
-	OT_JUMP_LESS_EQUAL,
-	OT_JUMP_EQUAL,
+enum operatinType{
+	AC_OP_ADD,
+	AC_OP_SUBB,
+	AC_OP_DIV,
+	AC_OP_MUL,
+
+	AC_LABEL,
+	AC_JUMP,
+	AC_JUMP_GREATER,
+	AC_JUMP_GREATER_EQUAL,
+	AC_JUMP_LESS,
+	AC_JUMP_LESS_EQUAL,
+	AC_JUMP_EQUAL,
+	AC_JUMP_NOT_EQUAL,
 };
 
 typedef struct AC_ItemStruct{

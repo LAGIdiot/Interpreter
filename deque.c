@@ -239,6 +239,37 @@ void D_PushBack(Deque deque, void * data)
 		mistake(ERR_INTERN,"Pushing back to uninitialized deque\n");
 }
 
+void D_PushFront(Deque deque, void * data)
+{
+#if DEBUG
+	printf("Pushing data to front of deque: %d\n", deque);
+#endif
+	if(deque != NULL && deque->type == DEQUE)
+	{
+		DequeContainer container = MM_Malloc(sizeof(struct dequeContainerStruct));
+
+		container->dataPtr = data;
+		container->prevPtr = NULL;
+
+		if(deque->first == NULL)
+		{
+			container->nextPtr = NULL;
+			deque->first = container;
+		}
+		else
+		{
+			container->nextPtr = deque->first;
+			deque->first->prevPtr = container;
+
+			deque->first = container;
+		}
+
+		if(deque->last == NULL)
+			deque->last = container;
+	}
+	else
+		mistake(ERR_INTERN,"Pushing back to uninitialized deque\n");
+}
 
 void * D_PopFront(Deque deque)
 {

@@ -35,7 +35,6 @@ void strClear(string s)
    s->length = 0;
 }
 
-//TODO:Test this, may have problems with + 1 sizes
 int strInsert(string s, char *text)
 {
 #if DEBUG

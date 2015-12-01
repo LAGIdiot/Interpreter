@@ -9,8 +9,6 @@
 #include "token.h"
 #include "deque.h"
 
-#define TOKEN_COUNT 46
-
 #define LONGEST_KEYWORD 6
 #define KEYWORD_COUNT 20
 #define EON_COUNT 6
@@ -101,17 +99,5 @@ static const char *key_words[KEYWORD_COUNT] = {"auto", "cin", "cout", "double",
  "length", "substr", "concat", "find", "sort"};
 
 static const char eon[EON_COUNT] = {'+', '-', '/', '*', ';', ' '};
-
-#if DEBUG
-static const char *tokenNames[TOKEN_COUNT] =
-	{"UNDEFINED", "EOF", "SEMICOLON", "STAR", "PLUS", "MINUS", "DEVIDE", "ASSIGN", "EQUEAL", "EQUAL_LESS",
-		"EQUAL_GREATER","NOT_EQUEAL", "LESS", "GREATER", "COMMA", "EXTRACTION", "INSERTION", "AND", "OR", "INCREMENT",
-		"DECREMENT", "PAR_L", "PAR_R", "BRACE_L", "BRACE_R", "IDENTIFIER","AUTO","CIN","COUT","DOUBLE",
-		"ELSE", "FOR", "IF", "INT", "RETURN", "STRING", "BOOL", "DO", "WHILE", "TRUE",
-		"FALSE", "LENGHT", "SUBSTR", "CONCAT", "FIND", "SORT"
-	};
-#endif
-
-void T_Get(tTokenPtr tokenPtr);
 
 #endif

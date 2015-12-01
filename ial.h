@@ -49,7 +49,7 @@ void deleteTree(nodePtr*);
 //nodePtr Root - strom v ktorom sa vyhladava
 //bKey key - kluc resp. nazov podla ktoreho vyhladava
 ///////////
-nodePtr searchNodeBySymbol (nodePtr Root, symbolPackagePtr symbol);
-nodePtr searchNodeByKey (nodePtr Root, string key);
+nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol);
+nodePtr searchNodeByKey (nodePtr *Root, string key);
 
 #endif //IAL_Header

@@ -1,6 +1,8 @@
 #include "symbol_table.h"
 
-symbolPackagePtr ST_PackeageCreate(string key, int typ, void * symbol)
+int ST_Remap(int tokenTyp);
+
+symbolPackagePtr ST_PackageCreate(string key, int typ, void * symbol)
 {
 	symbolPackagePtr symbolPackage = MM_Malloc(sizeof(struct symbolPackegeStruct));
 
@@ -49,15 +51,39 @@ void ST_FunctionDestroy(symbolFunctionPtr symbol)
 	}
 }
 
-void ST_FunctionAddParam(symbolFunctionPtr symbol, int variableType)
+
+//Function for maping datat taypes from token to symbolTbale
+int ST_Remap(int tokenTyp)
+{
+	int ret = 0;
+
+	switch(tokenTyp)
+	{
+		case TT_KEYWORD_INT:
+			ret = 1;
+			break;
+		case TT_KEYWORD_DOUBLE:
+			ret = 2;
+			break;
+		case TT_KEYWORD_STRING:
+			ret = 3;
+			break;
+		case TT_KEYWORD_AUTO:
+			ret = 4;
+			break;
+	}
+	return ret;
+}
+
+void ST_FunctionAddParam(symbolFunctionPtr symbol, int tokenType)
 {
 	if(symbol != NULL)
 	{
+		string params = strInit();
 		if(symbol->paramTypes == NULL)
-		{
-			string params = strInit();
 			symbol->paramTypes = params;
-		}
+
+		int variableType =  ST_Remap(tokenType);
 
 		switch(variableType)
 		{
@@ -67,14 +93,11 @@ void ST_FunctionAddParam(symbolFunctionPtr symbol, int variableType)
 			case ST_DOUBLE:
 				strConcatChar(symbol->paramTypes, "d");
 				break;
-			case ST_CHAR:
-				strConcatChar(symbol->paramTypes, "d");
-				break;
 			case ST_STRING:
-				strConcatChar(symbol->paramTypes, "d");
+				strConcatChar(symbol->paramTypes, "s");
 				break;
 			case ST_AUTO:
-				strConcatChar(symbol->paramTypes, "d");
+				strConcatChar(symbol->paramTypes, "a");
 				break;
 			default:
 				mistake(ERR_INTERN, "Problem with adding param type to function\n");
@@ -107,8 +130,41 @@ string ST_RandomKeyGenerator()
 	return strRNG(8);
 }
 
+int ST_CompareFunctions(symbolFunctionPtr symbol1, symbolFunctionPtr symbol2)
+{
+	if(symbol1->returnType != symbol1->returnType)
+		return -1;
+	else
+		return strCompare(symbol1->paramTypes, symbol2->paramTypes);
+}
+
+int ST_CompareVariables(symbolVariablePtr symbol1, symbolVariablePtr symbol2)
+{
+	if(symbol1->type == symbol2->type)
+		return 0;
+	else if(symbol1->type == ST_AUTO || symbol1->type == ST_AUTO)
+		return 2;
+	else
+		return -1;
+}
+
 //Nemuze dojik k rozdilu v symbol->type !!!
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
 {
-	return strCompare(symbol1->key, symbol2->key);
+	int compareInner = 0;
+	int str = strCompare(symbol1->key, symbol2->key);
+	if(str != 0)
+		return str;
+	else
+	{
+		if(symbol1->typ == ST_FUNCTION && symbol2->typ == ST_FUNCTION)
+			return ST_CompareFunctions(symbol1->data, symbol2->data);
+		else if(symbol1->typ == ST_VARIABLE && symbol2->typ == ST_VARIABLE)
+			return ST_CompareVariables(symbol1->data, symbol2->data);
+		else
+			mistake(ERR_SEM_UND, "There was problem with comparing two symbols with different type\n");
+			return -2;
+	}
+
+	return 0;
 }
