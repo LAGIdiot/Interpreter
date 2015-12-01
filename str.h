@@ -21,7 +21,7 @@ typedef struct stringStruct
 //char *pattern - pattern je hladani vzor , pole
 //int psize - dlzka vzoru
 ///////////
-int *prefix_to_FIND(char *pattern, int psize);
+int *prefix_to_FIND (string search);
 // lets dooooo dis :D
 string charToStr (char *c);
 string strInit();
