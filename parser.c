@@ -16,6 +16,7 @@ static Deque P_platnostStack = NULL;
 //Function prototypes - private
 nodePtr ParseFunctionHead();
 void ParseVariable(nodePtr localSymbolTable);
+void ParsePrirazeni(nodePtr localSymbolTyble);
 
 nodePtr ParseExp(nodePtr localSymbolTable, int needReturn);
 
@@ -141,6 +142,29 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 				tokenTemp = T_Init();
 				tokenTemp->typ = TT_S_TYP_UNIVERSAL;
 				S_Push(P_specialStack, tokenTemp);
+
+				ParseVariable(localSymbolTable);
+
+				break;
+			case 14:
+				//IDENTIFIER, ASSIGN, EXP, SEMICOLON
+				//remove STAT
+				tokenTemp = S_Pop(P_specialStack);
+				T_Destroy(tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_SEMICOLON;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_S_EXP;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_ASSIGN;
+				S_Push(P_specialStack, tokenTemp);
+
+				ParsePrirazeni(localSymbolTable);
 
 				break;
 			default:
@@ -346,7 +370,7 @@ void ParseVariable(nodePtr localSymbolTable)
 
 	int rule;
 
-	int exp = 0;
+	int expr = 0;
 
 	//vim ze tu budu potrebovat nejmene 4 tahy a to 1.TYP, 2.ID, 3.VAR_END 4. = || ;
 	int end = 4;
@@ -355,6 +379,9 @@ void ParseVariable(nodePtr localSymbolTable)
 	{
 		stackTop = S_Top(P_specialStack);
 		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
 
 		if(i == 0)//typ
 		{
@@ -376,11 +403,11 @@ void ParseVariable(nodePtr localSymbolTable)
 
 		//i == 2 ->rozebrani VAR_END
 
-		if(i == 3 && exp)
+		if(i == 3 && expr)
 		{
 			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeExp, NULL, node);
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,node, nodeExp, node);
 			AC_Add(P_internalCode, AC_Item);
 		}
 
@@ -406,19 +433,16 @@ void ParseVariable(nodePtr localSymbolTable)
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_SEMICOLON;
 			S_Push(P_specialStack, tokenTemp);
-			break;
 
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_S_EXP;
 			S_Push(P_specialStack, tokenTemp);
-			break;
 
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_ASSIGN;
 			S_Push(P_specialStack, tokenTemp);
-			break;
 
-			exp = 1;
+			expr = 1;
 			end ++;
 			break;
 		default:
@@ -426,6 +450,53 @@ void ParseVariable(nodePtr localSymbolTable)
 			break;
 		}
 	}
+}
+
+void ParsePrirazeni(nodePtr localSymbolTable)
+{
+	int rule;
+
+	nodePtr nodeId = NULL;
+
+	//vim ze tu budu potrebovat nejmene 4 tahy a to 1.ID, 2. =, 3. EXP, 4. ;
+	int end = 4;
+	for(int i = 0; i < 4; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 0)//ID
+		{
+			nodeId = searchNodeByKey(&localSymbolTable,charToStr(tokenLast->data));
+			if(nodeId == NULL)
+				mistake(ERR_SEM_UND,"No symbol with this name\n");
+
+		}
+		// i == 1 //=
+		if(i == 2)// EXP
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeId, nodeExp, nodeId);
+			AC_Add(P_internalCode, AC_Item);
+		}
+		// i == 3 //;
+
+		switch(rule)
+		{
+		case 0:
+			Rule0();
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+
+
 }
 
 nodePtr ParseExp(nodePtr localSymbolTable, int needReturn)
