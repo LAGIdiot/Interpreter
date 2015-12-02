@@ -11,16 +11,23 @@ static tTokenPtr tokenTemp = NULL;
 static tTokenPtr tokenLast = NULL;
 static tTokenPtr stackTop = NULL;
 
+static Deque P_platnostStack = NULL;
+
 //Function prototypes - private
 nodePtr ParseFunctionHead();
 void ParseVariable(nodePtr localSymbolTable);
 
-void ParseExp();
+nodePtr ParseExp(nodePtr localSymbolTable, int needReturn);
 
 int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop);
 string strGenerateLabel(string s1, char * newPart);
 
 void Rule0();
+
+void RozsahPlatnostiAddInner(string inner, int generateLabel);
+void RozsahPlatnostiRemoveInner();
+string RozsahPlatnostiGet();
+void RozsahPlatnostiTerminate();
 
 
 Deque Parse(Deque tokens, nodePtr *symbolTable)
@@ -145,6 +152,8 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 
 	T_Destroy(tokenFirst);
 	S_Terminate(P_specialStack);
+
+	RozsahPlatnostiTerminate();
 
 	return internCode;
 
@@ -316,15 +325,11 @@ nodePtr ParseFunctionHead()
 	{
 		functionSymbol->defined++;
 
-		string label = strGenerateLabel(functionNode->data->key, NULL);
-
-		//Dummy pro rozliseni levelu
-		symbolVariablePtr dummy = ST_VariableCreate();
-		dummy->labelPlatnosti = label;
-		symbolPackagePtr dummyPackage = ST_PackageCreate(DUMMY, ST_VARIABLE, dummy);
+		//rozliseni levelu platnosti
+		RozsahPlatnostiAddInner(functionNode->data->key, 1);
 
 		//LABEL pro skok na funkcy
-		AC_itemPtr AC_item = AC_I_Create(AC_LABEL,label, NULL, NULL);
+		AC_itemPtr AC_item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(), NULL, NULL);
 		AC_Add(P_internalCode,AC_item);
 
 		return functionInTable->symbolTable;
@@ -337,10 +342,7 @@ void ParseVariable(nodePtr localSymbolTable)
 {
 	symbolVariablePtr variable = NULL;
 	symbolPackagePtr packedVariable = NULL;
-
-	nodePtr dummyNode = searchNodeByKey(&localSymbolTable, DUMMY);
-	symbolVariablePtr dummy = dummyNode->data->data;
-	string label = dummy->labelPlatnosti;
+	nodePtr node = NULL;
 
 	int rule;
 
@@ -369,14 +371,17 @@ void ParseVariable(nodePtr localSymbolTable)
 				mistake(ERR_SYN,"Bad token type in parsing variable");
 
 			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
-			nodeInsert(localSymbolTable, packedVariable);
+			node = nodeInsert(&localSymbolTable, packedVariable);
 		}
 
 		//i == 2 ->rozebrani VAR_END
 
 		if(i == 3 && exp)
 		{
-			ParseExp();
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeExp, NULL, node);
+			AC_Add(P_internalCode, AC_Item);
 		}
 
 		switch(rule)
@@ -420,32 +425,10 @@ void ParseVariable(nodePtr localSymbolTable)
 			mistake(ERR_SYN, "No rule for this");
 			break;
 		}
-
 	}
-
-	//end by rule ->
-	//TODO: End this
-	stackTop = S_Top(P_specialStack);
-	tokenLast = D_TopFront(P_tokenQueue);
-
-	rule = LL_TableRule(tokenLast, stackTop);
-
-	switch(rule)
-	{
-		case 12:
-			//remove VAR_END
-			tokenTemp = S_Pop(P_specialStack);
-			T_Destroy(tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-			break;
-	}
-
 }
 
-void ParseExp()
+nodePtr ParseExp(nodePtr localSymbolTable, int needReturn)
 {
 	//TODO: napsat parsovaci funcki na exp
 }
@@ -580,22 +563,71 @@ string strGenerateLabel(string s1, char * newPart)
 //Function for removing one piece from stack and one from deque
 void Rule0()
 {
-	if((tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING) && stackTop->typ == TT_S_TYP_UNIVERSAL)
-	{
-		tokenTemp = S_Pop(P_specialStack);
-		T_Destroy(tokenTemp);
+	int remove = 0;
 
-		tokenTemp = D_PopFront(P_tokenQueue);
-		T_Destroy(tokenTemp);
+	if(tokenLast->typ == TT_BRACE_R && stackTop->typ == TT_BRACE_R)
+	{
+		RozsahPlatnostiRemoveInner();
+		remove = 1;
 	}
+	else if((tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING) && stackTop->typ == TT_S_TYP_UNIVERSAL)
+		remove = 1;
 	else if(tokenLast->typ == stackTop->typ)
-	{
-		tokenTemp = S_Pop(P_specialStack);
-		T_Destroy(tokenTemp);
-
-		tokenTemp = D_PopFront(P_tokenQueue);
-		T_Destroy(tokenTemp);
-	}
+		remove = 1;
 	else
 		mistake(ERR_SYN, "Rule 0 got two different token types\n");
+
+	if(remove)
+	{
+		tokenTemp = S_Pop(P_specialStack);
+		T_Destroy(tokenTemp);
+
+		tokenTemp = D_PopFront(P_tokenQueue);
+		T_Destroy(tokenTemp);
+	}
+}
+
+void RozsahPlatnostiAddInner(string inner, int generateLabel)
+{
+	if(P_platnostStack == NULL)
+	{
+		P_platnostStack = S_Init();
+	}
+
+	if(P_platnostStack->last == NULL)
+	{
+		if(generateLabel)
+			S_Push(P_platnostStack, strGenerateLabel(inner, NULL));
+		else
+			S_Push(P_platnostStack, inner);
+	}
+	else
+	{
+		string outer = S_Top(P_platnostStack);
+		string innerComplete = concat(outer, inner);
+
+		S_Push(P_platnostStack, innerComplete);
+	}
+}
+
+void RozsahPlatnostiRemoveInner()
+{
+	string temp = S_Pop(P_platnostStack);
+	strFree(temp);
+}
+
+string RozsahPlatnostiGet()
+{
+	return S_Top(P_platnostStack);
+}
+
+void RozsahPlatnostiTerminate()
+{
+	while(!S_Empty(P_platnostStack))
+	{
+		RozsahPlatnostiRemoveInner();
+	}
+
+	S_Terminate(P_platnostStack);
+	P_platnostStack = NULL;
 }

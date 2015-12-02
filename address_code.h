@@ -15,6 +15,8 @@ enum operatinType{
 	AC_OP_DIV,
 	AC_OP_MUL,
 
+	AC_OP_ASSIGN,
+
 	AC_LABEL,
 	AC_JUMP,
 	AC_JUMP_GREATER,

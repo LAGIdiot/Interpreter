@@ -36,7 +36,7 @@ void treeInit (nodePtr*);
 //bkey key - nazov podla ktoreho sa uklada uzol do stromo
 //symbolItemStruct symbol - symbol ktory sa do stromu vklada
 ///////////
-void nodeInsert (nodePtr* , symbolPackagePtr);
+nodePtr nodeInsert (nodePtr* , symbolPackagePtr);
 
 ///////////
 // funkcia deleteTree ( vymazava strom a uvolnuje pamat )
