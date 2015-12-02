@@ -1,6 +1,13 @@
 #include "str.h"
 
 const size_t stringSizeBase = 8;
+const size_t rngSizeBase = 8;
+
+static Deque rngDeque = NULL;
+
+int strRNGSearch(string data);
+void strRNGAdd(string data);
+void strRNGTerminate();
 
 string strInit()
 {
@@ -216,21 +223,70 @@ void strConcatChar(string s1, char * s2)
 
 	s1 = final;
 }
-string strRNG(size_t size)
+string strRNG()
 {
-	char rng[size + 1];
+	char rng[rngSizeBase + 1];
+	string str = NULL;
 
-	for(int i = 0; i < size; i++)
+	do
 	{
-		srand(time(NULL));
-		rng[i] = rand() % 26 + 97; //generuje pouze maly pismena
-	}
+		if(str != NULL)
+			strFree(str);
 
-	rng[size +1] = '\0';
+		for(int i = 0; i < rngSizeBase; i++)
+		{
+			srand(time(NULL));
+			rng[i] = rand() % 26 + 97; //generuje pouze maly pismena
+		}
 
-	string str = charToStr(rng);
+		rng[rngSizeBase +1] = '\0';
 
-	//TODO: Write some kind of verifiing mechanism
+		str = charToStr(rng);
+	}while(strRNGSearch(str));
+
+	strRNGAdd(str);
 
 	return str;
 }
+
+int strRNGSearch(string data)
+{
+	if(rngDeque != NULL)
+	{
+		string first = D_PopFront(rngDeque);
+		D_PushBack(rngDeque, first);
+		string temp = NULL;
+
+		do
+		{
+			temp = D_PopFront(rngDeque);
+			D_PushBack(rngDeque, temp);
+
+			if(temp == data)
+				return 1;
+		}while(temp != first);
+	}
+
+	return 0;
+}
+
+
+void strRNGAdd(string data)
+{
+	if(rngDeque == NULL)
+		rngDeque = D_Init();
+
+	D_PushBack(rngDeque, data);
+}
+
+void strRNGTerminate()
+{
+	while(!D_Empty(rngDeque))
+	{
+		string temp = D_PopFront(rngDeque);
+		strFree(temp);
+	}
+	D_Terminate(rngDeque);
+	rngDeque = NULL;
+}
+

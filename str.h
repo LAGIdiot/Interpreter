@@ -8,6 +8,7 @@
 
 #include "errors.h"
 #include "memory_manager.h"
+#include "deque.h"
 
 typedef struct stringStruct
 {
@@ -34,7 +35,7 @@ double charToDouble(char * c);
 int charToInt(char * c);
 
 void strConcatChar(string s1, char * s2);
-string strRNG(size_t size);
+string strRNG();
 
 //Vestavene funkce - dle zadani
 string concat(string s1, string s2);
