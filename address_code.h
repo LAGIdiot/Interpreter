@@ -28,6 +28,9 @@ enum operatinType{
 	AC_EQUAL,
 	AC_NOT_EQUAL,
 
+	AC_CALL_CIN,
+	AC_CALL_COUT,
+
 	AC_CALL_DUMMY, //slouzi k posilani parametru ktere by se nevesly
 	AC_CALL,
 	AC_RETURN,

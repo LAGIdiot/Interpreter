@@ -95,14 +95,11 @@ enum TokenType{
 	TT_S_STAT_LS,
 	TT_S_STAT,
 	TT_S_VAR_END,
-
+	TT_S_CIN_LS,
+	TT_S_COUT_LS,
 
 	TT_S_EXP,
 	TT_S_TYP_UNIVERSAL,
-
-
-	TT_SPECIAL_CIN_LS,
-	TT_SPECIAL_COUT_LS,
 }Typ;
 
 //Function prototypes
