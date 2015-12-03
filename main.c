@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
 			D_Terminate(tokenQueue);
 			AC_Terminate(internCode);
-			deleteTree(globalSymbolTree);
+			deleteTree(&globalSymbolTree);
 
 
 			T_SystemTerminate();

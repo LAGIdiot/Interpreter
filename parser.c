@@ -18,6 +18,7 @@ nodePtr ParseFunctionHead();
 void ParseVariable(nodePtr localSymbolTable);
 void ParsePrirazeni(nodePtr localSymbolTyble);
 void ParseIO(nodePtr localSymbolTable, int keyword, int cin);
+void ParseReturn(nodePtr localSymbolTable);
 
 nodePtr ParseExp(nodePtr localSymbolTable, int needReturn);
 
@@ -70,6 +71,13 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 
 		//zajisteni jaky pravidlo se pouzije
 		rule = LL_TableRule(tokenLast, stackTop);
+
+		//Odchytavani jeste neimplementovanych ale rozpoznanych tokenu
+		if(tokenLast->typ == TT_KEYWORD_DO ||tokenLast->typ == TT_KEYWORD_WHILE || tokenLast->typ == TT_AND ||
+			tokenLast->typ == TT_OR ||tokenLast->typ == TT_INCREMENT || tokenLast->typ == TT_DECREMENT ||
+			tokenLast->typ == TT_KEYWORD_BOOL || tokenLast->typ == TT_KEYWORD_TRUE || tokenLast->typ == TT_KEYWORD_FALSE)
+			mistake(ERR_LEX,"Unimplemented extension\n");
+
 
 #if DEBUG
 		printf("Using rule %d\n",rule);
@@ -254,6 +262,26 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			S_Push(P_specialStack, tokenTemp);
 
 			ParseIO(localSymbolTable, 0, 0);
+			break;
+		case 21:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_RETURN;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseReturn(localSymbolTable);
+
 			break;
 		default:
 			mistake(ERR_SYN,"No rule for this");
@@ -591,7 +619,7 @@ void ParseIO(nodePtr localSymbolTable, int keyword, int cin)
 
 	nodePtr nodeId = NULL;
 
-	//vim ze tu budu potrebovat nejmene 4 tahy a to 1. CIN, 2. >> 3. ID,
+	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. CIN, 2. >> 3. ID,
 	int end = 3;
 	int start = 1;
 
@@ -623,6 +651,50 @@ void ParseIO(nodePtr localSymbolTable, int keyword, int cin)
 
 			AC_Add(P_internalCode, AC_Item);
 		}
+
+		switch(rule)
+		{
+		case 0:
+			Rule0();
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+
+void ParseReturn(nodePtr localSymbolTable)
+{
+	int rule;
+
+	nodePtr nodeId = NULL;
+
+	//TODO: Zamyslet se zda je potreba infromovat funkci o faktu ze jsem nasel jeji return
+
+
+
+	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. RETURN, 2. EXP, 3. ;
+	int end = 3;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		//i == 0 return
+		if(i == 1) //EXP
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_RETURN, nodeExp, NULL, NULL);
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		//i == 2 ;
 
 		switch(rule)
 		{
