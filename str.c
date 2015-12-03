@@ -191,19 +191,17 @@ string charToStr (char *c)
 	return s;
 }
 
-int *prefix_to_FIND (char *pattern, int psize)
+int *prefix_to_FIND (string search)
 {
-	int k = -1;
-	int i = 1;
-	int * pi = MM_Malloc(sizeof(int)*psize);			// kontrola
+	int k = -1, i = 1, size = search->length;
+	int * pi = MM_Malloc(sizeof(int)*size);			// kontrola
 	if (!pi)
 		return NULL;
-
 	pi[0] = k;
-	for (i = 1; i < psize; i++) {
-		while (k > -1 && pattern[k+1] != pattern[i])
+	for (i = 1; i < size; i++) {
+		while (k > -1 && search->str[k+1] != search->str[i])
 			k = pi[k];
-		if (pattern[i] == pattern[k+1])
+		if (search->str[i] == search->str[k+1])
 			k++;
 		pi[i] = k;
 	}

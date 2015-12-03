@@ -2,7 +2,7 @@
 
 void treeInit (nodePtr *Root)
 {
-	*Root = NULL;	
+	*Root = NULL;
 }
 
 nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol)
@@ -67,10 +67,10 @@ nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
 			return *Root;
 		}
 	}
-} 
+}
 
-void deleteTree (nodePtr *RootPtr) 
-{	
+void deleteTree (nodePtr *RootPtr)
+{
 	if(*RootPtr != NULL)
 	{
 		deleteTree (&(*RootPtr)->lChild);
@@ -78,4 +78,25 @@ void deleteTree (nodePtr *RootPtr)
 		MM_Free(*RootPtr);
 		*RootPtr = NULL;
 	}
+}
+
+int find(string s, string search)
+{
+	int i	, k = -1, tsize = s->length , psize = search->length ;
+	int *pi = prefix_to_FIND(search);
+	if (!pi)
+		{				//chyba v pridelovaní pamete v compute_prefix_function
+    printf("error\n");
+		}
+	for (i = 0; i < tsize; i++) {
+		while (k > -1 && search->str[k+1] != s->str[i])
+			k = pi[k];
+		if ( s->str[i] == search->str[k+1])
+			k++;
+		if (k == psize - 1) {
+			MM_Free(pi);		//kontrola
+			return i-k;			//vracia poziciu
+		}
+	}
+	MM_Free(pi);				//kontrola
 }
