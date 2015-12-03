@@ -7,22 +7,35 @@
 #include "symbol_table.h"
 #include "deque.h"
 
-static const char * DUMMY = "#dummy";
-
 enum operatinType{
 	AC_OP_ADD,
 	AC_OP_SUBB,
 	AC_OP_DIV,
 	AC_OP_MUL,
 
+	AC_OP_ASSIGN,
+
 	AC_LABEL,
+	AC_LABEL_END,	//label konce platnosti - mezi nim a LABEL se stajnym jmenem je platnost symbolu
 	AC_JUMP,
-	AC_JUMP_GREATER,
-	AC_JUMP_GREATER_EQUAL,
-	AC_JUMP_LESS,
-	AC_JUMP_LESS_EQUAL,
-	AC_JUMP_EQUAL,
-	AC_JUMP_NOT_EQUAL,
+	AC_JUMP_C_TRUE,
+	AC_JUMP_C_FALSE,
+//	AC_JUMP_S,		//slouzi ke skakani na volitelne ELSE pri registraci rozsireni SIMPLE
+
+
+	AC_GREATER,
+	AC_GREATER_EQUAL,
+	AC_LESS,
+	AC_LESS_EQUAL,
+	AC_EQUAL,
+	AC_NOT_EQUAL,
+
+	AC_CALL_CIN,
+	AC_CALL_COUT,
+
+	AC_CALL_DUMMY,	//slouzi k posilani parametru ktere by se nevesly
+	AC_CALL,
+	AC_RETURN,
 };
 
 typedef struct AC_ItemStruct{

@@ -320,4 +320,3 @@ int D_Empty(Deque deque)
 		mistake(ERR_INTERN, "Problem with size in deque\n");
 	return -1;
 }
-

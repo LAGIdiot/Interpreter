@@ -11,16 +11,29 @@ static tTokenPtr tokenTemp = NULL;
 static tTokenPtr tokenLast = NULL;
 static tTokenPtr stackTop = NULL;
 
+static Deque P_platnostStack = NULL;
+
 //Function prototypes - private
 nodePtr ParseFunctionHead();
 void ParseVariable(nodePtr localSymbolTable);
+void ParsePrirazeni(nodePtr localSymbolTyble);
+void ParseIO(nodePtr localSymbolTable, int keyword, int cin);
+void ParseReturn(nodePtr localSymbolTable);
+void ParseIf(nodePtr localSymbolTable);
+void ParseFor(nodePtr localSymbolTable);
 
-void ParseExp();
+nodePtr ParseExp(nodePtr localSymbolTable, int needReturn);
 
 int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop);
-string strGenerateLabel(string s1, char * newPart);
 
 void Rule0();
+
+string RozsahPlatnostiBuildStringFromChars(char * newPart);
+string RozsahPlatnostiBuildString(string newPart);
+void RozsahPlatnostiAddInner(string inner);
+void RozsahPlatnostiRemoveInner();
+string RozsahPlatnostiGet();
+void RozsahPlatnostiTerminate();
 
 
 Deque Parse(Deque tokens, nodePtr *symbolTable)
@@ -62,89 +75,385 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 		//zajisteni jaky pravidlo se pouzije
 		rule = LL_TableRule(tokenLast, stackTop);
 
+		//Odchytavani jeste neimplementovanych ale rozpoznanych tokenu
+		if(tokenLast->typ == TT_KEYWORD_DO ||tokenLast->typ == TT_KEYWORD_WHILE || tokenLast->typ == TT_AND ||
+			tokenLast->typ == TT_OR ||tokenLast->typ == TT_INCREMENT || tokenLast->typ == TT_DECREMENT ||
+			tokenLast->typ == TT_KEYWORD_BOOL || tokenLast->typ == TT_KEYWORD_TRUE || tokenLast->typ == TT_KEYWORD_FALSE)
+			mistake(ERR_LEX,"Unimplemented extension\n");
+
+
 #if DEBUG
 		printf("Using rule %d\n",rule);
 #endif
 		switch(rule)
 		{
-			case 1:	//Only case that can end parsing without error
-				parsing = 0;
-				break;
-			case 2:
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_FUNKCE_LS;
-				S_Push(P_specialStack, tokenTemp);
+		case 1:	//Only case that can end parsing without error
+			parsing = 0;
+			break;
+		case 2:
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_FUNKCE_LS;
+			S_Push(P_specialStack, tokenTemp);
 
-				break;
-			case 3:
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_FUNKCE_HEAD_END;
-				S_Push(P_specialStack, tokenTemp);
+			break;
+		case 3:
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_FUNKCE_HEAD_END;
+			S_Push(P_specialStack, tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_FUNKCE_HEAD;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_FUNKCE_HEAD;
+			S_Push(P_specialStack, tokenTemp);
 
-				break;
-			case 4:
-				tokenTemp = S_Pop(P_specialStack);
-				T_Destroy(tokenTemp);
+			break;
+		case 4:
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_R;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_R;
+			S_Push(P_specialStack, tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_FUNKCE_P;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_FUNKCE_P;
+			S_Push(P_specialStack, tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_L;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_L;
+			S_Push(P_specialStack, tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_TYP_UNIVERSAL;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_TYP_UNIVERSAL;
+			S_Push(P_specialStack, tokenTemp);
 
-				localSymbolTable = ParseFunctionHead();
+			localSymbolTable = ParseFunctionHead();
 
-				break;
-			case 10:
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_STAT;
-				S_Push(P_specialStack, tokenTemp);
-				break;
-			case 11:
-				//remove STAT
-				tokenTemp = S_Pop(P_specialStack);
-				T_Destroy(tokenTemp);
+			break;
+		case 10:
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_STAT;
+			S_Push(P_specialStack, tokenTemp);
+			break;
+		case 11:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_VAR_END;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_VAR_END;
+			S_Push(P_specialStack, tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_TYP_UNIVERSAL;
-				S_Push(P_specialStack, tokenTemp);
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_TYP_UNIVERSAL;
+			S_Push(P_specialStack, tokenTemp);
 
-				break;
-			default:
-				mistake(ERR_SYN,"No rule for this");
-				break;
+			ParseVariable(localSymbolTable);
+
+			break;
+		case 14:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_ASSIGN;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParsePrirazeni(localSymbolTable);
+
+			break;
+		case 15:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_CIN_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_INSERTION;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_CIN;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseIO(localSymbolTable, 1, 1);
+			break;
+		case 16:
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_INSERTION;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseIO(localSymbolTable, 0, 1);
+			break;
+		case 17:
+			//remove CIN_LS
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			break;
+		case 18:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_COUT_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_EXTRACTION;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_COUT;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseIO(localSymbolTable, 1, 0);
+			break;
+		case 19:
+			//remove COUT_LS
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			break;
+		case 20:
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_EXTRACTION;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseIO(localSymbolTable, 0, 0);
+			break;
+		case 21:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_RETURN;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseReturn(localSymbolTable);
+			break;
+		case 22:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+			break;
+		case 23:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_STAT_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_ELSE;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_STAT_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_IF;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseIf(localSymbolTable);
+
+			break;
+		case 24:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_STAT_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			//posunuti rozsahu platnosti
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("BRACE"));
+
+			//label pro novou platnost
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(), NULL, NULL);
+			AC_Add(P_internalCode, AC_Item);
+
+			break;
+		case 25:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_STAT_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_ASSIGN;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_ASSIGN;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_IDENTIFIER;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_TYP_UNIVERSAL;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_FOR;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseFor(localSymbolTable);
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this");
+			break;
 		}
 
 	}
 
 	T_Destroy(tokenFirst);
 	S_Terminate(P_specialStack);
+
+	RozsahPlatnostiTerminate();
 
 	return internCode;
 
@@ -202,7 +511,7 @@ nodePtr ParseFunctionHead()
 			variable = ST_VariableCreate();
 			variable->type = tokenLast->typ;
 			variable->defined = 1;
-			variable->labelPlatnosti = strGenerateLabel(functionName, NULL);
+			variable->labelPlatnosti = RozsahPlatnostiBuildString(functionName);
 
 			ST_FunctionAddParam(functionSymbol,tokenLast->typ);
 
@@ -316,15 +625,11 @@ nodePtr ParseFunctionHead()
 	{
 		functionSymbol->defined++;
 
-		string label = strGenerateLabel(functionNode->data->key, NULL);
-
-		//Dummy pro rozliseni levelu
-		symbolVariablePtr dummy = ST_VariableCreate();
-		dummy->labelPlatnosti = label;
-		symbolPackagePtr dummyPackage = ST_PackageCreate(DUMMY, ST_VARIABLE, dummy);
+		//rozliseni levelu platnosti
+		RozsahPlatnostiAddInner(RozsahPlatnostiBuildString(functionNode->data->key));
 
 		//LABEL pro skok na funkcy
-		AC_itemPtr AC_item = AC_I_Create(AC_LABEL,label, NULL, NULL);
+		AC_itemPtr AC_item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(), NULL, NULL);
 		AC_Add(P_internalCode,AC_item);
 
 		return functionInTable->symbolTable;
@@ -337,14 +642,11 @@ void ParseVariable(nodePtr localSymbolTable)
 {
 	symbolVariablePtr variable = NULL;
 	symbolPackagePtr packedVariable = NULL;
-
-	nodePtr dummyNode = searchNodeByKey(&localSymbolTable, DUMMY);
-	symbolVariablePtr dummy = dummyNode->data->data;
-	string label = dummy->labelPlatnosti;
+	nodePtr node = NULL;
 
 	int rule;
 
-	int exp = 0;
+	int expr = 0;
 
 	//vim ze tu budu potrebovat nejmene 4 tahy a to 1.TYP, 2.ID, 3.VAR_END 4. = || ;
 	int end = 4;
@@ -353,6 +655,9 @@ void ParseVariable(nodePtr localSymbolTable)
 	{
 		stackTop = S_Top(P_specialStack);
 		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
 
 		if(i == 0)//typ
 		{
@@ -369,14 +674,17 @@ void ParseVariable(nodePtr localSymbolTable)
 				mistake(ERR_SYN,"Bad token type in parsing variable");
 
 			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
-			nodeInsert(localSymbolTable, packedVariable);
+			node = nodeInsert(&localSymbolTable, packedVariable);
 		}
 
 		//i == 2 ->rozebrani VAR_END
 
-		if(i == 3 && exp)
+		if(i == 3 && expr)
 		{
-			ParseExp();
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,node, nodeExp, node);
+			AC_Add(P_internalCode, AC_Item);
 		}
 
 		switch(rule)
@@ -401,51 +709,213 @@ void ParseVariable(nodePtr localSymbolTable)
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_SEMICOLON;
 			S_Push(P_specialStack, tokenTemp);
-			break;
 
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_S_EXP;
 			S_Push(P_specialStack, tokenTemp);
-			break;
 
 			tokenTemp = T_Init();
 			tokenTemp->typ = TT_ASSIGN;
 			S_Push(P_specialStack, tokenTemp);
-			break;
 
-			exp = 1;
+			expr = 1;
 			end ++;
 			break;
 		default:
 			mistake(ERR_SYN, "No rule for this");
 			break;
 		}
-
 	}
-
-	//end by rule ->
-	//TODO: End this
-	stackTop = S_Top(P_specialStack);
-	tokenLast = D_TopFront(P_tokenQueue);
-
-	rule = LL_TableRule(tokenLast, stackTop);
-
-	switch(rule)
-	{
-		case 12:
-			//remove VAR_END
-			tokenTemp = S_Pop(P_specialStack);
-			T_Destroy(tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-			break;
-	}
-
 }
 
-void ParseExp()
+void ParsePrirazeni(nodePtr localSymbolTable)
+{
+	int rule;
+
+	nodePtr nodeId = NULL;
+
+	//vim ze tu budu potrebovat nejmene 4 tahy a to 1.ID, 2. =, 3. EXP, 4. ;
+	int end = 4;
+	for(int i = 0; i < 4; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 0)//ID
+		{
+			nodeId = searchNodeByKey(&localSymbolTable,charToStr(tokenLast->data));
+			if(nodeId == NULL)
+				mistake(ERR_SEM_UND,"No symbol with this name\n");
+
+		}
+		// i == 1 //=
+		if(i == 2)// EXP
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeId, nodeExp, nodeId);
+			AC_Add(P_internalCode, AC_Item);
+		}
+		// i == 3 //;
+
+		switch(rule)
+		{
+		case 0:
+			Rule0();
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+
+void ParseIO(nodePtr localSymbolTable, int keyword, int cin)
+{
+	int rule;
+
+	nodePtr nodeId = NULL;
+
+	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. CIN, 2. >> 3. ID,
+	int end = 3;
+	int start = 1;
+
+	if(keyword)
+		start = 0;
+
+	for(int i = start; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		//i == 0 cin/cout
+		//i == 1 <<
+		if(i == 2) //ID
+		{
+			nodeId = searchNodeByKey(&localSymbolTable,charToStr(tokenLast->data));
+			if(nodeId == NULL)
+				mistake(ERR_SEM_UND,"No symbol with this name\n");
+
+			AC_itemPtr AC_Item = NULL;
+			//rozliseni jestli se bude IN or OUT
+			if(cin)
+				AC_Item = AC_I_Create(AC_CALL_CIN, NULL, NULL, nodeId);
+			else
+				AC_Item = AC_I_Create(AC_CALL_COUT, nodeId, NULL, NULL);
+
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		switch(rule)
+		{
+		case 0:
+			Rule0();
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+
+void ParseReturn(nodePtr localSymbolTable)
+{
+	int rule;
+
+	nodePtr nodeId = NULL;
+
+	//TODO: Zamyslet se zda je potreba infromovat funkci o faktu ze jsem nasel jeji return
+
+
+
+	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. RETURN, 2. EXP, 3. ;
+	int end = 3;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		//i == 0 return
+		if(i == 1) //EXP
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_RETURN, nodeExp, NULL, NULL);
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		//i == 2 ;
+
+		switch(rule)
+		{
+		case 0:
+			Rule0();
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+
+void ParseIf(nodePtr localSymbolTable)
+{
+	int rule;
+
+	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. IF, 2. (, 3. EXP
+	int end = 3;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 0)
+		{
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("IF"));
+			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL, RozsahPlatnostiGet(), NULL, NULL);
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		if(i == 3)
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_JUMP_C_FALSE, nodeExp, NULL, RozsahPlatnostiBuildStringFromChars("ELSE"));
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		switch(rule)
+		{
+		case 0:
+			Rule0();
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+
+void ParseFor(nodePtr localSymbolTable)
+{
+	//TODO: write parsing function for FOR
+}
+
+nodePtr ParseExp(nodePtr localSymbolTable, int needReturn)
 {
 	//TODO: napsat parsovaci funcki na exp
 }
@@ -458,100 +928,94 @@ int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
 
 	switch(stackTop->typ)
 	{
-		case TT_S_DOLLAR:
-			row += 1;
-			break;
-		case TT_S_FUNKCE_LS:
-			row += 2;
-			break;
-		case TT_S_FUNKCE_HEAD:
-			row += 3;
-			break;
-		case TT_S_FUNKCE_P:
-			row += 4;
-			break;
-		case TT_S_FUNKCE_HEAD_END:
-			row += 5;
-			break;
-		case TT_S_STAT_LS:
-			row += 6;
-			break;
-		case TT_S_STAT:
-			row += 7;
-			break;
-
-/*
-		case TT_SPECIAL_CIN_LS:
-			row += 7;
-			break;
-		case TT_SPECIAL_COUT_LS:
-			row += 8;
-			break;
-		case TT_SPECIAL_EXP:
-			row += 9;
-			break;
-*/
+	case TT_S_DOLLAR:
+		row += 1;
+		break;
+	case TT_S_FUNKCE_LS:
+		row += 2;
+		break;
+	case TT_S_FUNKCE_HEAD:
+		row += 3;
+		break;
+	case TT_S_FUNKCE_P:
+		row += 4;
+		break;
+	case TT_S_FUNKCE_HEAD_END:
+		row += 5;
+		break;
+	case TT_S_STAT_LS:
+		row += 6;
+		break;
+	case TT_S_STAT:
+		row += 7;
+		break;
+	case TT_S_CIN_LS:
+		row +=8;
+		break;
+	case TT_S_COUT_LS:
+		row +=9;
+		break;
 	}
 
 	switch(lastToken->typ)
 	{
-		case TT_EOF:
-			column += 1;
-			break;
-		case TT_KEYWORD_IF:
-			column += 2;
-			break;
-		case TT_KEYWORD_ELSE:
-			column += 3;
-			break;
-		case TT_KEYWORD_FOR:
-			column += 4;
-			break;
-		case TT_KEYWORD_RETURN:
-			column += 5;
-			break;
-		case TT_KEYWORD_CIN:
-			column += 6;
-			break;
-		case TT_KEYWORD_COUT:
-			column += 7;
-			break;
-		case TT_BRACE_L:
-			column += 8;
-			break;
-		case TT_BRACE_R:
-			column += 9;
-			break;
-		case TT_PAR_R:
-			column += 10;
-			break;
-		case TT_COMMA:
-			column += 11;
-			break;
-		case TT_SEMICOLON:
-			column += 12;
-			break;
-		case TT_INSERTION:
-			column += 13;
-			break;
-		case TT_EXTRACTION:
-			column += 14;
-			break;
-		case TT_IDENTIFIER:
-			column += 15;
-			break;
-		case TT_S_TYP_UNIVERSAL:
-		case TT_KEYWORD_INT:
-		case TT_KEYWORD_DOUBLE:
-		case TT_KEYWORD_STRING:
-			column += 16;
-			break;
-		case TT_ASSIGN:
-			column += 18;
-			break;
-		default:	//default case for exp
-			column += 17;
-			break;
+	case TT_EOF:
+		column += 1;
+		break;
+	case TT_KEYWORD_IF:
+		column += 2;
+		break;
+	case TT_KEYWORD_ELSE:
+		column += 3;
+		break;
+	case TT_KEYWORD_FOR:
+		column += 4;
+		break;
+	case TT_KEYWORD_RETURN:
+		column += 5;
+		break;
+	case TT_KEYWORD_CIN:
+		column += 6;
+		break;
+	case TT_KEYWORD_COUT:
+		column += 7;
+		break;
+	case TT_BRACE_L:
+		column += 8;
+		break;
+	case TT_BRACE_R:
+		column += 9;
+		break;
+	case TT_PAR_R:
+		column += 10;
+		break;
+	case TT_COMMA:
+		column += 11;
+		break;
+	case TT_SEMICOLON:
+		column += 12;
+		break;
+	case TT_INSERTION:
+		column += 13;
+		break;
+	case TT_EXTRACTION:
+		column += 14;
+		break;
+	case TT_IDENTIFIER:
+		column += 15;
+		break;
+	case TT_S_TYP_UNIVERSAL:
+	case TT_KEYWORD_INT:
+	case TT_KEYWORD_DOUBLE:
+	case TT_KEYWORD_STRING:
+		column += 16;
+		break;
+	case TT_ASSIGN:
+		column += 18;
+		break;
+	default:	//default case for exp
+		column += 17;
+		break;
 	}
 
 	if(row < 0 || row > LL_TABLE_ROWS || column < 0 || column > LL_TABLE_COLUMNS)
@@ -560,42 +1024,107 @@ int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
 		return LL_TABLE[row][column];
 }
 
-string strGenerateLabel(string s1, char * newPart)
-{
-	char *label = "LABEL_";
-
-	string labelPrefix = strInit();
-	strInsert(labelPrefix, label);
-
-	string str;
-
-	if(newPart == NULL)
-		str = concat(labelPrefix, s1);
-	else
-		str = concat(s1,charToStr(newPart));
-
-	return str;
-}
-
 //Function for removing one piece from stack and one from deque
 void Rule0()
 {
-	if((tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING) && stackTop->typ == TT_S_TYP_UNIVERSAL)
-	{
-		tokenTemp = S_Pop(P_specialStack);
-		T_Destroy(tokenTemp);
+	int remove = 0;
 
-		tokenTemp = D_PopFront(P_tokenQueue);
-		T_Destroy(tokenTemp);
+	if(tokenLast->typ == TT_BRACE_R && stackTop->typ == TT_BRACE_R)
+	{
+		//nahraje label oznacujici ukonceni oblasti platnosti
+		AC_itemPtr AC_Item = AC_I_Create(AC_LABEL_END,RozsahPlatnostiGet(), NULL, NULL);
+		AC_Add(P_internalCode, AC_Item);
+
+		//odebere vnitni platnost
+		RozsahPlatnostiRemoveInner();
+
+		remove = 1;
 	}
+	else if(tokenLast->typ == TT_KEYWORD_ELSE)
+	{
+		RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("ELSE"));
+		remove = 1;
+	}
+	else if((tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING) && stackTop->typ == TT_S_TYP_UNIVERSAL)
+		remove = 1;
 	else if(tokenLast->typ == stackTop->typ)
-	{
-		tokenTemp = S_Pop(P_specialStack);
-		T_Destroy(tokenTemp);
-
-		tokenTemp = D_PopFront(P_tokenQueue);
-		T_Destroy(tokenTemp);
-	}
+		remove = 1;
 	else
 		mistake(ERR_SYN, "Rule 0 got two different token types\n");
+
+	if(remove)
+	{
+		tokenTemp = S_Pop(P_specialStack);
+		T_Destroy(tokenTemp);
+
+		tokenTemp = D_PopFront(P_tokenQueue);
+		T_Destroy(tokenTemp);
+	}
+}
+
+string RozsahPlatnostiBuildString(string newPart)
+{
+	string oldPart = NULL;
+	string finished = NULL;
+
+	if(newPart == NULL)
+		mistake(ERR_INTERN, "Problem with building label\n");
+
+	oldPart = RozsahPlatnostiGet();
+	if(oldPart == NULL)
+		finished = newPart;
+	else
+		finished = concat(oldPart,newPart);
+
+	return finished;
+}
+
+string RozsahPlatnostiBuildStringFromChars(char * newPart)
+{
+	return RozsahPlatnostiBuildString(charToStr(newPart));
+}
+
+void RozsahPlatnostiAddInner(string inner)
+{
+	if(P_platnostStack == NULL)
+	{
+		P_platnostStack = S_Init();
+	}
+
+	if(P_platnostStack->last == NULL)
+	{
+		S_Push(P_platnostStack, inner);
+	}
+	else
+	{
+		string outer = S_Top(P_platnostStack);
+		string innerComplete = concat(outer, inner);
+
+		S_Push(P_platnostStack, innerComplete);
+	}
+}
+
+void RozsahPlatnostiRemoveInner()
+{
+	string temp = S_Pop(P_platnostStack);
+	strFree(temp);
+}
+
+string RozsahPlatnostiGet()
+{
+	if(!S_Empty(P_platnostStack))
+		return S_Top(P_platnostStack);
+	else
+		return NULL;
+}
+
+void RozsahPlatnostiTerminate()
+{
+	while(!S_Empty(P_platnostStack))
+	{
+		RozsahPlatnostiRemoveInner();
+	}
+
+	S_Terminate(P_platnostStack);
+	P_platnostStack = NULL;
 }

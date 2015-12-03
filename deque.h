@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "errors.h"
+
 //Enumes
 enum dequeueTypes{
 	DEQUE,

@@ -26,7 +26,8 @@ typedef struct symbolFunctionStruct{
 	string  paramTypes;
 	int defined;
 	int declared;	//prototyp
-	void * symbolTable;
+	int returnsFound;
+	void * symbolTable;	//symbol table pro tuto funkci
 }*symbolFunctionPtr;
 
 typedef struct symbolVariableStruct{

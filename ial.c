@@ -38,9 +38,8 @@ nodePtr searchNodeByKey (nodePtr *Root, string key)
 		return NULL;
 }
 
-void nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
-{
-
+nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
+{	
 	if(*Root == NULL)
 	{
 		*Root = MM_Malloc(sizeof(struct binaryTree));
@@ -48,6 +47,8 @@ void nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
         (*Root)->data = symbol;
         (*Root)->lChild = NULL;
         (*Root)->rChild = NULL;
+
+        return *Root;
 	}
 	else
 	{
@@ -60,8 +61,11 @@ void nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
 		{
 			return nodeInsert(&(*Root)->rChild,symbol);
 		}
-		else
+		else 
+		{
 			(*Root)->data = symbol;
+			return *Root;
+		}
 	}
 }
 
