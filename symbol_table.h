@@ -27,7 +27,7 @@ typedef struct symbolFunctionStruct{
 	int defined;
 	int declared;	//prototyp
 	int returnsFound;
-	void * symbolTable;
+	void * symbolTable;	//symbol table pro tuto funkci
 }*symbolFunctionPtr;
 
 typedef struct symbolVariableStruct{

@@ -21,11 +21,12 @@ const static int LL_TABLE[LL_TABLE_ROWS][LL_TABLE_COLUMNS] =
 /*FUNKCE_HEAD*/	{0,	0,	0,		0,	0,		0,	0,		0,	0,	0,	0,	0,	0,	0,	0,	4,	0,	0},
 /*FUNKCE_P*/	{0,	0,	0,		0,	0,		0,	0,		0,	0,	6,	9,	0,	0,	0,	0,	5,	0,	0},
 /*FUNKCE_H_END*/{0, 0,	0,		0,	0,		0,	0,		8,	0,	0,	0,	7,	0,	0,	0,	0,	0,	0},
-/*STAT_LS*/		{0,	99,	0,		99,	10,		10,	10,		0,	0,	0,	0,	99,	0,	0,	10,	10,	0,	0},
-/*STAT*/		{0,	99,	99,		99,	21,		15,	18,		99,	99,	0,	0,	99,	0,	0,	14,	11,	0,	0},
+/*STAT_LS*/		{0,	10,	0,		10,	10,		10,	10,		0,	0,	0,	0,	10,	0,	0,	10,	10,	0,	0},
+/*STAT*/		{0,	23,	0,		25,	21,		15,	18,		24,	0,	0,	0,	99,	0,	0,	14,	11,	0,	0},
 /*VAR_END*/		{0,	0,	0,		0,	0,		0,	0,		0,	0,	0,	0,	12,	0,	0,	0,	0,	0,	13},
 /*CIN_LS*/		{0,	0,	0,		0,	0,		0,	0,		0,	0,	0,	0,	17,	0,	16,	0,	0,	0,	0},
 /*COUT_LS*/		{0,	0,	0,		0,	0,		0,	0,		0,	0,	0,	0,	19,	20,	0,	0,	0,	0,	0},
+
 };
 
 /*
@@ -50,6 +51,10 @@ const static int LL_TABLE[LL_TABLE_ROWS][LL_TABLE_COLUMNS] =
  *	RULE 19:	COUT_LS			to	SEMICOLON
  *	RULE 20:	COUT_LS			to	<<, IDENTIFIER, COUT_LS
  *	RULE 21:	STAT			to	RETURN, EXP, SEMICOLN
+ *	RULE XX:	STAT			to	SEMICOLON
+ *	RULE 23:	STAT			to	IF, (, EXP, ), {, STAT_LS, }, ELSE, {, STAT_LS, }
+ *	RULE 24:	STAT			to	{, STAT_LS, }
+ *	RULE 25:	STAT			to	FOR, (, TYP_UNIVERSAL, IDENTIFIER, ASSIGN, EXP, SEMICOLON, EXP, SEMICOLON, IDENTIFIER, ASSIGN, EXP, ), {, STAT_LS, }
  */
 
 //Functions

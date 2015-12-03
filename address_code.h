@@ -16,9 +16,11 @@ enum operatinType{
 	AC_OP_ASSIGN,
 
 	AC_LABEL,
+	AC_LABEL_END,	//label konce platnosti - mezi nim a LABEL se stajnym jmenem je platnost symbolu
 	AC_JUMP,
 	AC_JUMP_C_TRUE,
 	AC_JUMP_C_FALSE,
+//	AC_JUMP_S,		//slouzi ke skakani na volitelne ELSE pri registraci rozsireni SIMPLE
 
 
 	AC_GREATER,
@@ -31,7 +33,7 @@ enum operatinType{
 	AC_CALL_CIN,
 	AC_CALL_COUT,
 
-	AC_CALL_DUMMY, //slouzi k posilani parametru ktere by se nevesly
+	AC_CALL_DUMMY,	//slouzi k posilani parametru ktere by se nevesly
 	AC_CALL,
 	AC_RETURN,
 };

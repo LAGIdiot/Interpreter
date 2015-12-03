@@ -36,6 +36,9 @@ int main(int argc, char *argv[])
 
 			Scann(tokenQueue);
 
+			if(file_p != NULL)
+				fclose(file_p);
+
 			//BT of global symbols
 			nodePtr globalSymbolTree;
 			treeInit(&globalSymbolTree);
@@ -57,9 +60,5 @@ int main(int argc, char *argv[])
 			MM_FreeAll(); //TODO: Vymyslet lepsi provedeni na vymazani pameti po ukonceni programu
 		}
 	}
-
-	if(file_p != NULL)
-		fclose(file_p);
-
 	return 0;
 }
