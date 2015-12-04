@@ -20,6 +20,7 @@ enum operatinType{
 	AC_JUMP,
 	AC_JUMP_C_TRUE,
 	AC_JUMP_C_FALSE,
+	AC_JUMP_C_FALSE_E, //skace na label konce platnosti
 //	AC_JUMP_S,		//slouzi ke skakani na volitelne ELSE pri registraci rozsireni SIMPLE
 
 

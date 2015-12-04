@@ -666,6 +666,7 @@ void ParseVariable(nodePtr localSymbolTable)
 
 			variable = ST_VariableCreate();
 			variable->type = ST_Remap(tokenLast->typ);
+			variable->labelPlatnosti = RozsahPlatnostiGet();
 		}
 
 		if(i == 1)//id
@@ -912,6 +913,87 @@ void ParseIf(nodePtr localSymbolTable)
 
 void ParseFor(nodePtr localSymbolTable)
 {
+	int rule;
+	nodePtr node = NULL;
+	symbolVariablePtr variable = NULL;
+	symbolPackagePtr packedVariable = NULL;
+
+	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. IF, 2. (, 3. EXP
+	int end = 3;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 2)
+		{
+			if(!(tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING))
+				mistake(ERR_SYN,"Bad token type in parsing variable");
+
+			//label for FOR - must be there because of rozsah platnosti
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("FOR"));
+
+			variable = ST_VariableCreate();
+			variable->type = ST_Remap(tokenLast->typ);
+			variable->labelPlatnosti = RozsahPlatnostiGet();
+		}
+
+		if(i == 3)
+		{
+			if(tokenLast->typ != TT_IDENTIFIER)
+				mistake(ERR_SYN,"Bad token type in parsing variable");
+
+			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
+			node = nodeInsert(&localSymbolTable, packedVariable);
+		}
+
+		if(i == 5)
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,node, nodeExp, node);
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+
+		if(i == 7)
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_JUMP_C_FALSE_E, NULL, NULL, RozsahPlatnostiGet());
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		if(i == 9)
+		{
+			node = searchNodeByKey(&localSymbolTable,charToStr(tokenLast->data));
+			if(node == NULL)
+				mistake(ERR_SEM_UND,"No symbol with this name\n");
+		}
+
+		if(i == 11)
+		{
+			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeExp, NULL, node);
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		switch(rule)
+		{
+		case 0:
+			Rule0();
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+
+	}
 	//TODO: write parsing function for FOR
 }
 
