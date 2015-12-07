@@ -22,11 +22,15 @@ void ParseReturn(nodePtr localSymbolTable);
 void ParseIf(nodePtr localSymbolTable);
 void ParseFor(nodePtr localSymbolTable);
 
+void ParseDoWhile(nodePtr localSymbolTable);
+void ParseDoWhilePart2(nodePtr localSymbolTable);
+void ParseWhile(nodePtr localSymbolTable);
+
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType);
 
 int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop);
 
-void Rule0();
+void Rule0(nodePtr localSymbolTable);
 
 string RozsahPlatnostiBuildStringFromChars(char * newPart);
 string RozsahPlatnostiBuildString(string newPart);
@@ -73,11 +77,10 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 		rule = LL_TableRule(tokenLast, stackTop);
 
 		//Odchytavani jeste neimplementovanych ale rozpoznanych tokenu
-		if(tokenLast->typ == TT_KEYWORD_DO ||tokenLast->typ == TT_KEYWORD_WHILE || tokenLast->typ == TT_AND ||
-			tokenLast->typ == TT_OR ||tokenLast->typ == TT_INCREMENT || tokenLast->typ == TT_DECREMENT ||
-			tokenLast->typ == TT_KEYWORD_BOOL || tokenLast->typ == TT_KEYWORD_TRUE || tokenLast->typ == TT_KEYWORD_FALSE)
+		if(tokenLast->typ == TT_AND || tokenLast->typ == TT_OR || tokenLast->typ == TT_INCREMENT ||
+			tokenLast->typ == TT_DECREMENT || tokenLast->typ == TT_KEYWORD_BOOL || tokenLast->typ == TT_KEYWORD_TRUE ||
+			tokenLast->typ == TT_KEYWORD_FALSE)
 			mistake(ERR_LEX,"Unimplemented extension\n");
-
 
 #if DEBUG
 		printf("Using rule %d\n",rule);
@@ -440,6 +443,89 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 
 			ParseFor(localSymbolTable);
 			break;
+		case 26:
+			//remove STAT_LS
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+			break;
+		case 27:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_DO;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_STAT_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_WHILE;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_SEMICOLON;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseDoWhile(localSymbolTable);
+			break;
+		case 28:
+			//remove STAT
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_KEYWORD_WHILE;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_EXP;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_PAR_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_L;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_S_STAT_LS;
+			S_Push(P_specialStack, tokenTemp);
+
+			tokenTemp = T_Init();
+			tokenTemp->typ = TT_BRACE_R;
+			S_Push(P_specialStack, tokenTemp);
+
+			ParseWhile(localSymbolTable);
+			break;
 		default:
 			mistake(ERR_SYN,"No rule for this");
 			break;
@@ -525,7 +611,7 @@ nodePtr ParseFunctionHead()
 		switch(rule)
 		{
 			case 0:
-				Rule0();
+				Rule0(NULL); //trochu podvod, ale zde nehrozi riziko ze by parametr byl potreba
 				break;
 			case 5:
 				tokenTemp = T_Init();
@@ -686,7 +772,7 @@ void ParseVariable(nodePtr localSymbolTable)
 		switch(rule)
 		{
 		case 0:
-			Rule0();
+			Rule0(localSymbolTable);
 			break;
 		case 12:
 			//remove VAR_END
@@ -760,7 +846,7 @@ void ParsePrirazeni(nodePtr localSymbolTable)
 		switch(rule)
 		{
 		case 0:
-			Rule0();
+			Rule0(localSymbolTable);
 			break;
 		default:
 			mistake(ERR_SYN,"No rule for this\n");
@@ -811,7 +897,7 @@ void ParseIO(nodePtr localSymbolTable, int keyword, int cin)
 		switch(rule)
 		{
 		case 0:
-			Rule0();
+			Rule0(localSymbolTable);
 			break;
 		default:
 			mistake(ERR_SYN,"No rule for this\n");
@@ -855,7 +941,7 @@ void ParseReturn(nodePtr localSymbolTable)
 		switch(rule)
 		{
 		case 0:
-			Rule0();
+			Rule0(localSymbolTable);
 			break;
 		default:
 			mistake(ERR_SYN,"No rule for this\n");
@@ -897,7 +983,7 @@ void ParseIf(nodePtr localSymbolTable)
 		switch(rule)
 		{
 		case 0:
-			Rule0();
+			Rule0(localSymbolTable);
 			break;
 		default:
 			mistake(ERR_SYN,"No rule for this\n");
@@ -1001,7 +1087,7 @@ void ParseFor(nodePtr localSymbolTable)
 		switch(rule)
 		{
 		case 0:
-			Rule0();
+			Rule0(localSymbolTable);
 			break;
 		default:
 			mistake(ERR_SYN,"No rule for this\n");
@@ -1010,11 +1096,272 @@ void ParseFor(nodePtr localSymbolTable)
 	}
 }
 
+//////////////////////////////////////////////////
+// nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
+// return nodePtr - pointer to node in local symbol tree
+// localSymbolTable
+// exitSymbolType - symbol that is expected after EXP
+////////////////////
+// Returning nodePtr to last/top/left symbol
+//////////////////////////////////////////////////
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 {
-	//TODO: napsat parsovaci funcki na exp
+	nodePtr nodeLastProcessed = NULL;
+	nodePtr nodeProcessing = NULL;
+	Deque stack = S_Init();
+
+	AC_itemPtr AC_Item = NULL;
+	symbolPackagePtr symbolPackage = NULL;
+	symbolVariablePtr symbolVariable = NULL;
+
+	int tokenCount = 0;
+	int endPAR = 0;
+
+	int PAR_L_Count = 0;
+	int PAR_R_Count = 0;
+
+	int expectingFunction = 0;
+
+	if(exitSymbolType == TT_PAR_R)
+		endPAR = 1;
+
+	//preliti tokenu
+	while(1)
+	{
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		if(tokenLast->typ == TT_PAR_R && endPAR &&  PAR_L_Count == PAR_R_Count) //ukoncovani pro exitSymbol PAR_R
+			break;
+
+		if(tokenLast->typ == exitSymbolType)
+			break;
+
+		if(tokenLast->typ == TT_PAR_L)
+			PAR_L_Count++;
+
+		if(tokenLast->typ == TT_PAR_R)
+			PAR_R_Count++;
+
+		S_Push(stack,D_PopFront(P_tokenQueue));
+		tokenCount++;
+	}
+
+	while(tokenCount)//zpracovani tokenu
+	{
+		tokenLast = S_Top(stack);
+
+		if(tokenLast->typ == TT_IDENTIFIER)
+		{
+			if(expectingFunction)
+			{
+				nodeProcessing = searchNodeByKey(P_symbolTable,charToStr(tokenLast->data));
+				if(nodeProcessing == NULL)
+					mistake(ERR_SEM_UND,"No symbol with this name\n");
+			}
+			else
+			{
+				nodeProcessing = searchNodeByKey(&localSymbolTable,charToStr(tokenLast->data));
+				if(nodeProcessing == NULL)
+					mistake(ERR_SEM_UND,"No symbol with this name\n");
+			}
+		}
+
+		if(tokenLast->typ == TT_INT || tokenLast->typ == TT_BIN_NUM || tokenLast->typ == TT_OCT_NUM || tokenLast->typ == TT_HEX_NUM)
+		{
+			symbolVariable = ST_VariableCreate();
+			symbolVariable->type = ST_Remap(tokenLast->typ);
+			symbolVariable->defined = 1;
+			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+			ST_VariableAddData_INT(symbolVariable, charToInt(tokenLast->data));
+
+			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
+
+			nodeProcessing = nodeInsert(&localSymbolTable, symbolPackage);
+		}
+
+		if(tokenLast->typ == TT_DOUBLE)
+		{
+			symbolVariable = ST_VariableCreate();
+			symbolVariable->type = ST_Remap(tokenLast->typ);
+			symbolVariable->defined = 1;
+			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+			ST_VariableAddData_INT(symbolVariable, charToDouble(tokenLast->data));
+
+			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
+
+			nodeProcessing = nodeInsert(&localSymbolTable, symbolPackage);
+		}
+
+		if(tokenLast->typ == TT_STRING)
+		{
+			symbolVariable = ST_VariableCreate();
+			symbolVariable->type = ST_Remap(tokenLast->typ);
+			symbolVariable->defined = 1;
+			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+
+			symbolVariable->data = charToStr(tokenLast->data);
+
+			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
+
+			nodeProcessing = nodeInsert(&localSymbolTable, symbolPackage);
+		}
+
+		//TODO: Zpracovani expu (posouvani processing to procesed, mathematic operations, function expecting)
+
+	}
+
+	//odeber EXP ze stacku
+	tokenTemp = S_Pop(P_specialStack);
+	T_Destroy(tokenTemp);
+
+	return nodeLastProcessed;
 }
 
+void ParseDoWhile(nodePtr localSymbolTable)
+{
+	int rule;
+	AC_itemPtr AC_Item = NULL;
+
+	int end = 1;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 0)
+		{
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_DO"));	//label je pouze DO aby se nekomplikovalo hledani
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
+
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_BODY"),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
+		}
+		switch(rule)
+		{
+		case 0:
+			Rule0(localSymbolTable);
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+void ParseDoWhilePart2(nodePtr localSymbolTable)
+{
+	int rule;
+	AC_itemPtr AC_Item = NULL;
+
+	int end = 5; //1. WHILE, 2. (, 3. EXP, 4. ), 5. ;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 2)
+		{
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_CONDIFION"),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
+
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_PAR_R);
+
+			AC_Item = AC_I_Create(AC_JUMP_C_TRUE, nodeExp, NULL, RozsahPlatnostiBuildStringFromChars("_BODY"));
+			AC_Add(P_internalCode, AC_Item);
+
+			AC_Item = AC_I_Create(AC_JUMP_C_FALSE_E, nodeExp, NULL, RozsahPlatnostiGet());
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		if(i == 4)
+		{
+			//nahraje label oznacujici ukonceni oblasti platnosti
+			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL_END,RozsahPlatnostiGet(), NULL, NULL);
+			AC_Add(P_internalCode, AC_Item);
+
+			//odebere vnitni platnost
+			RozsahPlatnostiRemoveInner();
+		}
+
+		switch(rule)
+		{
+		case 0:
+			Rule0(localSymbolTable);
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+
+void ParseWhile(nodePtr localSymbolTable)
+{
+	int rule;
+	AC_itemPtr AC_Item = NULL;
+
+	int end = 5;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 2)
+		{
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_WHILE"));
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
+
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_CONDIFION"),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
+
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_PAR_R);
+
+			AC_Item = AC_I_Create(AC_JUMP_C_TRUE, nodeExp, NULL, RozsahPlatnostiBuildStringFromChars("_BODY"));
+			AC_Add(P_internalCode, AC_Item);
+
+			AC_Item = AC_I_Create(AC_JUMP_C_FALSE_E, nodeExp, NULL, RozsahPlatnostiGet());
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		if(i == 5)
+		{
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_BODY"),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
+		}
+
+		switch(rule)
+		{
+		case 0:
+			Rule0(localSymbolTable);
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+}
+
+//////////////////////////////////////////////////
+// int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
+// return int - rule for parsing tokens
+// lastToken - first unused token
+// stackTop - top of stack from pushdown automaton
+////////////////////
+// Returning rule int value of next rule
+//////////////////////////////////////////////////
 int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
 {
 	//Zacnu s -1 aby mapovani odpovidalo papiru
@@ -1108,6 +1455,12 @@ int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
 	case TT_ASSIGN:
 		column += 18;
 		break;
+	case TT_KEYWORD_DO:
+		column += 19;
+		break;
+	case TT_KEYWORD_WHILE:
+		column += 20;
+		break;
 	default:	//default case for exp
 		column += 17;
 		break;
@@ -1120,9 +1473,10 @@ int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
 }
 
 //Function for removing one piece from stack and one from deque
-void Rule0()
+void Rule0(nodePtr localSymbolTable)
 {
 	int remove = 0;
+	int removeLabel = 1;
 	AC_itemPtr AC_Item = NULL;
 
 	if(tokenLast->typ == TT_BRACE_R && stackTop->typ == TT_BRACE_R)
@@ -1134,14 +1488,34 @@ void Rule0()
 			AC_Add(P_internalCode, AC_Item);
 		}
 
-		//nahraje label oznacujici ukonceni oblasti platnosti
-		AC_itemPtr AC_Item = AC_I_Create(AC_LABEL_END,RozsahPlatnostiGet(), NULL, NULL);
-		AC_Add(P_internalCode, AC_Item);
+		if(RozsahPlatnostiLastPart("WHILE"))	//pokud je posledni for cyklus
+		{
+			AC_Item = AC_I_Create(AC_JUMP, NULL, NULL, RozsahPlatnostiBuildStringFromChars("_CONDITION"));
+			AC_Add(P_internalCode, AC_Item);
+		}
 
-		//odebere vnitni platnost
-		RozsahPlatnostiRemoveInner();
+		if(RozsahPlatnostiLastPart("DO"))
+			removeLabel = 0;
+
+
+		if(removeLabel)
+		{
+			//nahraje label oznacujici ukonceni oblasti platnosti
+			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL_END,RozsahPlatnostiGet(), NULL, NULL);
+			AC_Add(P_internalCode, AC_Item);
+
+			//odebere vnitni platnost
+			RozsahPlatnostiRemoveInner();
+		}
 
 		remove = 1;
+	}
+	else if(tokenLast->typ == TT_KEYWORD_WHILE)
+	{
+		if(RozsahPlatnostiLastPart("DO"))	//pokud je posledni for cyklus
+			ParseDoWhilePart2(localSymbolTable);
+
+		remove = 0;
 	}
 	else if(tokenLast->typ == TT_KEYWORD_ELSE)
 	{
@@ -1155,6 +1529,7 @@ void Rule0()
 	else
 		mistake(ERR_SYN, "Rule 0 got two different token types\n");
 
+
 	if(remove)
 	{
 		tokenTemp = S_Pop(P_specialStack);
@@ -1165,6 +1540,13 @@ void Rule0()
 	}
 }
 
+//////////////////////////////////////////////////
+// int RozsahPlatnostiLastPart(char * str)
+// return int (1 for TRUE, 0 for FALSE and -1 for error)
+// str - char * for comparing
+////////////////////
+// Returning TRUE if top level rozsah platnosti a str are equal
+//////////////////////////////////////////////////
 //return 0 for false 1 for true
 int RozsahPlatnostiLastPart(char * str)
 {
@@ -1190,6 +1572,13 @@ int RozsahPlatnostiLastPart(char * str)
 		return -1;
 }
 
+//////////////////////////////////////////////////
+// string RozsahPlatnostiBuildString(string newPart)
+// return string
+// newPart - part that will be added to top level rozsah platnosti
+////////////////////
+// Returning concat of top level rozsah platnosti and newPart
+//////////////////////////////////////////////////
 string RozsahPlatnostiBuildString(string newPart)
 {
 	string oldPart = NULL;
@@ -1207,22 +1596,31 @@ string RozsahPlatnostiBuildString(string newPart)
 	return finished;
 }
 
+//////////////////////////////////////////////////
+// string RozsahPlatnostiBuildStringFromChars(char * newPart)
+// return string
+// newPart - part that will be added to top level rozsah platnosti
+////////////////////
+// Returning call to RozsahPlatnostiBuildString
+//////////////////////////////////////////////////
 string RozsahPlatnostiBuildStringFromChars(char * newPart)
 {
 	return RozsahPlatnostiBuildString(charToStr(newPart));
 }
 
+//////////////////////////////////////////////////
+// void RozsahPlatnostiAddInner(string inner)
+// inner - last part to be added to string
+////////////////////
+// Add inner to the end of top string and push it to P_platnostStack (Init stack if needed)
+//////////////////////////////////////////////////
 void RozsahPlatnostiAddInner(string inner)
 {
 	if(P_platnostStack == NULL)
-	{
 		P_platnostStack = S_Init();
-	}
 
 	if(P_platnostStack->last == NULL)
-	{
 		S_Push(P_platnostStack, inner);
-	}
 	else
 	{
 		string outer = S_Top(P_platnostStack);
@@ -1232,12 +1630,23 @@ void RozsahPlatnostiAddInner(string inner)
 	}
 }
 
+//////////////////////////////////////////////////
+// void RozsahPlatnostiRemoveInner()
+////////////////////
+// Remove top level (most inner) rozsah platnosti
+//////////////////////////////////////////////////
 void RozsahPlatnostiRemoveInner()
 {
 	string temp = S_Pop(P_platnostStack);
 	strFree(temp);
 }
 
+//////////////////////////////////////////////////
+// string RozsahPlatnostiGet()
+// return string
+////////////////////
+// Return top level (most inner) rozsah platnosti
+//////////////////////////////////////////////////
 string RozsahPlatnostiGet()
 {
 	if(!S_Empty(P_platnostStack))
@@ -1246,6 +1655,11 @@ string RozsahPlatnostiGet()
 		return NULL;
 }
 
+//////////////////////////////////////////////////
+// void RozsahPlatnostiTerminate()
+////////////////////
+// Terminate content of P_platnostStack and free all string in it
+//////////////////////////////////////////////////
 void RozsahPlatnostiTerminate()
 {
 	while(!S_Empty(P_platnostStack))

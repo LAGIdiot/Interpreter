@@ -60,12 +60,18 @@ int ST_Remap(int tokenTyp)
 	switch(tokenTyp)
 	{
 		case TT_KEYWORD_INT:
+		case TT_INT:
+		case TT_BIN_NUM:
+		case TT_OCT_NUM:
+		case TT_HEX_NUM:
 			ret = 1;
 			break;
 		case TT_KEYWORD_DOUBLE:
+		case TT_DOUBLE:
 			ret = 2;
 			break;
 		case TT_KEYWORD_STRING:
+		case TT_STRING:
 			ret = 3;
 			break;
 		case TT_KEYWORD_AUTO:
@@ -167,4 +173,19 @@ int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
 	}
 
 	return 0;
+}
+
+//TODO: test this 2 functions
+void ST_VariableAddData_INT(symbolVariablePtr symbol, int data)
+{
+	int *intPtr = MM_Malloc(sizeof(int));
+	intPtr = &data;
+	symbol->data = intPtr;
+
+}
+void ST_VariableAddData_DOUBLE(symbolVariablePtr symbol, double data)
+{
+	double *doublePtr = MM_Malloc(sizeof(double));
+	doublePtr = &data;
+	symbol->data = doublePtr;
 }

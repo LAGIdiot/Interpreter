@@ -21,8 +21,6 @@ enum operatinType{
 	AC_JUMP_C_TRUE,
 	AC_JUMP_C_FALSE,
 	AC_JUMP_C_FALSE_E, //skace na label konce platnosti
-//	AC_JUMP_S,		//slouzi ke skakani na volitelne ELSE pri registraci rozsireni SIMPLE
-
 
 	AC_GREATER,
 	AC_GREATER_EQUAL,
@@ -33,11 +31,20 @@ enum operatinType{
 
 	AC_CALL_CIN,
 	AC_CALL_COUT,
+	AC_CALL_CONCAT,
+	AC_CALL_SUBSTR,
+	AC_CALL_FIND,
+	AC_CALL_LENGTH,
+	AC_CALL_SORT,
 
 	AC_CALL_DUMMY,	//slouzi k posilani parametru ktere by se nevesly
 	AC_CALL,
 	AC_RETURN,
 };
+
+/*	Priklady jednotlivych operaci:
+ *
+ */
 
 typedef struct AC_ItemStruct{
 	int operation;
