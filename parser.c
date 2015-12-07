@@ -22,7 +22,7 @@ void ParseReturn(nodePtr localSymbolTable);
 void ParseIf(nodePtr localSymbolTable);
 void ParseFor(nodePtr localSymbolTable);
 
-nodePtr ParseExp(nodePtr localSymbolTable, int needReturn);
+nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType);
 
 int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop);
 
@@ -34,6 +34,7 @@ void RozsahPlatnostiAddInner(string inner);
 void RozsahPlatnostiRemoveInner();
 string RozsahPlatnostiGet();
 void RozsahPlatnostiTerminate();
+int RozsahPlatnostiLastPart(char * str);
 
 
 Deque Parse(Deque tokens, nodePtr *symbolTable)
@@ -61,10 +62,6 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 	tTokenPtr tokenFirst = T_Init();
 	tokenFirst->typ = TT_S_DOLLAR;
 	S_Push(P_specialStack, tokenFirst);
-
-
-//TODO: Parser automat
-
 
 	while(parsing)
 	{
@@ -364,7 +361,7 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			S_Push(P_specialStack, tokenTemp);
 
 			//posunuti rozsahu platnosti
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("BRACE"));
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_BRACE"));
 
 			//label pro novou platnost
 
@@ -479,8 +476,6 @@ nodePtr ParseFunctionHead()
 	symbolPackagePtr packedVariable = NULL;
 
 	string functionName = NULL;
-
-
 
 	int posloupnost = 1; //slouzi k razeni informaci o funkci
 
@@ -682,7 +677,7 @@ void ParseVariable(nodePtr localSymbolTable)
 
 		if(i == 3 && expr)
 		{
-			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_SEMICOLON);
 
 			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,node, nodeExp, node);
 			AC_Add(P_internalCode, AC_Item);
@@ -755,7 +750,7 @@ void ParsePrirazeni(nodePtr localSymbolTable)
 		// i == 1 //=
 		if(i == 2)// EXP
 		{
-			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_SEMICOLON);
 
 			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeId, nodeExp, nodeId);
 			AC_Add(P_internalCode, AC_Item);
@@ -849,7 +844,7 @@ void ParseReturn(nodePtr localSymbolTable)
 		//i == 0 return
 		if(i == 1) //EXP
 		{
-			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_SEMICOLON);
 
 			AC_itemPtr AC_Item = AC_I_Create(AC_RETURN, nodeExp, NULL, NULL);
 			AC_Add(P_internalCode, AC_Item);
@@ -886,16 +881,16 @@ void ParseIf(nodePtr localSymbolTable)
 
 		if(i == 0)
 		{
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("IF"));
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_IF"));
 			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL, RozsahPlatnostiGet(), NULL, NULL);
 			AC_Add(P_internalCode, AC_Item);
 		}
 
 		if(i == 3)
 		{
-			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_PAR_R);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_JUMP_C_FALSE, nodeExp, NULL, RozsahPlatnostiBuildStringFromChars("ELSE"));
+			AC_itemPtr AC_Item = AC_I_Create(AC_JUMP_C_FALSE, nodeExp, NULL, RozsahPlatnostiBuildStringFromChars("_ELSE"));
 			AC_Add(P_internalCode, AC_Item);
 		}
 
@@ -918,8 +913,10 @@ void ParseFor(nodePtr localSymbolTable)
 	symbolVariablePtr variable = NULL;
 	symbolPackagePtr packedVariable = NULL;
 
-	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. IF, 2. (, 3. EXP
-	int end = 3;
+	AC_itemPtr AC_Item = NULL;
+
+
+	int end = 13;
 
 	for(int i = 0; i < end; i++)
 	{
@@ -935,11 +932,14 @@ void ParseFor(nodePtr localSymbolTable)
 				mistake(ERR_SYN,"Bad token type in parsing variable");
 
 			//label for FOR - must be there because of rozsah platnosti
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("FOR"));
+			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_FOR"));
 
 			variable = ST_VariableCreate();
 			variable->type = ST_Remap(tokenLast->typ);
 			variable->labelPlatnosti = RozsahPlatnostiGet();
+
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(), NULL, NULL);
+			AC_Add(P_internalCode, AC_Item);
 		}
 
 		if(i == 3)
@@ -953,23 +953,32 @@ void ParseFor(nodePtr localSymbolTable)
 
 		if(i == 5)
 		{
-			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_SEMICOLON);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,node, nodeExp, node);
+			AC_Item = AC_I_Create(AC_OP_ASSIGN,node, nodeExp, node);
 			AC_Add(P_internalCode, AC_Item);
 		}
 
 
 		if(i == 7)
 		{
-			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+			AC_Item = AC_I_Create(AC_LABEL, RozsahPlatnostiBuildStringFromChars("_CONDITION"),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_JUMP_C_FALSE_E, NULL, NULL, RozsahPlatnostiGet());
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_SEMICOLON);
+
+			AC_Item = AC_I_Create(AC_JUMP_C_TRUE, nodeExp, NULL, RozsahPlatnostiBuildStringFromChars("_BODY"));
+			AC_Add(P_internalCode, AC_Item);
+
+			AC_Item = AC_I_Create(AC_JUMP_C_FALSE_E, nodeExp, NULL, RozsahPlatnostiGet());
 			AC_Add(P_internalCode, AC_Item);
 		}
 
 		if(i == 9)
 		{
+			AC_Item = AC_I_Create(AC_LABEL, RozsahPlatnostiBuildStringFromChars("_MODIFICATION"),NULL,NULL);
+			AC_Add(P_internalCode, AC_Item);
+
 			node = searchNodeByKey(&localSymbolTable,charToStr(tokenLast->data));
 			if(node == NULL)
 				mistake(ERR_SEM_UND,"No symbol with this name\n");
@@ -977,9 +986,15 @@ void ParseFor(nodePtr localSymbolTable)
 
 		if(i == 11)
 		{
-			nodePtr nodeExp = ParseExp(localSymbolTable, 1);
+			nodePtr nodeExp = ParseExp(localSymbolTable, TT_PAR_R);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeExp, NULL, node);
+			AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeExp, NULL, node);
+			AC_Add(P_internalCode, AC_Item);
+
+			AC_Item = AC_I_Create(AC_JUMP, NULL, NULL, RozsahPlatnostiBuildStringFromChars("_CONDITION"));
+			AC_Add(P_internalCode, AC_Item);
+
+			AC_Item = AC_I_Create(AC_LABEL, RozsahPlatnostiBuildStringFromChars("_BODY"), NULL, NULL);
 			AC_Add(P_internalCode, AC_Item);
 		}
 
@@ -992,12 +1007,10 @@ void ParseFor(nodePtr localSymbolTable)
 			mistake(ERR_SYN,"No rule for this\n");
 			break;
 		}
-
 	}
-	//TODO: write parsing function for FOR
 }
 
-nodePtr ParseExp(nodePtr localSymbolTable, int needReturn)
+nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 {
 	//TODO: napsat parsovaci funcki na exp
 }
@@ -1110,9 +1123,17 @@ int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop)
 void Rule0()
 {
 	int remove = 0;
+	AC_itemPtr AC_Item = NULL;
 
 	if(tokenLast->typ == TT_BRACE_R && stackTop->typ == TT_BRACE_R)
 	{
+		//odchyceni veci jako FOR - nutno zachytit pred end label
+		if(RozsahPlatnostiLastPart("FOR"))	//pokud je posledni for cyklus
+		{
+			AC_Item = AC_I_Create(AC_JUMP, NULL, NULL, RozsahPlatnostiBuildStringFromChars("_MODIFICATION"));
+			AC_Add(P_internalCode, AC_Item);
+		}
+
 		//nahraje label oznacujici ukonceni oblasti platnosti
 		AC_itemPtr AC_Item = AC_I_Create(AC_LABEL_END,RozsahPlatnostiGet(), NULL, NULL);
 		AC_Add(P_internalCode, AC_Item);
@@ -1124,7 +1145,7 @@ void Rule0()
 	}
 	else if(tokenLast->typ == TT_KEYWORD_ELSE)
 	{
-		RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("ELSE"));
+		RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_ELSE"));
 		remove = 1;
 	}
 	else if((tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING) && stackTop->typ == TT_S_TYP_UNIVERSAL)
@@ -1142,6 +1163,31 @@ void Rule0()
 		tokenTemp = D_PopFront(P_tokenQueue);
 		T_Destroy(tokenTemp);
 	}
+}
+
+//return 0 for false 1 for true
+int RozsahPlatnostiLastPart(char * str)
+{
+	if(str != NULL)
+	{
+		int length;
+
+		for(length = 0; str[length] != '\0'; length++); //spociat delku casti kterou hledam
+
+		string rozsahPlatnosti = RozsahPlatnostiGet();
+
+		if(rozsahPlatnosti->length < length)
+			return -1;
+
+		string lastPart = substr(rozsahPlatnosti,rozsahPlatnosti->length - length, length);
+
+		if(strCompare(lastPart,charToStr(str)) == 0)
+			return 1;
+		else
+			return 0;
+	}
+	else
+		return -1;
 }
 
 string RozsahPlatnostiBuildString(string newPart)
