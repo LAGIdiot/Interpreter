@@ -85,7 +85,8 @@ typedef enum FM_STATES{
 
 	FM_UNDEFINED,
 	
-	FM_ZERO
+	FM_ZERO,
+	FM_ESC_SQ
 	//---------------------------------------------------------------------------
 
 	/*, FM_BOOL_ ... && || */

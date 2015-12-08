@@ -179,7 +179,7 @@ void T_Get(tTokenPtr tokenPtr)
 						}
 						else
 						{
-							state = FM_UNDEFINED;
+							mistake(ERR_LEX, "Znak není povolen v rámci jazyka IFJ15!\n");
 						}
 						T_Update(read_char);
 					}
@@ -546,6 +546,7 @@ void T_Get(tTokenPtr tokenPtr)
 				{
 					tokenPtr->typ = TT_INT;
 					T_Update('0');
+					ungetc(read_char, file_p);
 					state = FM_END;
 				}
 				else if (read_char == '0')
@@ -697,11 +698,47 @@ void T_Get(tTokenPtr tokenPtr)
 					tokenPtr->typ = TT_STRING;
 					state = FM_END;
 				}
+				else if (read_char == '\\')
+				{
+					state = FM_ESC_SQ;
+				}
 				else
 				{
 					T_Update(read_char);
 				}
 			}break;
+			//-----------------------------------------------------------------------
+			
+			case FM_ESC_SQ:
+			{
+				switch (read_char)
+				{
+					case 'n': 
+					{
+						T_Update('\n');
+					} break;
+					
+					case 't': 
+					{
+						T_Update('\t');
+					} break;
+					
+					case '\\': 
+					{
+						T_Update('\\');
+					} break;
+					
+					case '\"': 
+					{
+						T_Update('\"');
+					} break;
+					default: 
+					{
+						T_Update(read_char);
+						state = FM_STRING;
+					} break;
+				}
+			} break;
 			//-----------------------------------------------------------------------
 			
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
