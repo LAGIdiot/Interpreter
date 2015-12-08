@@ -27,6 +27,7 @@ void ParseDoWhilePart2(nodePtr localSymbolTable);
 void ParseWhile(nodePtr localSymbolTable);
 
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType);
+symbolPackagePtr TokenToSymbol(tTokenPtr token);
 
 int LL_TableRule(tTokenPtr lastToken, tTokenPtr stackTop);
 
@@ -1268,7 +1269,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 
 	if(tokenTemp->typ == TT_IDENTIFIER)
 	{
-		nodeFunction = searchNodeByKey(&P_symbolTable, charToStr(tokenTemp->data));
+		nodeFunction = searchNodeByKey(P_symbolTable, charToStr(tokenTemp->data));
 		if(nodeFunction != NULL)
 			expectingFunction = 1;
 	}
@@ -1277,7 +1278,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	{
 		if(tokenTemp->typ == TT_IDENTIFIER)
 		{
-			nodeLastProcessed = nodeSearchByKey(&localSymbolTable, charToStr(tokenTemp->data));
+			nodeLastProcessed = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
 
 			//zabiti tokenu
 			tokenTemp = D_PopFront(deque);
@@ -1288,7 +1289,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 		}
 		else
 		{
-			symbolPackagePtr symbolPackage = TokenToSymbol(tokenTemp);
+			symbolPackage = TokenToSymbol(tokenTemp);
 
 			//zabiti tokenu
 			tokenTemp = D_PopFront(deque);
@@ -1305,18 +1306,18 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 		//prvni ID/cislo
 		if(tokenTemp->typ == TT_IDENTIFIER)
 		{
-			nodeLastProcessed = nodeSearchByKey(&localSymbolTable, charToStr(tokenTemp->data));
+			nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
 
 			//zabiti tokenu
 			tokenTemp = D_PopFront(deque);
 			T_Destroy(tokenTemp);
 
-			if(nodeLastProcessed == NULL)
+			if(nodeFirst == NULL)
 				mistake(ERR_SEM_UND, "Problem with only argument in EXP\n");
 		}
 		else
 		{
-			symbolPackagePtr symbolPackage = TokenToSymbol(tokenTemp);
+			symbolPackage = TokenToSymbol(tokenTemp);
 
 			//zabiti tokenu
 			tokenTemp = D_PopFront(deque);
@@ -1325,26 +1326,72 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 			if(symbolPackage == NULL)
 				mistake(ERR_SYN, "Problem with only argument in EXP\n");
 
-			nodeLastProcessed = nodeInsert(&localSymbolTable, symbolPackage);
+			nodeFirst = nodeInsert(&localSymbolTable, symbolPackage);
 		}
 
-		//TODO: Odchyceni a zpracovani operace
+		//operace pro pocitani
+		tokenTemp = D_TopFront(deque);
+		int AC_Operation = 0;
 
+		switch(tokenTemp->typ)
+		{
+		case TT_PLUS:
+			AC_Operation = AC_OP_ADD;
+			break;
+		case TT_MINUS:
+			AC_Operation = AC_OP_SUB;
+			break;
+		case TT_STAR:
+			AC_Operation = AC_OP_MUL;
+			break;
+		case TT_DIVIDE:
+			AC_Operation = AC_OP_DIV;
+			break;
+
+		case TT_EQUAL:
+			AC_Operation = AC_EQUAL;
+			break;
+		case TT_NOT_EQUAL:
+			AC_Operation = AC_NOT_EQUAL;
+			break;
+		case TT_GREATER:
+			AC_Operation = AC_GREATER;
+			break;
+		case TT_EQUAL_GREATER:
+			AC_Operation = AC_GREATER_EQUAL;
+			break;
+		case TT_LESS:
+			AC_Operation = AC_LESS;
+			break;
+		case TT_EQUAL_LESS:
+			AC_Operation = AC_LESS_EQUAL;
+			break;
+		default:
+			mistake(ERR_SYN, "Problem with sign\n");
+			break;
+		}
+
+		//zabiti tokenu
+		tokenTemp = D_PopFront(deque);
+		T_Destroy(tokenTemp);
+
+
+		tokenTemp = D_TopFront(deque);
 		//druhy ID/cislo
 		if(tokenTemp->typ == TT_IDENTIFIER)
 		{
-			nodeLastProcessed = nodeSearchByKey(&localSymbolTable, charToStr(tokenTemp->data));
+			nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
 
 			//zabiti tokenu
 			tokenTemp = D_PopFront(deque);
 			T_Destroy(tokenTemp);
 
-			if(nodeLastProcessed == NULL)
+			if(nodeFirst == NULL)
 				mistake(ERR_SEM_UND, "Problem with only argument in EXP\n");
 		}
 		else
 		{
-			symbolPackagePtr symbolPackage = TokenToSymbol(tokenTemp);
+			symbolPackage = TokenToSymbol(tokenTemp);
 
 			//zabiti tokenu
 			tokenTemp = D_PopFront(deque);
@@ -1353,16 +1400,21 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 			if(symbolPackage == NULL)
 				mistake(ERR_SYN, "Problem with only argument in EXP\n");
 
-			nodeLastProcessed = nodeInsert(&localSymbolTable, symbolPackage);
+			nodeFirst = nodeInsert(&localSymbolTable, symbolPackage);
 		}
 
-
 		//TODO: AC a operace a navrat
+		symbolVariable = ST_VariableCreate();
+		symbolVariable->defined = 1;
+		symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+		symbolVariable->type = ST_AUTO;
+		symbolVariable->data = NULL;
 
+		symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
 
+		nodeLastProcessed = nodeInsert(&localSymbolTable, symbolPackage);
 
-
-
+		AC_Item = AC_I_Create(AC_Operation, nodeFirst, nodeSecond, nodeLastProcessed);
 	}
 	else
 	{

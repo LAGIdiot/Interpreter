@@ -9,7 +9,7 @@
 
 enum operatinType{
 	AC_OP_ADD,
-	AC_OP_SUBB,
+	AC_OP_SUB,
 	AC_OP_DIV,
 	AC_OP_MUL,
 
