@@ -307,6 +307,42 @@ void * D_TopFront(Deque deque)
 	return NULL;
 }
 
+void * D_PopBack(Deque deque)
+{
+#if DEBUG
+	printf("Popping data from deque: %d\n", deque);
+#endif
+	if(deque != NULL && deque->type == DEQUE)
+	{
+		DequeContainer container = deque->last;
+
+		if(deque->last == deque->first)
+			deque->last = NULL;
+
+		if(deque->active == deque->first)
+			deque->active = NULL;
+
+		deque->last = container->prevPtr;
+
+		return container;
+	}
+	else
+		mistake(ERR_INTERN, "There was problem with toping deque\n");
+	return NULL;
+}
+
+void * D_TopBack(Deque deque)
+{
+#if DEBUG
+	printf("Getting data from top front of deque: %d\n", deque);
+#endif
+	if(deque != NULL && deque->type == DEQUE)
+		return deque->last;
+	else
+		mistake(ERR_INTERN, "There was problem with toping deque\n");
+	return NULL;
+}
+
 int D_Empty(Deque deque)
 {
 	if(deque != NULL && deque->type == DEQUE)

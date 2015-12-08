@@ -1106,6 +1106,7 @@ void ParseFor(nodePtr localSymbolTable)
 //////////////////////////////////////////////////
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 {
+#if I_have_idea_how_to_do_this_I_will_not_need_to_store_this_code
 	nodePtr nodeLastProcessed = NULL;
 	nodePtr nodeProcessing = NULL;
 	Deque stack = S_Init();
@@ -1215,6 +1216,215 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	T_Destroy(tokenTemp);
 
 	return nodeLastProcessed;
+#endif
+
+	nodePtr nodeLastProcessed = NULL;
+	nodePtr nodeFunction = NULL;
+
+	nodePtr nodeFirst = NULL;
+	nodePtr nodeSecond = NULL;
+
+	Deque deque = D_Init();
+
+	AC_itemPtr AC_Item = NULL;
+	symbolPackagePtr symbolPackage = NULL;
+	symbolVariablePtr symbolVariable = NULL;
+
+	int tokenCount = 0;
+	int endPAR = 0;
+
+	int PAR_L_Count = 0;
+	int PAR_R_Count = 0;
+
+	int expectingFunction = 0;
+
+	if(exitSymbolType == TT_PAR_R)
+		endPAR = 1;
+
+	//preliti tokenu
+	while(1)
+	{
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		if(tokenLast->typ == TT_PAR_R && endPAR &&  PAR_L_Count == PAR_R_Count) //ukoncovani pro exitSymbol PAR_R
+			break;
+
+		if(tokenLast->typ == exitSymbolType)
+			break;
+
+		if(tokenLast->typ == TT_PAR_L)
+			PAR_L_Count++;
+
+		if(tokenLast->typ == TT_PAR_R)
+			PAR_R_Count++;
+
+		D_PushBack(deque,D_PopFront(P_tokenQueue));
+		tokenCount++;
+	}
+
+	tokenTemp = D_TopFront(deque);
+
+	//if ohnuti zadani jako krava
+
+	if(tokenTemp->typ == TT_IDENTIFIER)
+	{
+		nodeFunction = searchNodeByKey(&P_symbolTable, charToStr(tokenTemp->data));
+		if(nodeFunction != NULL)
+			expectingFunction = 1;
+	}
+
+	if(tokenCount == 1)
+	{
+		if(tokenTemp->typ == TT_IDENTIFIER)
+		{
+			nodeLastProcessed = nodeSearchByKey(&localSymbolTable, charToStr(tokenTemp->data));
+
+			//zabiti tokenu
+			tokenTemp = D_PopFront(deque);
+			T_Destroy(tokenTemp);
+
+			if(nodeLastProcessed == NULL)
+				mistake(ERR_SEM_UND, "Problem with only argument in EXP\n");
+		}
+		else
+		{
+			symbolPackagePtr symbolPackage = TokenToSymbol(tokenTemp);
+
+			//zabiti tokenu
+			tokenTemp = D_PopFront(deque);
+			T_Destroy(tokenTemp);
+
+			if(symbolPackage == NULL)
+				mistake(ERR_SYN, "Problem with only argument in EXP\n");
+
+			nodeLastProcessed = nodeInsert(&localSymbolTable, symbolPackage);
+		}
+	}
+	else if(tokenCount == 3)
+	{
+		//prvni ID/cislo
+		if(tokenTemp->typ == TT_IDENTIFIER)
+		{
+			nodeLastProcessed = nodeSearchByKey(&localSymbolTable, charToStr(tokenTemp->data));
+
+			//zabiti tokenu
+			tokenTemp = D_PopFront(deque);
+			T_Destroy(tokenTemp);
+
+			if(nodeLastProcessed == NULL)
+				mistake(ERR_SEM_UND, "Problem with only argument in EXP\n");
+		}
+		else
+		{
+			symbolPackagePtr symbolPackage = TokenToSymbol(tokenTemp);
+
+			//zabiti tokenu
+			tokenTemp = D_PopFront(deque);
+			T_Destroy(tokenTemp);
+
+			if(symbolPackage == NULL)
+				mistake(ERR_SYN, "Problem with only argument in EXP\n");
+
+			nodeLastProcessed = nodeInsert(&localSymbolTable, symbolPackage);
+		}
+
+		//TODO: Odchyceni a zpracovani operace
+
+		//druhy ID/cislo
+		if(tokenTemp->typ == TT_IDENTIFIER)
+		{
+			nodeLastProcessed = nodeSearchByKey(&localSymbolTable, charToStr(tokenTemp->data));
+
+			//zabiti tokenu
+			tokenTemp = D_PopFront(deque);
+			T_Destroy(tokenTemp);
+
+			if(nodeLastProcessed == NULL)
+				mistake(ERR_SEM_UND, "Problem with only argument in EXP\n");
+		}
+		else
+		{
+			symbolPackagePtr symbolPackage = TokenToSymbol(tokenTemp);
+
+			//zabiti tokenu
+			tokenTemp = D_PopFront(deque);
+			T_Destroy(tokenTemp);
+
+			if(symbolPackage == NULL)
+				mistake(ERR_SYN, "Problem with only argument in EXP\n");
+
+			nodeLastProcessed = nodeInsert(&localSymbolTable, symbolPackage);
+		}
+
+
+		//TODO: AC a operace a navrat
+
+
+
+
+
+	}
+	else
+	{
+		//funkce
+		if(expectingFunction)
+		{
+
+		}
+		else
+			mistake(ERR_SYN, "Unrecognized token in EXP\n");
+	}
+	//odeber EXP ze stacku
+	tokenTemp = S_Pop(P_specialStack);
+	T_Destroy(tokenTemp);
+
+	return nodeLastProcessed;
+}
+
+symbolPackagePtr TokenToSymbol(tTokenPtr token)
+{
+	symbolVariablePtr symbolVariable = NULL;
+	symbolPackagePtr symbolPackage = NULL;
+
+	if(token->typ != TT_INT || token->typ != TT_BIN_NUM || token->typ != TT_OCT_NUM || token->typ != TT_HEX_NUM || token->typ != TT_DOUBLE || token->typ != TT_STRING)
+		return NULL;
+	else
+	{
+		if(tokenLast->typ == TT_INT || tokenLast->typ == TT_BIN_NUM || tokenLast->typ == TT_OCT_NUM || tokenLast->typ == TT_HEX_NUM)
+		{
+			symbolVariable = ST_VariableCreate();
+			symbolVariable->type = ST_Remap(tokenLast->typ);
+			symbolVariable->defined = 1;
+			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+			ST_VariableAddData_INT(symbolVariable, charToInt(tokenLast->data));
+
+			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
+		}
+
+		if(tokenLast->typ == TT_DOUBLE)
+		{
+			symbolVariable = ST_VariableCreate();
+			symbolVariable->type = ST_Remap(tokenLast->typ);
+			symbolVariable->defined = 1;
+			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+			ST_VariableAddData_INT(symbolVariable, charToDouble(tokenLast->data));
+
+			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
+		}
+
+		if(tokenLast->typ == TT_STRING)
+		{
+			symbolVariable = ST_VariableCreate();
+			symbolVariable->type = ST_Remap(tokenLast->typ);
+			symbolVariable->defined = 1;
+			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+
+			symbolVariable->data = charToStr(tokenLast->data);
+
+			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
+		}
+	}
+	return symbolPackage;
 }
 
 void ParseDoWhile(nodePtr localSymbolTable)
