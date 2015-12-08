@@ -715,21 +715,25 @@ void T_Get(tTokenPtr tokenPtr)
 				{
 					case 'n': 
 					{
+						state = FM_STRING;
 						T_Update('\n');
 					} break;
 					
 					case 't': 
 					{
+						state = FM_STRING;
 						T_Update('\t');
 					} break;
 					
 					case '\\': 
 					{
+						state = FM_STRING;
 						T_Update('\\');
 					} break;
 					
 					case '\"': 
 					{
+						state = FM_STRING;
 						T_Update('\"');
 					} break;
 					default: 
