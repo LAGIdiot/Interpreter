@@ -11,7 +11,7 @@
 
 #define LONGEST_KEYWORD 6
 #define KEYWORD_COUNT 20
-#define EON_COUNT 6
+#define EON_COUNT 7
 
 //Externs
 extern FILE * file_p;
@@ -94,6 +94,6 @@ typedef enum FM_STATES{
 //Functions
 void Scann(Deque tokenQueue);
 
-static const char eon[EON_COUNT] = {'+', '-', '/', '*', ';', ' '};
+static const char eon[EON_COUNT] = {'+', '-', '/', '*', ';', ' ', ')'};
 
 #endif

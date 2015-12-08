@@ -557,7 +557,7 @@ void T_Get(tTokenPtr tokenPtr)
 					state = FM_NUMBER;
 					ungetc(read_char, file_p);
 				}
-			}
+			}break;
 			//-----------------------------------------------------------------------
 			
 			case FM_NUMBER:
