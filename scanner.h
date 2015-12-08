@@ -83,7 +83,9 @@ typedef enum FM_STATES{
 	FM_COMMENT_MULTILINE,
 	FM_COMMENT_MULTILINE_END,
 
-	FM_UNDEFINED
+	FM_UNDEFINED,
+	
+	FM_ZERO
 	//---------------------------------------------------------------------------
 
 	/*, FM_BOOL_ ... && || */
@@ -91,12 +93,6 @@ typedef enum FM_STATES{
 
 //Functions
 void Scann(Deque tokenQueue);
-
-static const char *key_words[KEYWORD_COUNT] = {"auto", "cin", "cout", "double",
- "else", "for", "if", "int", "return", "string", "bool", "do", "while",
- "true", "false",
- // VESTAVĚNÉ FUNKCE TAKÉ JAKO
- "length", "substr", "concat", "find", "sort"};
 
 static const char eon[EON_COUNT] = {'+', '-', '/', '*', ';', ' '};
 

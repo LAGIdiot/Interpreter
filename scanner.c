@@ -2,6 +2,12 @@
 
 static int keyword_type = 0;
 
+static const char *key_words[KEYWORD_COUNT] = {"auto", "cin", "cout", "double",
+ "else", "for", "if", "int", "return", "string", "bool", "do", "while",
+ "true", "false",
+ // VESTAVĚNÉ FUNKCE TAKÉ JAKO
+ "length", "substr", "concat", "find", "sort"};
+
 //Function prototypes - private
 void T_Get(tTokenPtr tokenPtr);
 int IsKeyword(void);
@@ -72,7 +78,7 @@ void T_Get(tTokenPtr tokenPtr)
 			tokenu*/
 			/////////////////////////////////////////////////////////////////////////
 			case FM_START:
-				switch(read_char)
+				switch (read_char)
 				{
 					case '(':
 						state = FM_PAR_L;
@@ -164,7 +170,7 @@ void T_Get(tTokenPtr tokenPtr)
 						// když je to znak 0
 						else if (read_char == ZERO)
 						{
-							continue; // Nuly se na začátku čísla ignorují
+							state = FM_ZERO;
 						}
 						// když je to znak 1-9
 						else if ((read_char >= ZERO+1) && (read_char <= NINE))
@@ -243,14 +249,13 @@ void T_Get(tTokenPtr tokenPtr)
 					
 			case FM_PLUS:
 			{
-				tokenPtr->typ = TT_PLUS;
-				
 				if (read_char == '+')
 				{
 					state = FM_INCREMENT;
 				}
 				else
 				{
+					tokenPtr->typ = TT_PLUS;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -268,14 +273,13 @@ void T_Get(tTokenPtr tokenPtr)
 				
 			case FM_MINUS:
 			{
-				tokenPtr->typ = TT_MINUS;
-				
 				if (read_char == '-')
 				{
 					state = FM_DECREMENT;
 				}
 				else
 				{
+					tokenPtr->typ = TT_MINUS;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -293,14 +297,13 @@ void T_Get(tTokenPtr tokenPtr)
 				
 			case FM_DIVIDE:
 			{
-				tokenPtr->typ = TT_DIVIDE;
-
 				if(read_char == '/')
 					state = FM_COMMENT_SINGLELINE;
 				else if(read_char == '*')
 					state = FM_COMMENT_MULTILINE;
 				else
 				{
+					tokenPtr->typ = TT_DIVIDE;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -309,7 +312,7 @@ void T_Get(tTokenPtr tokenPtr)
 				
 			case FM_COMMENT_SINGLELINE:
 			{
-				tokenPtr->typ = TT_UNDEFINED;
+				//tokenPtr->typ = TT_UNDEFINED;
 
 				if(read_char == NEW_LINE)
 					state = FM_START;
@@ -318,7 +321,7 @@ void T_Get(tTokenPtr tokenPtr)
 				
 			case FM_COMMENT_MULTILINE:
 			{
-				tokenPtr->typ = TT_UNDEFINED;
+				//tokenPtr->typ = TT_UNDEFINED;
 
 				if(read_char == '*')
 					state = FM_COMMENT_MULTILINE_END;
@@ -336,11 +339,11 @@ void T_Get(tTokenPtr tokenPtr)
 				
 			case FM_ASSIGN:
 			{
-				tokenPtr->typ = TT_ASSIGN;
 				if(read_char == '=')
 					state = FM_EQUAL;
 				else
 				{
+					tokenPtr->typ = TT_ASSIGN;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -357,16 +360,15 @@ void T_Get(tTokenPtr tokenPtr)
 			//-----------------------------------------------------------------------
 				
 			case FM_NOT_EQUAL:
-			{
-				tokenPtr->typ = TT_NOT_EQUAL;
-					
+			{	
 				if (read_char == '=')
 				{
+					tokenPtr->typ = TT_NOT_EQUAL;
 					state = FM_END;
 				}
 				else
 				{
-						//TODO: ERROR
+					mistake(ERR_LEX, "V kódu se nachází samotný znak \"!\" \n");
 				}
 			} break;
 			//-----------------------------------------------------------------------
@@ -389,7 +391,7 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
-					//TODO ERROR
+					mistake(ERR_LEX, "V kódu je samotný znak \"&\" \n");
 				}
 				
 			} break;
@@ -404,16 +406,14 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
-					//TODO ERROR
+					mistake(ERR_LEX, "V kódu je samotná znak \"|\" \n");
 				}
 				
 			} break;
 			//-----------------------------------------------------------------------
 					
 			case FM_GREATER:
-			{
-				tokenPtr->typ = TT_GREATER;
-					
+			{		
 				if (read_char == '=')
 					state = FM_G_EQUAL;
 				else if (read_char == '>')
@@ -422,6 +422,7 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
+					tokenPtr->typ = TT_GREATER;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -438,18 +439,16 @@ void T_Get(tTokenPtr tokenPtr)
 			//-----------------------------------------------------------------------
 					
 			case FM_LESS:
-			{
-				tokenPtr->typ = TT_LESS;
-					
+			{	
 				if (read_char == '=')
 					state = FM_L_EQUAL;
 				else if (read_char == '<')
 				{
-					T_Update(read_char);
 					state = FM_INSERTION;
 				}
 				else
 				{
+					tokenPtr->typ = TT_LESS;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -541,6 +540,26 @@ void T_Get(tTokenPtr tokenPtr)
 			} break;
 			//-----------------------------------------------------------------------
 			
+			case FM_ZERO:
+			{
+				if (EndOfNumber(read_char))
+				{
+					tokenPtr->typ = TT_INT;
+					T_Update('0');
+					state = FM_END;
+				}
+				else if (read_char == '0')
+				{
+					continue;
+				}
+				else
+				{
+					state = FM_NUMBER;
+					ungetc(read_char, file_p);
+				}
+			}
+			//-----------------------------------------------------------------------
+			
 			case FM_NUMBER:
 			{
 				if ((read_char >= ZERO) && (read_char <= NINE))
@@ -554,14 +573,14 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
-					if (!EndOfNumber(read_char))
+					if (EndOfNumber(read_char))
 					{
 						state = FM_INT;
 						ungetc(read_char, file_p);
 					}
 					else
 					{
-						//TODO odchytávání chyb
+						mistake(ERR_LEX, "Za číslem není EndOfNumber!\n");
 					}
 					
 				}
@@ -585,7 +604,7 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
-					if (!EndOfNumber(read_char))
+					if (EndOfNumber(read_char))
 					{
 						tokenPtr->typ = TT_DOUBLE;
 						ungetc(read_char, file_p);
@@ -593,7 +612,7 @@ void T_Get(tTokenPtr tokenPtr)
 					}
 					else
 					{
-						// TODO ERROR
+						mistake(ERR_LEX, "Chyba při čtení double!\n");
 					}
 				}
 			}break;
@@ -616,24 +635,23 @@ void T_Get(tTokenPtr tokenPtr)
 						break;
 						
 					default:
-						//TODO --ERROR
-						 break;
+						mistake(ERR_LEX, "Chybný BASE!\n");
+						break;
 				}
 			} break;
 			//-----------------------------------------------------------------------
 			
 			case FM_HEX_NUM:
 			{
-				tokenPtr->typ = TT_HEX_NUM;
-				
-				if (((read_char >= LETTER_A) && (read_char <= LETTER_Z))
-					|| ((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
+				if (((read_char >= LETTER_A) && (read_char <= (LETTER_A + 5)))
+					|| ((read_char >= CAPITAL_A) && (read_char <= (CAPITAL_A + 5)))
 					|| ((read_char >= ZERO) && (read_char <= NINE)))
 				{
 					T_Update(read_char);
 				}
 				else
 				{
+					tokenPtr->typ = TT_HEX_NUM;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -642,8 +660,6 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			case FM_OCT_NUM:
 			{
-				tokenPtr->typ = TT_OCT_NUM;
-				
 				// znaky '0' - '7'
 				if ((read_char >= ZERO) && (read_char <= NINE-2))
 				{
@@ -651,6 +667,7 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
+					tokenPtr->typ = TT_OCT_NUM;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -659,8 +676,6 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			case FM_BIN_NUM:
 			{
-				tokenPtr->typ = TT_BIN_NUM;
-				
 				// pouze znaky '0' a '1'
 				if ((read_char == ZERO) || (read_char == ZERO+1))
 				{
@@ -668,6 +683,7 @@ void T_Get(tTokenPtr tokenPtr)
 				}
 				else
 				{
+					tokenPtr->typ = TT_BIN_NUM;
 					ungetc(read_char, file_p);
 					state = FM_END;
 				}
@@ -739,7 +755,7 @@ int EndOfNumber(char c)
 	for (int i = 0; i < EON_COUNT; i++)
 	{
 		if (c == eon[i])
-			return 0;
+			return 1;
 	}
-	return 1;
+	return 0;
 }
