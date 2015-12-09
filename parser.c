@@ -506,7 +506,7 @@ void ParsePrirazeni(nodePtr localSymbolTable)
 
 	//vim ze tu budu potrebovat nejmene 4 tahy a to 1.ID, 2. =, 3. EXP, 4. ;
 	int end = 4;
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < end; i++)
 	{
 		stackTop = S_Top(P_specialStack);
 		tokenLast = D_TopFront(P_tokenQueue);
@@ -598,8 +598,6 @@ void ParseReturn(nodePtr localSymbolTable)
 {
 	int rule;
 
-	nodePtr nodeId = NULL;
-
 	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. RETURN, 2. EXP, 3. ;
 	int end = 3;
 
@@ -611,7 +609,6 @@ void ParseReturn(nodePtr localSymbolTable)
 		//zajisteni jaky pravidlo se pouzije
 		rule = LL_TableRule(tokenLast, stackTop);
 
-		//i == 0 return
 		if(i == 1) //EXP
 		{
 			nodePtr nodeExp = ParseExp(localSymbolTable, TT_SEMICOLON);
@@ -619,8 +616,6 @@ void ParseReturn(nodePtr localSymbolTable)
 			AC_itemPtr AC_Item = AC_I_Create(AC_RETURN, nodeExp, NULL, NULL);
 			AC_Add(P_internalCode, AC_Item);
 		}
-
-		//i == 2 ;
 
 		switch(rule)
 		{
@@ -1167,8 +1162,6 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr localSymbolTable)
 
 nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTable)
 {
-	int rule;
-
 	nodePtr nodeFirst = NULL;
 	nodePtr nodeSecond = NULL;
 	nodePtr nodeThird = NULL;
@@ -1179,7 +1172,7 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTa
 
 	AC_itemPtr AC_Item = NULL;
 
-	int end;
+	int end = 0;
 
 	switch(function)
 	{

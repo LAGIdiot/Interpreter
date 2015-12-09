@@ -157,7 +157,6 @@ int ST_CompareVariables(symbolVariablePtr symbol1, symbolVariablePtr symbol2)
 //Nemuze dojik k rozdilu v symbol->type !!!
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
 {
-	int compareInner = 0;
 	int str = strCompare(symbol1->key, symbol2->key);
 	if(str != 0)
 		return str;
