@@ -9,7 +9,7 @@
 
 enum operatinType{
 	AC_OP_ADD,
-	AC_OP_SUBB,
+	AC_OP_SUB,
 	AC_OP_DIV,
 	AC_OP_MUL,
 
@@ -32,6 +32,11 @@ enum operatinType{
 
 	AC_CALL_CIN,
 	AC_CALL_COUT,
+	AC_CALL_CONCAT,
+	AC_CALL_SUBSTR,
+	AC_CALL_FIND,
+	AC_CALL_LENGTH,
+	AC_CALL_SORT,
 
 	AC_CALL_LENGTH,
 	AC_CALL_SUBSTR,
@@ -43,7 +48,6 @@ enum operatinType{
 	AC_CALL,
 	AC_RETURN,
 };
-
 
 /*	Operations - vsechno jsou odkazy do tabulky symbolu (krome LABEL, LABEL_END a vsechny JUMP - zde jde o string v pameti)
  *	AC_OP_ADD,			INT/DOUBLE			INT/DOUBLE 			INT/DOUBLE (vysledek)
@@ -91,7 +95,6 @@ enum operatinType{
  *	Casem doplnim dalsi az rozhodnu o jejich implementaci
  *
  */
-
 
 typedef struct AC_ItemStruct{
 	int operation;

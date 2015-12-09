@@ -53,9 +53,15 @@ void ST_FunctionAddParam(symbolFunctionPtr symbol, int variableType);
 symbolVariablePtr ST_VariableCreate();
 void ST_VariableDestroy(symbolVariablePtr symbol);
 
+void ST_VariableAddData_INT(symbolVariablePtr symbol, int data);
+void ST_VariableAddData_DOUBLE(symbolVariablePtr symbol, double data);
+
 string ST_RandomKeyGenerator();
 
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2);
+
+int ST_CompareParamT(symbolFunctionPtr function, int tokenType, int position);
+int ST_CompareParamS(symbolFunctionPtr function, int variableType, int position);
 
 int ST_Remap(int tokenTyp);
 

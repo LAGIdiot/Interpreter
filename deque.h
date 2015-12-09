@@ -48,6 +48,9 @@ void D_PushFront(Deque deque, void * data);
 void * D_PopFront(Deque deque);
 void * D_TopFront(Deque deque);
 
+void * D_PopBack(Deque deque);
+void * D_TopBack(Deque deque);
+
 int D_Empty(Deque deque);
 
 #endif //DEQUE_Header
