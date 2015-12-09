@@ -34,6 +34,10 @@ enum operatinType{
 	AC_CALL_COUT,
 
 	AC_CALL_LENGTH,
+	AC_CALL_SUBSTR,
+	AC_CALL_CONCAT,
+	AC_CALL_FIND,
+	AC_CALL_SORT,
 
 	AC_CALL_DUMMY,	//slouzi k posilani parametru ktere by se nevesly
 	AC_CALL,
@@ -68,7 +72,21 @@ enum operatinType{
  *	AC_CALL_CIN			NULL				NULL				INT/DOUBLE/STRING
  *	AC_CALL_COUT		INT/DOUBLE/STRING	NULL				NULL
  *
- *	AC_CALL_LENGTH		STRING				NULL				STRING
+ *	int lenght(string s)
+ *	AC_CALL_LENGTH		STRING (s)			NULL				INT
+ *
+ *	string substr(string s, int i, int n)
+ *	AC_CALL_DUMMY		INT (n)				NULL				NULL
+ *	AC_CALL_SUBSTR		STRING (s)			INT (i)				STRING
+ *
+ *	string concat(string s1, string s2)
+ *	AC_CALL_CONCAT		STRING (s1)			STRING (s2)			STRING
+ *
+ *	int find(string s, string search)
+ *	AC_CALL_FIND		STRING (s1)			STRING (search)		INT
+ *
+ *	string sort(string s)
+ *	AC_CALL_SORT		STRING (s)			NULL				STRING
  *
  *	Casem doplnim dalsi az rozhodnu o jejich implementaci
  *
