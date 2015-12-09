@@ -466,12 +466,12 @@ void T_Get(tTokenPtr tokenPtr)
 					
 			case FM_CODEWORD:
 			{
-				if (((read_char >= LETTER_A) && (read_char <= LETTER_Z))
-					|| ((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z)))
+				if ((read_char >= LETTER_A) && (read_char <= LETTER_Z))
 				{
 					T_Update(read_char);
 				}
 				else if (((read_char >= ZERO) && (read_char <= NINE))
+					|| ((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
 					|| (read_char == '_'))
 				{
 					T_Update(read_char);
@@ -747,12 +747,13 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
 			{
-				tokenPtr->typ = TT_UNDEFINED;
+				mistake(ERR_LEX, "Token není povolen v rámci jazyka IFJ15!\n");
+				/*tokenPtr->typ = TT_UNDEFINED;
 
 				if(!whiteSpace)
 					T_Update(read_char);
 				else
-					state = FM_END;
+					state = FM_END;*/
 			} break;
 		}	//switch
 	}	//while
