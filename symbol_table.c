@@ -189,3 +189,24 @@ void ST_VariableAddData_DOUBLE(symbolVariablePtr symbol, double data)
 	doublePtr = &data;
 	symbol->data = doublePtr;
 }
+
+int ST_CompareParamT(symbolFunctionPtr function, int tokenType, int position)
+{
+	int variableType = ST_Remap(tokenType);
+	return ST_CompareParamS(function, variableType, position);
+}
+
+int ST_CompareParamS(symbolFunctionPtr function, int variableType, int position)
+{
+	if(position > function->paramTypes->length)
+		mistake(ERR_SEM_COMP, "Too much arguments for this function\n");
+
+	int paramType = function->paramTypes->str[position -1];
+
+	if(variableType > paramType)
+		return -1;
+	else if(variableType < paramType)
+		return 1;
+	else
+		return 0;
+}

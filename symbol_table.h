@@ -60,6 +60,9 @@ string ST_RandomKeyGenerator();
 
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2);
 
+int ST_CompareParamT(symbolFunctionPtr function, int tokenType, int position);
+int ST_CompareParamS(symbolFunctionPtr function, int variableType, int position);
+
 int ST_Remap(int tokenTyp);
 
 #endif //ST_Header

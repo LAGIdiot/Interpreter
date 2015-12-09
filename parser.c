@@ -29,7 +29,7 @@ void ParseWhile(nodePtr localSymbolTable);
 
 //Parsovani funkci
 nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTable);
-nodePtr ParseUserDefinedFunction(nodePtr localSymbolTable);
+nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr localSymbolTable);
 
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType);
 symbolPackagePtr TokenToSymbol(tTokenPtr token);
@@ -1311,7 +1311,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	{
 		//funkce
 		if(expectingFunction == 1)
-			nodeLastProcessed = ParseUserDefinedFunction(localSymbolTable);
+			nodeLastProcessed = ParseUserDefinedFunction(deque, localSymbolTable);
 		else if(expectingFunction == 2)
 		{
 			if(tokenTemp->typ == TT_KEYWORD_LENGTH)
@@ -1460,9 +1460,130 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	return nodeLastProcessed;
 }
 
-nodePtr ParseUserDefinedFunction(nodePtr localSymbolTable)
+nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr localSymbolTable)
 {
 	//TODO: Function Call - uzivatelsky
+	//Battle plan:	get functionSymbol and list of its parametrs -> expecting number of parametrs
+	//				take the deque from end, found PAR_R and take arguments from end and put them to AC_CALL_DUMMYs and AC_CALL
+
+	symbolFunctionPtr function = NULL;
+	symbolVariablePtr variable = NULL;
+	symbolPackagePtr package = NULL;
+
+	nodePtr nodeFunction = NULL;
+	nodePtr nodeFirst = NULL;
+	nodePtr nodeSecond = NULL;
+	nodePtr nodeRet = NULL;
+
+	AC_itemPtr AC_Item = NULL;
+
+	int numberOfArguments = 0;
+	int tokenCount = 0;
+
+	tokenTemp = D_TopFront(dequeExp);
+
+	nodeFunction = searchNodeByKey(P_symbolTable, charToStr(tokenTemp->data));
+	if(nodeFunction == NULL)
+		mistake(ERR_SEM_UND, "User defined function not found\n");
+
+	function = nodeFunction->data->data;
+
+	if(function->defined != 1)
+		mistake(ERR_SEM_UND, "Definition of user defined function not found\n");
+
+	numberOfArguments = function->paramTypes->length;
+
+	Deque stack = S_Init();
+
+	//preliti tokenu
+	while(1)
+	{
+		tokenLast = D_TopFront(dequeExp);
+
+		S_Push(stack,D_PopFront(P_tokenQueue));
+		tokenCount++;
+
+		if(tokenLast->typ == TT_PAR_R) //ukoncovani pro PAR_R
+			break;
+	}
+
+	for(int i = 0; i < tokenCount; i++)
+	{
+		tokenTemp = D_TopFront(dequeExp);
+
+		if ((i % 2) == 1) //jede se po lichych protoze na 0 je PAR_R
+		{
+			if((numberOfArguments % 2) == 1)	//uklada se na adress 1 - zde taky dochazi k volani funcke dummy
+			{
+				if(tokenTemp->typ == TT_IDENTIFIER)
+				{
+					nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
+					if(nodeFirst == NULL)
+						mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
+
+					variable = nodeFirst->data->data;
+					if(ST_CompareParamS(function, variable->type, numberOfArguments) != 0)
+						mistake(ERR_SEM_COMP, "Bad token type\n");
+				}
+				else if(ST_CompareParamT(function, tokenTemp->typ, numberOfArguments) == 0)
+					nodeFirst = nodeInsert(&localSymbolTable, TokenToSymbol(tokenTemp));
+				else
+					mistake(ERR_SEM_COMP, "Bad token type\n");
+
+				if(numberOfArguments > 2)	//volani funkce dummy - volani funkce je az za cyklem
+				{
+					AC_Item = AC_I_Create(AC_CALL_DUMMY, nodeFirst, nodeSecond, NULL);
+					AC_Add(P_internalCode, AC_Item);
+				}
+
+			}
+			else	//uklda se na adress 2
+			{
+				if(tokenTemp->typ == TT_IDENTIFIER)
+				{
+					nodeSecond = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
+					if(nodeSecond == NULL)
+						mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
+
+					variable = nodeSecond->data->data;
+					if(ST_CompareParamS(function, variable->type, numberOfArguments) != 0)
+						mistake(ERR_SEM_COMP, "Bad token type\n");
+				}
+				else if(ST_CompareParamT(function, tokenTemp->typ, numberOfArguments) == 0)
+					nodeSecond = nodeInsert(&localSymbolTable, TokenToSymbol(tokenTemp));
+				else
+					mistake(ERR_SEM_COMP, "Bad token type\n");
+			}
+		}
+
+		if(tokenTemp->typ == stackTop->typ)
+		{
+			tokenTemp = D_PopFront(dequeExp);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
+		}
+		else
+			mistake(ERR_SYN, "Top of stack and token are not equal\n");
+	}
+
+	//vytvoreni promena pro vraceni z funkce
+	variable = ST_VariableCreate();
+	variable->defined = 1;
+	variable->labelPlatnosti = RozsahPlatnostiGet();
+	variable->type = function->returnType;
+
+	package = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, variable);
+
+	nodeRet = nodeInsert(&localSymbolTable, package);
+
+	//volani funkce
+
+	AC_Item = AC_I_Create(AC_CALL, nodeFirst, nodeSecond, nodeRet);
+	AC_Add(P_internalCode, AC_Item);
+
+	return nodeRet;
 }
 
 nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTable)
@@ -1506,48 +1627,71 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTa
 
 		if(i == 2) //there must be IDENTIFIER type STRING every time
 		{
-			nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
-			if(nodeFirst == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
+			if(tokenTemp->typ == TT_IDENTIFIER)
+			{
+				nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
+				if(nodeFirst == NULL)
+					mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
 
-			variable = nodeFirst->data->data;
-			if(variable->type != ST_STRING)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
+				variable = nodeFirst->data->data;
+				if(variable->type != ST_STRING)
+					mistake(ERR_SEM_COMP, "This param needs to be string\n");
+			}
+			else if(tokenTemp->typ == TT_STRING)
+				nodeFirst = nodeInsert(&localSymbolTable, TokenToSymbol(tokenTemp));
+			else
+				mistake(ERR_SEM_COMP, "Bad token type\n");
 		}
 
 		if(i == 4)
 		{
-			nodeSecond = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
-			if(nodeSecond == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
-
-			variable = nodeSecond->data->data;
-			switch(function)
+			if(tokenTemp->typ == TT_IDENTIFIER)
 			{
-			case BF_CONCAT:
-			case BF_FIND:
-				if(variable->type != ST_STRING)
-					mistake(ERR_SEM_COMP, "This param needs to be string\n");
-				break;
-			case BF_SUBSTR:
-				if(variable->type != ST_STRING)
-					mistake(ERR_SEM_COMP, "This param needs to be string\n");
-				break;
-			default:
-				mistake(ERR_INTERN, "Someone messed up with second build-in function list\n");
-				break;
+				nodeSecond = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
+				if(nodeSecond == NULL)
+					mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
+
+				variable = nodeSecond->data->data;
+				switch(function)
+				{
+				case BF_CONCAT:
+				case BF_FIND:
+					if(variable->type != ST_STRING)
+						mistake(ERR_SEM_COMP, "This param needs to be string\n");
+					break;
+				case BF_SUBSTR:
+					if(variable->type != ST_INT)
+						mistake(ERR_SEM_COMP, "This param needs to be string\n");
+					break;
+				default:
+					mistake(ERR_INTERN, "Someone messed up with second build-in function list\n");
+					break;
+				}
 			}
+			else if((function == BF_CONCAT || function == BF_FIND) && tokenTemp->typ == TT_STRING)
+				nodeThird = nodeInsert(&localSymbolTable, TokenToSymbol(tokenTemp));
+			else if (function == BF_SUBSTR && (tokenTemp->typ == TT_INT || tokenTemp->typ == TT_BIN_NUM || tokenTemp->typ == TT_OCT_NUM || tokenTemp->typ == TT_HEX_NUM))
+				nodeThird = nodeInsert(&localSymbolTable, TokenToSymbol(tokenTemp));
+			else
+				mistake(ERR_SEM_COMP, "Bad token type\n");
 		}
 
 		if(i == 6)
 		{
-			nodeThird = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
-			if(nodeThird == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
+			if(tokenTemp->typ == TT_IDENTIFIER)
+			{
+				nodeThird = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
+				if(nodeThird == NULL)
+					mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
 
-			variable = nodeThird->data->data;
-			if(variable->type != ST_INT)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
+				variable = nodeThird->data->data;
+				if(variable->type != ST_INT)
+					mistake(ERR_SEM_COMP, "This param needs to be string\n");
+			}
+			else if (tokenTemp->typ == TT_INT || tokenTemp->typ == TT_BIN_NUM || tokenTemp->typ == TT_OCT_NUM || tokenTemp->typ == TT_HEX_NUM)
+				nodeThird = nodeInsert(&localSymbolTable, TokenToSymbol(tokenTemp));
+			else
+				mistake(ERR_SEM_COMP, "Bad token type\n");
 		}
 
 		if(tokenTemp->typ == stackTop->typ)
@@ -1560,7 +1704,6 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTa
 		}
 		else
 			mistake(ERR_SYN, "Top of stack and token are not equal\n");
-
 	}
 
 	variable = ST_VariableCreate();
