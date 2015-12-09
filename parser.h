@@ -14,6 +14,14 @@
 #define LL_TABLE_ROWS 10
 #define LL_TABLE_COLUMNS 20
 
+typedef enum BUILTIN_FUNCTIONS{
+	BF_LENGTH,
+	BF_SUBSTR,
+	BF_CONCAT,
+	BF_FIND,
+	BF_SORT,
+}builtin_functions;
+
 const static int LL_TABLE[LL_TABLE_ROWS][LL_TABLE_COLUMNS] =
 {/*				EOF,if,	else,	for,return,	cin,cout,	{,	},	),	',',;,	<<,	>>,	id,	typ,exp,=,	do,	while*/
 /*$*/			{1,	0,	0,		0,	0,		0,	0,		0,	0,	0,	0,	0,	0,	0,	0,	2,	0,	0,	0,	0},

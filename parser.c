@@ -27,12 +27,9 @@ void ParseDoWhile(nodePtr localSymbolTable);
 void ParseDoWhilePart2(nodePtr localSymbolTable);
 void ParseWhile(nodePtr localSymbolTable);
 
-//Vestavene funkce
-nodePtr ParseLength(nodePtr localSymbolTable);
-nodePtr ParseFind(nodePtr localSymbolTable);
-nodePtr ParseSort(nodePtr localSymbolTable);
-nodePtr ParseConcat(nodePtr localSymbolTable);
-nodePtr ParseSubstr(nodePtr localSymbolTable);
+//Parsovani funkci
+nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTable);
+nodePtr ParseUserDefinedFunction(nodePtr localSymbolTable);
 
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType);
 symbolPackagePtr TokenToSymbol(tTokenPtr token);
@@ -1314,10 +1311,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	{
 		//funkce
 		if(expectingFunction == 1)
-		{
-			//TODO: Function Call - uzivatelsky
-
-		}
+			nodeLastProcessed = ParseUserDefinedFunction(localSymbolTable);
 		else if(expectingFunction == 2)
 		{
 			if(tokenTemp->typ == TT_KEYWORD_LENGTH)
@@ -1338,7 +1332,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 				tokenTemp->typ = TT_PAR_R;
 				S_Push(P_specialStack, tokenTemp);
 
-				nodeLastProcessed = ParseLength(localSymbolTable);
+				nodeLastProcessed = ParseBuiltinFunction(BF_LENGTH, deque, localSymbolTable);
 			}
 			else if(tokenTemp->typ == TT_KEYWORD_SUBSTRING)
 			{
@@ -1374,7 +1368,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 				tokenTemp->typ = TT_PAR_R;
 				S_Push(P_specialStack, tokenTemp);
 
-				nodeLastProcessed = ParseSubstr(localSymbolTable);
+				nodeLastProcessed = ParseBuiltinFunction(BF_SUBSTR, deque, localSymbolTable);
 			}
 			else if(tokenLast->typ == TT_KEYWORD_CONCAT)
 			{
@@ -1402,7 +1396,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 				tokenTemp->typ = TT_PAR_R;
 				S_Push(P_specialStack, tokenTemp);
 
-				nodeLastProcessed = ParseConcat(localSymbolTable);
+				nodeLastProcessed = ParseBuiltinFunction(BF_CONCAT, deque, localSymbolTable);
 			}
 			else if(tokenLast->typ == TT_KEYWORD_FIND)
 			{
@@ -1430,7 +1424,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 				tokenTemp->typ = TT_PAR_R;
 				S_Push(P_specialStack, tokenTemp);
 
-				nodeLastProcessed = ParseFind(localSymbolTable);
+				nodeLastProcessed = ParseBuiltinFunction(BF_FIND, deque, localSymbolTable);
 			}
 			else if(tokenLast->typ == TT_KEYWORD_SORT)
 			{
@@ -1450,7 +1444,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 				tokenTemp->typ = TT_PAR_R;
 				S_Push(P_specialStack, tokenTemp);
 
-				nodeLastProcessed = ParseSort(localSymbolTable);
+				nodeLastProcessed = ParseBuiltinFunction(BF_SORT, deque, localSymbolTable);
 			}
 			else
 				mistake(ERR_INTERN,"Unrecognized built-in function\n");
@@ -1466,66 +1460,15 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	return nodeLastProcessed;
 }
 
-nodePtr ParseLength(nodePtr localSymbolTable)
+nodePtr ParseUserDefinedFunction(nodePtr localSymbolTable)
 {
-	int rule;
-	nodePtr node = NULL;
-	nodePtr nodeRet = NULL;
-	symbolVariablePtr variable = NULL;
-	symbolPackagePtr package = NULL;
-
-	AC_itemPtr AC_Item = NULL;
-
-	int end = 4;
-
-	for(int i = 0; i < end; i++)
-	{
-		stackTop = S_Top(P_specialStack);
-		tokenLast = D_TopFront(P_tokenQueue);
-
-		//zajisteni jaky pravidlo se pouzije
-		rule = LL_TableRule(tokenLast, stackTop);
-
-		if(i == 2)
-		{
-			node = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
-			if(node == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
-
-			variable = node->data->data;
-			if(variable->type != ST_STRING)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
-		}
-
-		switch(rule)
-		{
-		case 0:
-			Rule0(localSymbolTable);
-			break;
-		default:
-			mistake(ERR_SYN,"No rule for this\n");
-			break;
-		}
-	}
-
-	variable = ST_VariableCreate();
-	variable->defined = 1;
-	variable->labelPlatnosti = RozsahPlatnostiGet();
-	variable->type = ST_INT;
-
-	package = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, variable);
-
-	nodeRet = nodeInsert(&localSymbolTable, package);
-
-	AC_Item = AC_I_Create(AC_CALL_LENGTH, node, NULL, nodeRet);
-	AC_Add(P_internalCode, AC_Item);
-
-	return nodeRet;
+	//TODO: Function Call - uzivatelsky
 }
 
-nodePtr ParseSubstr(nodePtr localSymbolTable)
+nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr localSymbolTable)
 {
 	int rule;
+
 	nodePtr nodeFirst = NULL;
 	nodePtr nodeSecond = NULL;
 	nodePtr nodeThird = NULL;
@@ -1536,19 +1479,34 @@ nodePtr ParseSubstr(nodePtr localSymbolTable)
 
 	AC_itemPtr AC_Item = NULL;
 
-	int end = 8;
+	int end;
+
+	switch(function)
+	{
+	case BF_LENGTH:
+	case BF_SORT:
+		end = 4;
+		break;
+	case BF_FIND:
+	case BF_CONCAT:
+		end = 6;
+		break;
+	case BF_SUBSTR:
+		end = 8;
+		break;
+	default:
+		mistake(ERR_INTERN, "Unrecognized built in function.\n");
+		break;
+	}
 
 	for(int i = 0; i < end; i++)
 	{
+		tokenTemp = D_TopFront(dequeExp);
 		stackTop = S_Top(P_specialStack);
-		tokenLast = D_TopFront(P_tokenQueue);
 
-		//zajisteni jaky pravidlo se pouzije
-		rule = LL_TableRule(tokenLast, stackTop);
-
-		if(i == 2)
+		if(i == 2) //there must be IDENTIFIER type STRING every time
 		{
-			nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
+			nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
 			if(nodeFirst == NULL)
 				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
 
@@ -1559,18 +1517,31 @@ nodePtr ParseSubstr(nodePtr localSymbolTable)
 
 		if(i == 4)
 		{
-			nodeSecond = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
+			nodeSecond = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
 			if(nodeSecond == NULL)
 				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
 
 			variable = nodeSecond->data->data;
-			if(variable->type != ST_INT)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
+			switch(function)
+			{
+			case BF_CONCAT:
+			case BF_FIND:
+				if(variable->type != ST_STRING)
+					mistake(ERR_SEM_COMP, "This param needs to be string\n");
+				break;
+			case BF_SUBSTR:
+				if(variable->type != ST_STRING)
+					mistake(ERR_SEM_COMP, "This param needs to be string\n");
+				break;
+			default:
+				mistake(ERR_INTERN, "Someone messed up with second build-in function list\n");
+				break;
+			}
 		}
 
 		if(i == 6)
 		{
-			nodeThird = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
+			nodeThird = searchNodeByKey(&localSymbolTable, charToStr(tokenTemp->data));
 			if(nodeThird == NULL)
 				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
 
@@ -1579,222 +1550,72 @@ nodePtr ParseSubstr(nodePtr localSymbolTable)
 				mistake(ERR_SEM_COMP, "This param needs to be string\n");
 		}
 
-		switch(rule)
+		if(tokenTemp->typ == stackTop->typ)
 		{
-		case 0:
-			Rule0(localSymbolTable);
-			break;
-		default:
-			mistake(ERR_SYN,"No rule for this\n");
-			break;
+			tokenTemp = D_PopFront(dequeExp);
+			T_Destroy(tokenTemp);
+
+			tokenTemp = S_Pop(P_specialStack);
+			T_Destroy(tokenTemp);
 		}
+		else
+			mistake(ERR_SYN, "Top of stack and token are not equal\n");
+
 	}
 
 	variable = ST_VariableCreate();
 	variable->defined = 1;
 	variable->labelPlatnosti = RozsahPlatnostiGet();
-	variable->type = ST_STRING;
 
-	package = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, variable);
-
-	nodeRet = nodeInsert(&localSymbolTable, package);
-
-	AC_Item = AC_I_Create(AC_CALL_DUMMY, nodeThird, NULL, NULL);
-	AC_Add(P_internalCode, AC_Item);
-
-	AC_Item = AC_I_Create(AC_CALL_SUBSTR, nodeFirst, nodeSecond, nodeRet);
-	AC_Add(P_internalCode, AC_Item);
-}
-
-nodePtr ParseConcat(nodePtr localSymbolTable)
-{
-	int rule;
-	nodePtr nodeFirst = NULL;
-	nodePtr nodeSecond = NULL;
-	nodePtr nodeRet = NULL;
-
-	symbolVariablePtr variable = NULL;
-	symbolPackagePtr package = NULL;
-
-	AC_itemPtr AC_Item = NULL;
-
-	int end = 6;
-
-	for(int i = 0; i < end; i++)
+	switch(function)
 	{
-		stackTop = S_Top(P_specialStack);
-		tokenLast = D_TopFront(P_tokenQueue);
-
-		//zajisteni jaky pravidlo se pouzije
-		rule = LL_TableRule(tokenLast, stackTop);
-
-		if(i == 2)
-		{
-			nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
-			if(nodeFirst == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
-
-			variable = nodeFirst->data->data;
-			if(variable->type != ST_STRING)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
-		}
-
-		if(i == 4)
-		{
-			nodeSecond = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
-			if(nodeSecond == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
-
-			variable = nodeSecond->data->data;
-			if(variable->type != ST_STRING)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
-		}
-
-		switch(rule)
-		{
-		case 0:
-			Rule0(localSymbolTable);
-			break;
-		default:
-			mistake(ERR_SYN,"No rule for this\n");
-			break;
-		}
+	case BF_LENGTH:
+	case BF_FIND:
+		variable->type = ST_INT;
+		break;
+	case BF_SUBSTR:
+	case BF_CONCAT:
+	case BF_SORT:
+		variable->type = ST_STRING;
+		break;
+	default:
+		mistake(ERR_INTERN, "Someone messed up with second build-in function list\n");
+		break;
 	}
-
-	variable = ST_VariableCreate();
-	variable->defined = 1;
-	variable->labelPlatnosti = RozsahPlatnostiGet();
-	variable->type = ST_STRING;
 
 	package = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, variable);
 
 	nodeRet = nodeInsert(&localSymbolTable, package);
 
-	AC_Item = AC_I_Create(AC_CALL_CONCAT, nodeFirst, nodeSecond, nodeRet);
-	AC_Add(P_internalCode, AC_Item);
-}
-
-nodePtr ParseFind(nodePtr localSymbolTable)
-{
-	int rule;
-	nodePtr nodeFirst = NULL;
-	nodePtr nodeSecond = NULL;
-	nodePtr nodeRet = NULL;
-
-	symbolVariablePtr variable = NULL;
-	symbolPackagePtr package = NULL;
-
-	AC_itemPtr AC_Item = NULL;
-
-	int end = 6;
-
-	for(int i = 0; i < end; i++)
+	switch(function)
 	{
-		stackTop = S_Top(P_specialStack);
-		tokenLast = D_TopFront(P_tokenQueue);
+	case BF_LENGTH:
+		AC_Item = AC_I_Create(AC_CALL_LENGTH, nodeFirst, NULL, nodeRet);
+		AC_Add(P_internalCode, AC_Item);
+		break;
+	case BF_SUBSTR:
+		AC_Item = AC_I_Create(AC_CALL_DUMMY, nodeThird, NULL, NULL);
+		AC_Add(P_internalCode, AC_Item);
 
-		//zajisteni jaky pravidlo se pouzije
-		rule = LL_TableRule(tokenLast, stackTop);
-
-		if(i == 2)
-		{
-			nodeFirst = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
-			if(nodeFirst == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
-
-			variable = nodeFirst->data->data;
-			if(variable->type != ST_STRING)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
-		}
-
-		if(i == 4)
-		{
-			nodeSecond = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
-			if(nodeSecond == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
-
-			variable = nodeSecond->data->data;
-			if(variable->type != ST_STRING)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
-		}
-
-		switch(rule)
-		{
-		case 0:
-			Rule0(localSymbolTable);
-			break;
-		default:
-			mistake(ERR_SYN,"No rule for this\n");
-			break;
-		}
+		AC_Item = AC_I_Create(AC_CALL_SUBSTR, nodeFirst, nodeSecond, nodeRet);
+		AC_Add(P_internalCode, AC_Item);
+		break;
+	case BF_CONCAT:
+		AC_Item = AC_I_Create(AC_CALL_CONCAT, nodeFirst, nodeSecond, nodeRet);
+		AC_Add(P_internalCode, AC_Item);
+		break;
+	case BF_FIND:
+		AC_Item = AC_I_Create(AC_CALL_FIND, nodeFirst, nodeSecond, nodeRet);
+		AC_Add(P_internalCode, AC_Item);
+		break;
+	case BF_SORT:
+		AC_Item = AC_I_Create(AC_CALL_SORT, nodeFirst, NULL, nodeRet);
+		AC_Add(P_internalCode, AC_Item);
+		break;
+	default:
+		mistake(ERR_INTERN, "Someone messed up with second build-in function list\n");
+		break;
 	}
-
-	variable = ST_VariableCreate();
-	variable->defined = 1;
-	variable->labelPlatnosti = RozsahPlatnostiGet();
-	variable->type = ST_STRING;
-
-	package = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, variable);
-
-	nodeRet = nodeInsert(&localSymbolTable, package);
-
-	AC_Item = AC_I_Create(AC_CALL_FIND, nodeFirst, nodeSecond, nodeRet);
-	AC_Add(P_internalCode, AC_Item);
-}
-
-nodePtr ParseSort(nodePtr localSymbolTable)
-{
-	int rule;
-	nodePtr node = NULL;
-	nodePtr nodeRet = NULL;
-	symbolVariablePtr variable = NULL;
-	symbolPackagePtr package = NULL;
-
-	AC_itemPtr AC_Item = NULL;
-
-	int end = 4;
-
-	for(int i = 0; i < end; i++)
-	{
-		stackTop = S_Top(P_specialStack);
-		tokenLast = D_TopFront(P_tokenQueue);
-
-		//zajisteni jaky pravidlo se pouzije
-		rule = LL_TableRule(tokenLast, stackTop);
-
-		if(i == 2)
-		{
-			node = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
-			if(node == NULL)
-				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
-
-			variable = node->data->data;
-			if(variable->type != ST_STRING)
-				mistake(ERR_SEM_COMP, "This param needs to be string\n");
-		}
-
-		switch(rule)
-		{
-		case 0:
-			Rule0(localSymbolTable);
-			break;
-		default:
-			mistake(ERR_SYN,"No rule for this\n");
-			break;
-		}
-	}
-
-	variable = ST_VariableCreate();
-	variable->defined = 1;
-	variable->labelPlatnosti = RozsahPlatnostiGet();
-	variable->type = ST_STRING;
-
-	package = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, variable);
-
-	nodeRet = nodeInsert(&localSymbolTable, package);
-
-	AC_Item = AC_I_Create(AC_CALL_SORT, node, NULL, nodeRet);
-	AC_Add(P_internalCode, AC_Item);
 
 	return nodeRet;
 }
@@ -1808,39 +1629,21 @@ symbolPackagePtr TokenToSymbol(tTokenPtr token)
 		return NULL;
 	else
 	{
+		symbolVariable = ST_VariableCreate();
+		symbolVariable->type = ST_Remap(tokenLast->typ);
+		symbolVariable->defined = 1;
+		symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+
 		if(tokenLast->typ == TT_INT || tokenLast->typ == TT_BIN_NUM || tokenLast->typ == TT_OCT_NUM || tokenLast->typ == TT_HEX_NUM)
-		{
-			symbolVariable = ST_VariableCreate();
-			symbolVariable->type = ST_Remap(tokenLast->typ);
-			symbolVariable->defined = 1;
-			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
 			ST_VariableAddData_INT(symbolVariable, charToInt(tokenLast->data));
-
-			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
-		}
-
-		if(tokenLast->typ == TT_DOUBLE)
-		{
-			symbolVariable = ST_VariableCreate();
-			symbolVariable->type = ST_Remap(tokenLast->typ);
-			symbolVariable->defined = 1;
-			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
+		else if(tokenLast->typ == TT_DOUBLE)
 			ST_VariableAddData_INT(symbolVariable, charToDouble(tokenLast->data));
-
-			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
-		}
-
-		if(tokenLast->typ == TT_STRING)
-		{
-			symbolVariable = ST_VariableCreate();
-			symbolVariable->type = ST_Remap(tokenLast->typ);
-			symbolVariable->defined = 1;
-			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
-
+		else if(tokenLast->typ == TT_STRING)
 			symbolVariable->data = charToStr(tokenLast->data);
+		else
+			mistake(ERR_INTERN, "Problem with parsing token to symbol\n");
 
-			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
-		}
+		symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
 	}
 	return symbolPackage;
 }
