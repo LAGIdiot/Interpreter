@@ -2,6 +2,7 @@
 #define PARSER_Header
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "deque.h"
 #include "ial.h"

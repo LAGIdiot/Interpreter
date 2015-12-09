@@ -288,7 +288,11 @@ void * D_PopFront(Deque deque)
 
 		deque->first = container->nextPtr;
 
-		return container;
+		void * data = container->dataPtr;
+
+		MM_Free(container);
+
+		return data;
 	}
 	else
 		mistake(ERR_INTERN, "There was problem with toping deque\n");
@@ -301,7 +305,7 @@ void * D_TopFront(Deque deque)
 	printf("Getting data from top front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
-		return deque->first;
+		return deque->first->dataPtr;
 	else
 		mistake(ERR_INTERN, "There was problem with toping deque\n");
 	return NULL;
@@ -324,7 +328,11 @@ void * D_PopBack(Deque deque)
 
 		deque->last = container->prevPtr;
 
-		return container;
+		void * data = container->dataPtr;
+
+		MM_Free(container);
+
+		return data;
 	}
 	else
 		mistake(ERR_INTERN, "There was problem with toping deque\n");
@@ -337,7 +345,7 @@ void * D_TopBack(Deque deque)
 	printf("Getting data from top front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
-		return deque->last;
+		return deque->last->dataPtr;
 	else
 		mistake(ERR_INTERN, "There was problem with toping deque\n");
 	return NULL;

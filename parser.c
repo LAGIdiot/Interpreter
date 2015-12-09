@@ -46,6 +46,7 @@ string RozsahPlatnostiGet();
 void RozsahPlatnostiTerminate();
 int RozsahPlatnostiLastPart(char * str);
 
+void TokenPusher(Deque stack, int tokensPushed, ...);
 
 Deque Parse(Deque tokens, nodePtr *symbolTable)
 {
@@ -69,9 +70,7 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 
 
 	//pushnu si na stak zakoncovaci token
-	tTokenPtr tokenFirst = T_Init();
-	tokenFirst->typ = TT_S_DOLLAR;
-	S_Push(P_specialStack, tokenFirst);
+	TokenPusher(P_specialStack, 1, TT_S_DOLLAR);
 
 	while(parsing)
 	{
@@ -97,124 +96,52 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			parsing = 0;
 			break;
 		case 2:
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_FUNKCE_LS;
-			S_Push(P_specialStack, tokenTemp);
-
+			TokenPusher(P_specialStack, 1, TT_S_FUNKCE_LS);
 			break;
 		case 3:
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_FUNKCE_HEAD_END;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_FUNKCE_HEAD;
-			S_Push(P_specialStack, tokenTemp);
-
+			TokenPusher(P_specialStack, 2, TT_S_FUNKCE_HEAD_END, TT_S_FUNKCE_HEAD);
 			break;
 		case 4:
+			//remove FUNKCE_HEAD
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_FUNKCE_P;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_TYP_UNIVERSAL;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 5, TT_PAR_R, TT_S_FUNKCE_P, TT_PAR_L, TT_IDENTIFIER, TT_S_TYP_UNIVERSAL);
 
 			localSymbolTable = ParseFunctionHead();
-
 			break;
 		case 10:
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_STAT;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 1, TT_S_STAT);
 			break;
 		case 11:
 			//remove STAT
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_VAR_END;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_TYP_UNIVERSAL;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 3, TT_S_VAR_END, TT_IDENTIFIER, TT_S_TYP_UNIVERSAL);
 
 			ParseVariable(localSymbolTable);
-
 			break;
 		case 14:
 			//remove STAT
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_ASSIGN;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 3, TT_SEMICOLON, TT_S_EXP, TT_ASSIGN);
 
 			ParsePrirazeni(localSymbolTable);
-
 			break;
 		case 15:
 			//remove STAT
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_CIN_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_INSERTION;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_CIN;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 4, TT_S_CIN_LS, TT_IDENTIFIER, TT_INSERTION, TT_KEYWORD_CIN);
 
 			ParseIO(localSymbolTable, 1, 1);
 			break;
 		case 16:
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_INSERTION;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 2, TT_IDENTIFIER, TT_INSERTION);
 
 			ParseIO(localSymbolTable, 0, 1);
 			break;
@@ -223,31 +150,14 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-
+			TokenPusher(P_specialStack, 1, TT_SEMICOLON);
 			break;
 		case 18:
 			//remove STAT
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_COUT_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_EXTRACTION;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_COUT;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 4, TT_S_COUT_LS, TT_IDENTIFIER, TT_EXTRACTION, TT_KEYWORD_COUT);
 
 			ParseIO(localSymbolTable, 1, 0);
 			break;
@@ -256,19 +166,10 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-
+			TokenPusher(P_specialStack, 1, TT_SEMICOLON);
 			break;
 		case 20:
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_EXTRACTION;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 2, TT_IDENTIFIER, TT_EXTRACTION);
 
 			ParseIO(localSymbolTable, 0, 0);
 			break;
@@ -277,17 +178,7 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_RETURN;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 3, TT_SEMICOLON, TT_S_EXP, TT_KEYWORD_RETURN);
 
 			ParseReturn(localSymbolTable);
 			break;
@@ -296,156 +187,40 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 1, TT_SEMICOLON);
 			break;
 		case 23:
 			//remove STAT
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_STAT_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_ELSE;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_STAT_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_IF;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 11, TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L, TT_KEYWORD_ELSE,
+				TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L, TT_PAR_R, TT_S_EXP, TT_PAR_L, TT_KEYWORD_IF);
 
 			ParseIf(localSymbolTable);
-
 			break;
 		case 24:
 			//remove STAT
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_STAT_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_L;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 3, TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L);
 
 			//posunuti rozsahu platnosti
 			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_BRACE"));
 
 			//label pro novou platnost
-
 			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(), NULL, NULL);
 			AC_Add(P_internalCode, AC_Item);
-
 			break;
 		case 25:
 			//remove STAT
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_STAT_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_ASSIGN;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_ASSIGN;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_IDENTIFIER;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_TYP_UNIVERSAL;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_FOR;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 16, TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L, TT_PAR_R,
+				TT_S_EXP, TT_ASSIGN, TT_IDENTIFIER, TT_SEMICOLON, TT_S_EXP, TT_SEMICOLON,
+				TT_S_EXP, TT_ASSIGN, TT_IDENTIFIER, TT_S_TYP_UNIVERSAL, TT_PAR_L, TT_KEYWORD_FOR);
 
 			ParseFor(localSymbolTable);
 			break;
@@ -459,41 +234,8 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_DO;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_STAT_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_WHILE;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 9, TT_SEMICOLON, TT_PAR_R, TT_S_EXP, TT_PAR_L,
+					TT_KEYWORD_WHILE, TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L, TT_KEYWORD_DO);
 
 			ParseDoWhile(localSymbolTable);
 			break;
@@ -502,33 +244,8 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_KEYWORD_WHILE;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_PAR_R;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_L;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_STAT_LS;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_BRACE_R;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 7, TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L, TT_PAR_R,
+				TT_S_EXP, TT_PAR_L, TT_KEYWORD_WHILE);
 
 			ParseWhile(localSymbolTable);
 			break;
@@ -536,19 +253,19 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			mistake(ERR_SYN,"No rule for this");
 			break;
 		}
-
 	}
 
-	T_Destroy(tokenFirst);
+	tokenTemp = S_Pop(P_specialStack);
+	T_Destroy(tokenTemp);
 	S_Terminate(P_specialStack);
 
 	RozsahPlatnostiTerminate();
 
-	return internCode;
-
 #if DEBUG
 	printf("Parsing done intern code was made\n");
 #endif
+
+	return internCode;
 }
 
 //vytvori node z toho co ma k dispozici a na konci porovna jestli uz takovej neni
@@ -620,13 +337,7 @@ nodePtr ParseFunctionHead()
 				Rule0(NULL); //trochu podvod, ale zde nehrozi riziko ze by parametr byl potreba
 				break;
 			case 5:
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_TYP_UNIVERSAL;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 2, TT_IDENTIFIER, TT_S_TYP_UNIVERSAL);
 
 				parametr = 1;
 				break;
@@ -634,18 +345,13 @@ nodePtr ParseFunctionHead()
 				tokenTemp = S_Pop(P_specialStack);
 				T_Destroy(tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_R;
-				S_Push(P_specialStack, tokenTemp);
-
+				TokenPusher(P_specialStack, 1, TT_PAR_R);
 				break;
 			case 7:
 				tokenTemp = S_Pop(P_specialStack);
 				T_Destroy(tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_SEMICOLON;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 1, TT_SEMICOLON);
 
 				body = 0;
 				break;
@@ -653,25 +359,13 @@ nodePtr ParseFunctionHead()
 				tokenTemp = S_Pop(P_specialStack);
 				T_Destroy(tokenTemp);
 
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_BRACE_R;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_S_STAT_LS;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_BRACE_L;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 3, TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L);
 
 				body = 1;
 
 				break;
 			case 9:
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_COMMA;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 1, TT_COMMA);
 				break;
 			default:
 				mistake(ERR_SYN,"No rule for this");
@@ -785,26 +479,14 @@ void ParseVariable(nodePtr localSymbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 1, TT_SEMICOLON);
 			break;
 		case 13:
 			//remove VAR_END
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_SEMICOLON;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_S_EXP;
-			S_Push(P_specialStack, tokenTemp);
-
-			tokenTemp = T_Init();
-			tokenTemp->typ = TT_ASSIGN;
-			S_Push(P_specialStack, tokenTemp);
+			TokenPusher(P_specialStack, 3, TT_SEMICOLON, TT_S_EXP, TT_ASSIGN);
 
 			expr = 1;
 			end ++;
@@ -844,7 +526,7 @@ void ParsePrirazeni(nodePtr localSymbolTable)
 		{
 			nodePtr nodeExp = ParseExp(localSymbolTable, TT_SEMICOLON);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN,nodeId, nodeExp, nodeId);
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN, nodeId, nodeExp, nodeId);
 			AC_Add(P_internalCode, AC_Item);
 		}
 		// i == 3 //;
@@ -1316,139 +998,37 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 		{
 			if(tokenTemp->typ == TT_KEYWORD_LENGTH)
 			{
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_KEYWORD_LENGTH;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_L;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_R;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 4, TT_PAR_R, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_LENGTH);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_LENGTH, deque, localSymbolTable);
 			}
 			else if(tokenTemp->typ == TT_KEYWORD_SUBSTRING)
 			{
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_KEYWORD_SUBSTRING;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_L;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_COMMA;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_COMMA;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_R;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 8, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER,
+					TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_SUBSTRING);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_SUBSTR, deque, localSymbolTable);
 			}
 			else if(tokenLast->typ == TT_KEYWORD_CONCAT)
 			{
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_KEYWORD_CONCAT;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_L;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_COMMA;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_R;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_CONCAT);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_CONCAT, deque, localSymbolTable);
 			}
 			else if(tokenLast->typ == TT_KEYWORD_FIND)
 			{
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_KEYWORD_FIND;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_L;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_COMMA;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_R;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_FIND);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_FIND, deque, localSymbolTable);
 			}
 			else if(tokenLast->typ == TT_KEYWORD_SORT)
 			{
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_KEYWORD_SORT;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_L;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_IDENTIFIER;
-				S_Push(P_specialStack, tokenTemp);
-
-				tokenTemp = T_Init();
-				tokenTemp->typ = TT_PAR_R;
-				S_Push(P_specialStack, tokenTemp);
+				TokenPusher(P_specialStack, 4, TT_PAR_R, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_SORT);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_SORT, deque, localSymbolTable);
 			}
 			else
-				mistake(ERR_INTERN,"Unrecognized built-in function\n");
-
+				mistake(ERR_INTERN, "Unrecognized built-in function\n");
 		}
 		else
 			mistake(ERR_SYN, "Unrecognized token in EXP\n");
@@ -1462,7 +1042,6 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 
 nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr localSymbolTable)
 {
-	//TODO: Function Call - uzivatelsky
 	//Battle plan:	get functionSymbol and list of its parametrs -> expecting number of parametrs
 	//				take the deque from end, found PAR_R and take arguments from end and put them to AC_CALL_DUMMYs and AC_CALL
 
@@ -2112,6 +1691,22 @@ void Rule0(nodePtr localSymbolTable)
 		tokenTemp = D_PopFront(P_tokenQueue);
 		T_Destroy(tokenTemp);
 	}
+}
+
+//nelze nijak ochranit pred padem pokud prijde rozdilne cislo v tokensPushed a tokenu samotnych
+void TokenPusher(Deque stack, int tokensPushed, ...)
+{
+	va_list va;
+	va_start(va, tokensPushed);
+
+	for(int i = 0; i < tokensPushed; i++)
+	{
+		tokenTemp = T_Init();
+		tokenTemp->typ = va_arg(va, int);
+		S_Push(stack, tokenTemp);
+	}
+
+	va_end(va);
 }
 
 //////////////////////////////////////////////////
