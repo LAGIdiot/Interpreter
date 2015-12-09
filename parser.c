@@ -22,9 +22,17 @@ void ParseReturn(nodePtr localSymbolTable);
 void ParseIf(nodePtr localSymbolTable);
 void ParseFor(nodePtr localSymbolTable);
 
+//rozsireni WHILE
 void ParseDoWhile(nodePtr localSymbolTable);
 void ParseDoWhilePart2(nodePtr localSymbolTable);
 void ParseWhile(nodePtr localSymbolTable);
+
+//Vestavene funkce
+nodePtr ParseLength(nodePtr localSymbolTable);
+nodePtr ParseFind(nodePtr localSymbolTable);
+nodePtr ParseSort(nodePtr localSymbolTable);
+nodePtr ParseConcat(nodePtr localSymbolTable);
+nodePtr ParseSubstr(nodePtr localSymbolTable);
 
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType);
 symbolPackagePtr TokenToSymbol(tTokenPtr token);
@@ -913,10 +921,6 @@ void ParseReturn(nodePtr localSymbolTable)
 
 	nodePtr nodeId = NULL;
 
-	//TODO: Zamyslet se zda je potreba infromovat funkci o faktu ze jsem nasel jeji return
-
-
-
 	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. RETURN, 2. EXP, 3. ;
 	int end = 3;
 
@@ -1107,118 +1111,6 @@ void ParseFor(nodePtr localSymbolTable)
 //////////////////////////////////////////////////
 nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 {
-#if I_have_idea_how_to_do_this_I_will_not_need_to_store_this_code
-	nodePtr nodeLastProcessed = NULL;
-	nodePtr nodeProcessing = NULL;
-	Deque stack = S_Init();
-
-	AC_itemPtr AC_Item = NULL;
-	symbolPackagePtr symbolPackage = NULL;
-	symbolVariablePtr symbolVariable = NULL;
-
-	int tokenCount = 0;
-	int endPAR = 0;
-
-	int PAR_L_Count = 0;
-	int PAR_R_Count = 0;
-
-	int expectingFunction = 0;
-
-	if(exitSymbolType == TT_PAR_R)
-		endPAR = 1;
-
-	//preliti tokenu
-	while(1)
-	{
-		tokenLast = D_TopFront(P_tokenQueue);
-
-		if(tokenLast->typ == TT_PAR_R && endPAR &&  PAR_L_Count == PAR_R_Count) //ukoncovani pro exitSymbol PAR_R
-			break;
-
-		if(tokenLast->typ == exitSymbolType)
-			break;
-
-		if(tokenLast->typ == TT_PAR_L)
-			PAR_L_Count++;
-
-		if(tokenLast->typ == TT_PAR_R)
-			PAR_R_Count++;
-
-		S_Push(stack,D_PopFront(P_tokenQueue));
-		tokenCount++;
-	}
-
-	while(tokenCount)//zpracovani tokenu
-	{
-		tokenLast = S_Top(stack);
-
-		if(tokenLast->typ == TT_IDENTIFIER)
-		{
-			if(expectingFunction)
-			{
-				nodeProcessing = searchNodeByKey(P_symbolTable,charToStr(tokenLast->data));
-				if(nodeProcessing == NULL)
-					mistake(ERR_SEM_UND,"No symbol with this name\n");
-			}
-			else
-			{
-				nodeProcessing = searchNodeByKey(&localSymbolTable,charToStr(tokenLast->data));
-				if(nodeProcessing == NULL)
-					mistake(ERR_SEM_UND,"No symbol with this name\n");
-			}
-		}
-
-		if(tokenLast->typ == TT_INT || tokenLast->typ == TT_BIN_NUM || tokenLast->typ == TT_OCT_NUM || tokenLast->typ == TT_HEX_NUM)
-		{
-			symbolVariable = ST_VariableCreate();
-			symbolVariable->type = ST_Remap(tokenLast->typ);
-			symbolVariable->defined = 1;
-			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
-			ST_VariableAddData_INT(symbolVariable, charToInt(tokenLast->data));
-
-			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
-
-			nodeProcessing = nodeInsert(&localSymbolTable, symbolPackage);
-		}
-
-		if(tokenLast->typ == TT_DOUBLE)
-		{
-			symbolVariable = ST_VariableCreate();
-			symbolVariable->type = ST_Remap(tokenLast->typ);
-			symbolVariable->defined = 1;
-			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
-			ST_VariableAddData_INT(symbolVariable, charToDouble(tokenLast->data));
-
-			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
-
-			nodeProcessing = nodeInsert(&localSymbolTable, symbolPackage);
-		}
-
-		if(tokenLast->typ == TT_STRING)
-		{
-			symbolVariable = ST_VariableCreate();
-			symbolVariable->type = ST_Remap(tokenLast->typ);
-			symbolVariable->defined = 1;
-			symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
-
-			symbolVariable->data = charToStr(tokenLast->data);
-
-			symbolPackage = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, symbolVariable);
-
-			nodeProcessing = nodeInsert(&localSymbolTable, symbolPackage);
-		}
-
-		//TODO: Zpracovani expu (posouvani processing to procesed, mathematic operations, function expecting)
-
-	}
-
-	//odeber EXP ze stacku
-	tokenTemp = S_Pop(P_specialStack);
-	T_Destroy(tokenTemp);
-
-	return nodeLastProcessed;
-#endif
-
 	nodePtr nodeLastProcessed = NULL;
 	nodePtr nodeFunction = NULL;
 
@@ -1267,7 +1159,9 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 
 	//if ohnuti zadani jako krava
 
-	if(tokenTemp->typ == TT_IDENTIFIER)
+	if(tokenTemp->typ == TT_KEYWORD_CONCAT || tokenTemp->typ == TT_KEYWORD_FIND || tokenTemp->typ == TT_KEYWORD_SUBSTRING || tokenTemp->typ == TT_KEYWORD_LENGTH)
+		expectingFunction = 2;
+	else if(tokenTemp->typ == TT_IDENTIFIER)
 	{
 		nodeFunction = searchNodeByKey(P_symbolTable, charToStr(tokenTemp->data));
 		if(nodeFunction != NULL)
@@ -1403,7 +1297,7 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 			nodeFirst = nodeInsert(&localSymbolTable, symbolPackage);
 		}
 
-		//TODO: AC a operace a navrat
+		//AC a operace a navrat
 		symbolVariable = ST_VariableCreate();
 		symbolVariable->defined = 1;
 		symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
@@ -1419,8 +1313,147 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	else
 	{
 		//funkce
-		if(expectingFunction)
+		if(expectingFunction == 1)
 		{
+			//TODO: Function Call - uzivatelsky
+		}
+		else if(expectingFunction == 2)
+		{
+			//TODO: Function Call - vestaveny
+			if(tokenTemp->typ == TT_KEYWORD_LENGTH)
+			{
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_KEYWORD_LENGTH;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_L;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_R;
+				S_Push(P_specialStack, tokenTemp);
+
+				nodeLastProcessed = ParseLength(localSymbolTable);
+			}
+			else if(tokenTemp->typ == TT_KEYWORD_SUBSTRING)
+			{
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_KEYWORD_SUBSTRING;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_L;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_COMMA;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_COMMA;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_R;
+				S_Push(P_specialStack, tokenTemp);
+
+				nodeLastProcessed = ParseSubstr(localSymbolTable);
+			}
+			else if(tokenLast->typ == TT_KEYWORD_CONCAT)
+			{
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_KEYWORD_CONCAT;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_L;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_COMMA;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_R;
+				S_Push(P_specialStack, tokenTemp);
+
+				nodeLastProcessed = ParseConcat(localSymbolTable);
+			}
+			else if(tokenLast->typ == TT_KEYWORD_FIND)
+			{
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_KEYWORD_FIND;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_L;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_COMMA;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_R;
+				S_Push(P_specialStack, tokenTemp);
+
+				nodeLastProcessed = ParseFind(localSymbolTable);
+			}
+			else if(tokenLast->typ == TT_KEYWORD_SORT)
+			{
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_KEYWORD_SORT;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_L;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_IDENTIFIER;
+				S_Push(P_specialStack, tokenTemp);
+
+				tokenTemp = T_Init();
+				tokenTemp->typ = TT_PAR_R;
+				S_Push(P_specialStack, tokenTemp);
+
+				nodeLastProcessed = ParseSort(localSymbolTable);
+			}
+			else
+				mistake(ERR_INTERN,"Unrecognized built-in function\n");
 
 		}
 		else
@@ -1431,6 +1464,83 @@ nodePtr ParseExp(nodePtr localSymbolTable, int exitSymbolType)
 	T_Destroy(tokenTemp);
 
 	return nodeLastProcessed;
+}
+
+nodePtr ParseLength(nodePtr localSymbolTable)
+{
+	int rule;
+	nodePtr node = NULL;
+	nodePtr nodeRet = NULL;
+	symbolVariablePtr variable = NULL;
+	symbolPackagePtr package = NULL;
+
+	AC_itemPtr AC_Item = NULL;
+
+	int end = 4;
+
+	for(int i = 0; i < end; i++)
+	{
+		stackTop = S_Top(P_specialStack);
+		tokenLast = D_TopFront(P_tokenQueue);
+
+		//zajisteni jaky pravidlo se pouzije
+		rule = LL_TableRule(tokenLast, stackTop);
+
+		if(i == 2)
+		{
+			node = searchNodeByKey(&localSymbolTable, charToStr(tokenLast->data));
+			if(node == NULL)
+				mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
+
+			variable = node->data->data;
+			if(variable->type != ST_STRING)
+				mistake(ERR_SEM_COMP, "This param needs to be string\n");
+		}
+
+		switch(rule)
+		{
+		case 0:
+			Rule0(localSymbolTable);
+			break;
+		default:
+			mistake(ERR_SYN,"No rule for this\n");
+			break;
+		}
+	}
+
+	variable = ST_VariableCreate();
+	variable->defined = 1;
+	variable->labelPlatnosti = RozsahPlatnostiGet();
+	variable->type = ST_STRING;
+
+	package = ST_PackageCreate(ST_RandomKeyGenerator(), ST_VARIABLE, variable);
+
+	nodeRet = nodeInsert(&localSymbolTable, package);
+
+	AC_Item = AC_I_Create(AC_CALL_LENGTH, node, NULL, nodeRet);
+	AC_Add(P_internalCode, AC_Item);
+
+	return nodeRet;
+}
+
+nodePtr ParseFind(nodePtr localSymbolTable)
+{
+
+}
+
+nodePtr ParseSort(nodePtr localSymbolTable)
+{
+
+}
+
+nodePtr ParseConcat(nodePtr localSymbolTable)
+{
+
+}
+
+nodePtr ParseSubstr(nodePtr localSymbolTable)
+{
+
 }
 
 symbolPackagePtr TokenToSymbol(tTokenPtr token)
