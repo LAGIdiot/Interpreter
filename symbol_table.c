@@ -35,6 +35,8 @@ symbolFunctionPtr ST_FunctionCreate()
 	function->declared = 0;
 	function->defined = 0;
 
+	function->symbolTable = NULL;
+
 	return function;
 }
 

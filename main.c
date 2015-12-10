@@ -10,6 +10,17 @@
 
 FILE *file_p;
 
+void Test()
+{
+	nodePtr tree = NULL;
+	treeInit(&tree);
+
+	symbolPackagePtr package = ST_PackageCreate(charToStr("test"), 1, NULL);
+
+	nodeInsert(&tree, package);
+
+}
+
 int main(int argc, char *argv[])
 {
 #if DEBUG
@@ -31,6 +42,8 @@ int main(int argc, char *argv[])
 			MM_Init(); //Initialize memory manager
 			T_SystemInit();
 
+			//Test();
+
 			//Token Queue
 			Deque tokenQueue = D_Init();
 
@@ -40,7 +53,7 @@ int main(int argc, char *argv[])
 				fclose(file_p);
 
 			//BT of global symbols
-			nodePtr globalSymbolTree;
+			nodePtr globalSymbolTree = NULL;;
 			treeInit(&globalSymbolTree);
 
 			//Dequeu of intern code
@@ -57,7 +70,7 @@ int main(int argc, char *argv[])
 
 			T_SystemTerminate();
 
-			MM_FreeAll(); //TODO: Vymyslet lepsi provedeni na vymazani pameti po ukonceni programu
+			MM_Terminate();
 		}
 	}
 	return 0;

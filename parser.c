@@ -323,6 +323,9 @@ nodePtr ParseFunctionHead()
 			break;
 		case 2:
 			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
+
+			treeInit(functionSymbol->symbolTable);
+
 			nodeInsert(functionSymbol->symbolTable,packedVariable);
 			parametr = 0;
 			break;

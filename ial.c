@@ -42,11 +42,12 @@ nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
 {	
 	if(*Root == NULL)
 	{
-		*Root = MM_Malloc(sizeof(struct binaryTree));
+		nodePtr node = MM_Malloc(sizeof(struct binaryTree));
+		node->data = symbol;
+		node->lChild = NULL;
+		node->rChild = NULL;
 
-        (*Root)->data = symbol;
-        (*Root)->lChild = NULL;
-        (*Root)->rChild = NULL;
+		*Root = node;
 
         return *Root;
 	}

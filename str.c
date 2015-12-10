@@ -16,7 +16,11 @@ string strInit()
 #endif
 	string s = MM_Malloc(sizeof(struct stringStruct));
 
+#if DEBUG
+	printf("Allocating memory for char array\n");
+#endif
 	s->str = MM_Malloc(sizeof(char)*stringSizeBase);
+	s->str[0] = '\0';
 
 	s->length = 0;
 	s->allocSize = stringSizeBase;
@@ -28,7 +32,7 @@ void strFree(string s)
 #if DEBUG
 	printf("Removing string container\n");
 #endif
-	MM_Free(s->str);
+	MM_Free(s->str);	//FIXME: pad pameti
 	MM_Free(s);
 }
 
@@ -52,12 +56,14 @@ int strInsert(string s, char *text)
   if(s->length == 0)
   {
 	  if(length + 1 > s->allocSize)
+	  {
 		  s->str = MM_Realloc(s->str, sizeof(char) * (length + 1));
+		  s->allocSize = length + 1;
+	  }
 
 	  s->length = length;
-	  s->allocSize = length + 1;
 
-	  s->str = text;
+	  strncpy(s->str, text, length);
 
 	  return 0;
   }

@@ -52,6 +52,9 @@ tTokenPtr T_Init()
 {
 	tTokenPtr token = MM_Malloc(sizeof(struct TokenStruct));
 
+	token->typ = 0;
+	token->data = NULL;
+
 #if DEBUG
 	printf("Token initialized at: %d \n", token);
 	tokenCount++;
@@ -68,8 +71,9 @@ tTokenPtr T_Init()
 //////////////////////////////////////////////////
 void T_Destroy(tTokenPtr token)
 {
-	/*Token and its data deallocating must be done in this order otherwise there will be memory leak*/
-	MM_Free(token->data);
+	if(token->data != NULL)
+		MM_Free(token->data);
+
 	MM_Free(token);
 
 #if DEBUG

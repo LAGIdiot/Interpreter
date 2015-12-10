@@ -164,7 +164,7 @@ int S_Empty(Deque stack)
 
 Deque D_Init()
 {
-	Deque deque = MM_Malloc(sizeof(struct dequeContainerStruct));
+	Deque deque = MM_Malloc(sizeof(struct dequeStruct));
 
 	deque->type = DEQUE;
 
