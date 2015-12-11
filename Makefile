@@ -18,19 +18,19 @@ ST=symbol_table
 .PHONY: debug2
 .PHONY: clean
 
-all: compiler
-debug: compiler-d
-debug2: compiler-d2
+all: interpret
+debug: interpret_d
+debug2: interpret_d2
 
 #linking
-compiler: $(PARTS)
-	$(CC) -o compiler $(PARTS)
+interpret: $(PARTS)
+	$(CC) -o interpret $(PARTS)
 
-compiler-d: $(PARTS-d)
-	$(CC) -o compiler-d $(PARTS-d)
+interpret_d: $(PARTS-d)
+	$(CC) -o interpret_d $(PARTS-d)
 	
-compiler-d2: $(PARTS-d2)
-	$(CC) -o compiler-d $(PARTS-d2)
+interpret_d2: $(PARTS-d2)
+	$(CC) -o interpret_d $(PARTS-d2)
 
 #compiling
 main.o: main.c errors.h $(MM).h parser.h str.h $(ST).h token.h scanner.h interpret.h
@@ -113,4 +113,4 @@ $(MM)-d2.o: $(MM).c $(MM).h errors.h
 
 #clean
 clean:
-	rm -f compiler compiler-d *.o
+	rm -f interpret interpret_d *.o

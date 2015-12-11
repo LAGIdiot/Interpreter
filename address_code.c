@@ -8,7 +8,7 @@ Deque AC_Init()
 	Deque deque = D_Init();
 	return deque;
 }
-//TODO: Test this: May have problem with leaving allocated memory - maybe not because symbol table will do it
+
 void AC_Terminate(Deque deque)
 {
 #if DEBUG

@@ -31,7 +31,8 @@ void MM_Terminate()
 #if DEBUG
 	printf("Terminating Memory Manager\n");
 #endif
-
+	if(MM == NULL)	//Only if problem with opening file
+		return;
 	if(MM->numberOfAllocatedBlocks != 0)
 		MM_FreeAll();
 

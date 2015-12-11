@@ -45,6 +45,10 @@ void *S_Pop(Deque stack)
 		{
 			DequeContainer container = stack->last;
 
+#if DEBUG
+		stack->member_counter--;
+#endif
+
 			stack->last = container->prevPtr;
 
 			void * data = container->dataPtr;
@@ -52,9 +56,6 @@ void *S_Pop(Deque stack)
 			MM_Free(container);
 
 			return data;
-#if DEBUG
-		stack->member_counter--;
-#endif
 		}
 	}
 	else
@@ -216,6 +217,10 @@ void D_PushBack(Deque deque, void * data)
 	{
 		DequeContainer container = MM_Malloc(sizeof(struct dequeContainerStruct));
 
+#if DEBUG
+		deque->member_counter++;
+#endif
+
 		container->dataPtr = data;
 		container->nextPtr = NULL;
 
@@ -248,6 +253,10 @@ void D_PushFront(Deque deque, void * data)
 	{
 		DequeContainer container = MM_Malloc(sizeof(struct dequeContainerStruct));
 
+#if DEBUG
+		deque->member_counter++;
+#endif
+
 		container->dataPtr = data;
 		container->prevPtr = NULL;
 
@@ -279,6 +288,10 @@ void * D_PopFront(Deque deque)
 	if(deque != NULL && deque->type == DEQUE)
 	{
 		DequeContainer container = deque->first;
+
+#if DEBUG
+		deque->member_counter--;
+#endif
 
 		if(deque->active == deque->first)
 			deque->active = NULL;
@@ -319,6 +332,10 @@ void * D_PopBack(Deque deque)
 	if(deque != NULL && deque->type == DEQUE)
 	{
 		DequeContainer container = deque->last;
+
+#if DEBUG
+		deque->member_counter--;
+#endif
 
 		if(deque->last == deque->first)
 			deque->last = NULL;

@@ -670,7 +670,7 @@ void ParseIf(nodePtr *localSymbolTable)
 			AC_Add(P_internalCode, AC_Item);
 		}
 
-		if(i == 3)
+		if(i == 2)
 		{
 			nodePtr nodeExp = ParseExp(&(*localSymbolTable), TT_PAR_R);
 
@@ -1449,7 +1449,7 @@ void ParseDoWhilePart2(nodePtr *localSymbolTable)
 
 		if(i == 2)
 		{
-			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_CONDIFION"),NULL,NULL);
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_CONDITION"),NULL,NULL);
 			AC_Add(P_internalCode, AC_Item);
 
 			nodePtr nodeExp = ParseExp(localSymbolTable, TT_PAR_R);
@@ -1506,7 +1506,7 @@ void ParseWhile(nodePtr *localSymbolTable)
 			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(),NULL,NULL);
 			AC_Add(P_internalCode, AC_Item);
 
-			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_CONDIFION"),NULL,NULL);
+			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiBuildStringFromChars("_CONDITION"),NULL,NULL);
 			AC_Add(P_internalCode, AC_Item);
 
 			nodePtr nodeExp = ParseExp(&(*localSymbolTable), TT_PAR_R);
@@ -1700,10 +1700,10 @@ void Rule0(nodePtr *localSymbolTable)
 	}
 	else if(tokenLast->typ == TT_KEYWORD_WHILE)
 	{
-		if(RozsahPlatnostiLastPart("DO"))	//pokud je posledni for cyklus
+		if(RozsahPlatnostiLastPart("DO"))
 			ParseDoWhilePart2(localSymbolTable);
 
-		remove = 0;
+		remove = 1;//TODO: Check if this 1 will not affect something
 	}
 	else if(tokenLast->typ == TT_KEYWORD_ELSE)
 	{
@@ -1842,8 +1842,11 @@ void RozsahPlatnostiAddInner(string inner)
 //////////////////////////////////////////////////
 void RozsahPlatnostiRemoveInner()
 {
-	string temp = S_Pop(P_platnostStack);
-	strFree(temp);
+	if(!S_Empty(P_platnostStack))
+	{
+		string temp = S_Pop(P_platnostStack);
+		strFree(temp);
+	}
 }
 
 //////////////////////////////////////////////////
