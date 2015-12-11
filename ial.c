@@ -24,7 +24,7 @@ nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol)
 
 nodePtr searchNodeByKey (nodePtr *Root, string key)
 {
-	if(Root != NULL)
+	if(*Root != NULL)
 	{
 		int i = strCompare((*Root)->data->key, key);
 		if(i == 0)

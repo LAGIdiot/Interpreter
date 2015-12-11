@@ -227,6 +227,12 @@ void strConcatChar(string s1, char * s2)
 
 	s1 = final;
 }
+
+void strRNGInit()
+{
+	srand(time(NULL));
+}
+
 string strRNG()
 {
 	char rng[rngSizeBase + 1];
@@ -239,8 +245,7 @@ string strRNG()
 
 		for(int i = 0; i < rngSizeBase; i++)
 		{
-			srand(time(NULL));
-			rng[i] = rand() % 26 + 97; //generuje pouze maly pismena
+			rng[i] = (rand() % 26) + 97; //generuje pouze maly pismena
 		}
 
 		rng[rngSizeBase +1] = '\0';

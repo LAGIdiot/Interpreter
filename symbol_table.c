@@ -122,6 +122,7 @@ symbolVariablePtr ST_VariableCreate()
 	symbol->data = NULL;
 	symbol->defined = 0;
 	symbol->type = ST_UNDEFINED;
+	symbol->labelPlatnosti = NULL;
 
 	return symbol;
 

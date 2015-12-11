@@ -58,15 +58,12 @@ int main(int argc, char *argv[])
 
 			//Dequeu of intern code
 			Deque internCode = Parse(tokenQueue, &globalSymbolTree);
-
+			D_Terminate(tokenQueue);
 
 			Interpret(internCode, globalSymbolTree);
 
-
-			D_Terminate(tokenQueue);
 			AC_Terminate(internCode);
 			deleteTree(&globalSymbolTree);
-
 
 			T_SystemTerminate();
 

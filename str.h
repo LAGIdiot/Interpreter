@@ -43,4 +43,5 @@ string substr(string s, int i, int n);
 
 int strCompare(string s1, string s2);
 
+void strRNGInit();
 #endif
