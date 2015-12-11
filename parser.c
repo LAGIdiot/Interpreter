@@ -158,12 +158,12 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			TokenPusher(P_specialStack, 4, TT_S_CIN_LS, TT_IDENTIFIER, TT_INSERTION, TT_KEYWORD_CIN);
+			TokenPusher(P_specialStack, 4, TT_S_CIN_LS, TT_IDENTIFIER, TT_EXTRACTION, TT_KEYWORD_CIN);
 
 			ParseIO(&localSymbolTable, 1, 1);
 			break;
 		case 16:
-			TokenPusher(P_specialStack, 2, TT_IDENTIFIER, TT_INSERTION);
+			TokenPusher(P_specialStack, 2, TT_IDENTIFIER, TT_EXTRACTION);
 
 			ParseIO(&localSymbolTable, 0, 1);
 			break;
@@ -172,12 +172,12 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			tokenTemp = S_Pop(P_specialStack);
 			T_Destroy(tokenTemp);
 
-			TokenPusher(P_specialStack, 4, TT_S_COUT_LS, TT_IDENTIFIER, TT_EXTRACTION, TT_KEYWORD_COUT);
+			TokenPusher(P_specialStack, 4, TT_S_COUT_LS, TT_S_ID_OR_TYP, TT_INSERTION, TT_KEYWORD_COUT);
 
 			ParseIO(&localSymbolTable, 1, 0);
 			break;
 		case 20:
-			TokenPusher(P_specialStack, 2, TT_IDENTIFIER, TT_EXTRACTION);
+			TokenPusher(P_specialStack, 2, TT_S_ID_OR_TYP, TT_INSERTION);
 
 			ParseIO(&localSymbolTable, 0, 0);
 			break;
@@ -556,7 +556,7 @@ void ParseIO(nodePtr *localSymbolTable, int keyword, int cin)
 
 	nodePtr nodeId = NULL;
 
-	//vim ze tu budu potrebovat nejmene 3 tahy a to 1. CIN, 2. >> 3. ID,
+	//vim ze tu budu potrebovat nejmene 3 tahy a to 0. CIN/COUT, 1. >>/<< 3. ID, 4
 	int end = 3;
 	int start = 1;
 
@@ -573,9 +573,21 @@ void ParseIO(nodePtr *localSymbolTable, int keyword, int cin)
 
 		if(i == 2)
 		{
-			nodeId = searchNodeByKey(&(*localSymbolTable),charToStr(tokenLast->data));
-			if(nodeId == NULL)
-				mistake(ERR_SEM_UND,"No symbol with this name\n");
+			if(!cin && tokenLast->typ != TT_IDENTIFIER)
+			{
+				symbolPackagePtr package = TokenToSymbol(tokenLast);
+
+				if(package == NULL)
+					mistake(ERR_SYN, "Bad token after insertion/n");
+
+				nodeId = nodeInsert(&(*localSymbolTable), package);
+			}
+			else
+			{
+				nodeId = searchNodeByKey(&(*localSymbolTable),charToStr(tokenLast->data));
+				if(nodeId == NULL)
+					mistake(ERR_SEM_UND,"No symbol with this name\n");
+			}
 
 			AC_itemPtr AC_Item = NULL;
 			//rozliseni jestli se bude IN or OUT
@@ -1699,6 +1711,10 @@ void Rule0(nodePtr *localSymbolTable)
 		remove = 1;
 	}
 	else if((tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING) && stackTop->typ == TT_S_TYP_UNIVERSAL)
+		remove = 1;
+	else if((tokenLast->typ == TT_IDENTIFIER || tokenLast->typ == TT_INT || tokenLast->typ == TT_DOUBLE ||
+			tokenLast->typ == TT_STRING || tokenLast->typ == TT_BIN_NUM || tokenLast->typ == TT_OCT_NUM ||
+			tokenLast->typ == TT_HEX_NUM) && stackTop->typ == TT_S_ID_OR_TYP)
 		remove = 1;
 	else if(tokenLast->typ == stackTop->typ)
 		remove = 1;
