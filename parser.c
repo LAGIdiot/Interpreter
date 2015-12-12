@@ -283,14 +283,18 @@ nodePtr ParseFunctionHead()
 	int parametr = 0;
 	int body = 0;
 
+	int tokenType = 0; //ukladani param
+
 	nodePtr functionNode = NULL;
 	symbolFunctionPtr functionSymbol = ST_FunctionCreate();
+	symbolFunctionPtr functionInTable = NULL;
 	symbolPackagePtr packedSymbol = NULL;
 
 	symbolVariablePtr variable = NULL;
 	symbolPackagePtr packedVariable = NULL;
 
 	string functionName = NULL;
+	string paramName = NULL;
 
 	int posloupnost = 1; //slouzi k razeni informaci o funkci
 
@@ -323,12 +327,15 @@ nodePtr ParseFunctionHead()
 			variable->defined = 1;
 			variable->labelPlatnosti = RozsahPlatnostiBuildString(functionName);
 
-			ST_FunctionAddParam(functionSymbol,tokenLast->typ);
+			tokenType = tokenLast->typ;
 
 			parametr++;
 			break;
 		case 2:
 			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
+
+			//add param to function
+			ST_FunctionAddParam(functionSymbol, charToStr(tokenLast->data), tokenType);
 
 			//ohnuti (pretypovani) pointeru pro zapis do lokalni tabulky symbolu
 			nodePtr temp = (nodePtr)functionSymbol->symbolTable;
@@ -389,24 +396,24 @@ nodePtr ParseFunctionHead()
 
 	functionSymbol->declared++;
 
-	packedSymbol = ST_PackageCreate(functionName, ST_FUNCTION, functionSymbol);
-
 	functionNode = searchNodeByKey(P_symbolTable, functionName);
-
-	symbolFunctionPtr functionInTable;
 
 	if(functionNode == NULL)
 	{
+		packedSymbol = ST_PackageCreate(functionName, ST_FUNCTION, functionSymbol);
 		functionNode = nodeInsert(P_symbolTable, packedSymbol);
 		functionInTable = functionNode->data->data;
 	}
 	else
 	{
-		functionInTable = functionNode->data->data;
-		int compare = ST_Compare(functionNode->data, packedSymbol);
+		functionInTable = functionNode->data->data; //vytahnu si funkci z tabulky symbolu
 
-		if(compare == 0)
-			ST_PackageDestroy(packedSymbol);
+		if(ST_CompareFunctions(functionInTable, functionSymbol) == 0)
+		{
+			functionInTable->declared++;
+			ST_FunctionDestroy(functionSymbol);
+			functionSymbol = functionInTable;
+		}
 		else
 			mistake(ERR_SEM_UND, "Redefinition of function prototype \n");
 	}
@@ -425,7 +432,7 @@ nodePtr ParseFunctionHead()
 		AC_itemPtr AC_item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(), NULL, NULL);
 		AC_Add(P_internalCode,AC_item);
 
-		return functionInTable->symbolTable;
+		return functionSymbol->symbolTable;
 	}
 	return NULL;
 
@@ -482,6 +489,7 @@ void ParseVariable(nodePtr *localSymbolTable)
 			AC_Add(P_internalCode, AC_Item);
 
 			stackTop = S_Top(P_specialStack);
+			tokenLast = D_TopFront(P_tokenQueue);
 		}
 
 		switch(rule)
@@ -1101,6 +1109,7 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 	symbolFunctionPtr function = NULL;
 	symbolVariablePtr variable = NULL;
 	symbolPackagePtr package = NULL;
+	symbolPackagePtr packageParam = NULL;
 
 	nodePtr nodeFunction = NULL;
 	nodePtr nodeFirst = NULL;
@@ -1111,6 +1120,7 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 
 	int numberOfArguments = 0;
 	int tokenCount = 0;
+	int remove = 0;
 
 	tokenTemp = D_TopFront(dequeExp);
 
@@ -1123,7 +1133,7 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 	if(function->defined != 1)
 		mistake(ERR_SEM_UND, "Definition of user defined function not found\n");
 
-	numberOfArguments = function->paramTypes->length;
+	numberOfArguments = D_MemberCountGet(function->params);
 
 	Deque stack = S_Init();
 
@@ -1132,16 +1142,16 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 	{
 		tokenLast = D_TopFront(dequeExp);
 
-		S_Push(stack,D_PopFront(P_tokenQueue));
+		S_Push(stack,D_PopFront(dequeExp));
 		tokenCount++;
 
 		if(tokenLast->typ == TT_PAR_R) //ukoncovani pro PAR_R
 			break;
 	}
 
-	for(int i = 0; i < tokenCount; i++)
+	for(int i = 0; i < (tokenCount - 1); i++) //-1 protoze tokenCount obsahuje i nazev funkce
 	{
-		tokenTemp = D_TopFront(dequeExp);
+		tokenTemp = S_Top(stack);
 
 		if ((i % 2) == 1) //jede se po lichych protoze na 0 je PAR_R
 		{
@@ -1154,10 +1164,10 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 						mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
 
 					variable = nodeFirst->data->data;
-					if(ST_CompareParamS(function, variable->type, numberOfArguments) != 0)
+					if(!ST_ParamOKV(function, variable->type, numberOfArguments))
 						mistake(ERR_SEM_COMP, "Bad token type\n");
 				}
-				else if(ST_CompareParamT(function, tokenTemp->typ, numberOfArguments) == 0)
+				else if(ST_ParamOKT(function, tokenTemp->typ, numberOfArguments))
 					nodeFirst = nodeInsert(&(*localSymbolTable), TokenToSymbol(tokenTemp));
 				else
 					mistake(ERR_SEM_COMP, "Bad token type\n");
@@ -1166,7 +1176,11 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 				{
 					AC_Item = AC_I_Create(AC_CALL_DUMMY, nodeFirst, nodeSecond, NULL);
 					AC_Add(P_internalCode, AC_Item);
+
+					nodeFirst = NULL;
+					nodeSecond = NULL;
 				}
+				numberOfArguments--;
 
 			}
 			else	//uklda se na adress 2
@@ -1178,26 +1192,20 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 						mistake(ERR_SEM_UND, "This identifier is not registered in symbol table \n");
 
 					variable = nodeSecond->data->data;
-					if(ST_CompareParamS(function, variable->type, numberOfArguments) != 0)
+					if(!ST_ParamOKV(function, variable->type, numberOfArguments))
 						mistake(ERR_SEM_COMP, "Bad token type\n");
 				}
-				else if(ST_CompareParamT(function, tokenTemp->typ, numberOfArguments) == 0)
+				else if(ST_ParamOKT(function, tokenTemp->typ, numberOfArguments))
 					nodeSecond = nodeInsert(&(*localSymbolTable), TokenToSymbol(tokenTemp));
 				else
 					mistake(ERR_SEM_COMP, "Bad token type\n");
+
+				numberOfArguments--;
 			}
 		}
 
-		if(tokenTemp->typ == stackTop->typ)
-		{
-			tokenTemp = D_PopFront(dequeExp);
-			T_Destroy(tokenTemp);
-
-			tokenTemp = S_Pop(P_specialStack);
-			T_Destroy(tokenTemp);
-		}
-		else
-			mistake(ERR_SYN, "Top of stack and token are not equal\n");
+		tokenTemp = S_Pop(stack);
+		T_Destroy(tokenTemp);
 	}
 
 	//vytvoreni promena pro vraceni z funkce
@@ -1214,6 +1222,11 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 
 	AC_Item = AC_I_Create(AC_CALL, nodeFirst, nodeSecond, nodeRet);
 	AC_Add(P_internalCode, AC_Item);
+
+	//odstraneni bordelu
+	tokenTemp = S_Pop(stack);
+	T_Destroy(tokenTemp);
+	S_Terminate(stack);
 
 	return nodeRet;
 }
@@ -1827,7 +1840,7 @@ int RozsahPlatnostiLastPart(char * str)
 		string rozsahPlatnosti = RozsahPlatnostiGet();	//pouze zapujcen ne deallokovat
 
 		if(rozsahPlatnosti->length < partToCompare->length)
-			return -1;
+			return 0;
 
 		string lastPart = substr(rozsahPlatnosti,(rozsahPlatnosti->length - partToCompare->length), partToCompare->length);
 
@@ -1845,7 +1858,7 @@ int RozsahPlatnostiLastPart(char * str)
 		}
 	}
 	else
-		return -1;
+		return 0;
 }
 
 //////////////////////////////////////////////////
@@ -1921,7 +1934,7 @@ void RozsahPlatnostiRemoveInner()
 	if(!S_Empty(P_platnostStack))
 	{
 		string temp = S_Pop(P_platnostStack);
-		strFree(temp);
+		//strFree(temp); // nesmi se odtranit protoze se jedna zaroven o nazev funkce
 	}
 }
 

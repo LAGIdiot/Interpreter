@@ -60,7 +60,7 @@ $(AC).o: $(AC).c $(AC).h
 str.o: str.c str.h errors.h $(MM).h
 	$(CC) $(CFLAGS) -o str.o str.c
 
-$(ST).o: $(ST).c $(ST).h $(MM).h errors.h str.h
+$(ST).o: $(ST).c $(ST).h $(MM).h errors.h str.h deque.h
 	$(CC) $(CFLAGS) -o $(ST).o $(ST).c
 	
 deque.o: deque.c deque.h errors.h $(MM).h
@@ -98,14 +98,14 @@ $(AC)-d.o: $(AC).c $(AC).h
 str-d.o: str.c str.h errors.h $(MM).h
 	$(CC) $(CFLAGSD) -o str-d.o str.c
 
-$(ST)-d.o: $(ST).c $(ST).h $(MM).h errors.h str.h
+$(ST)-d.o: $(ST).c $(ST).h $(MM).h errors.h str.h deque.h
 	$(CC) $(CFLAGSD) -o $(ST)-d.o $(ST).c
 	
 deque-d.o: deque.c deque.h errors.h $(MM).h
 	$(CC) $(CFLAGSD) -o deque-d.o deque.c
 
 interpret-d.o: interpret.c interpret.h errors.h deque.h ial.h
-	$(CC) $(CFLAGS) -o interpret-d.o interpret.c
+	$(CC) $(CFLAGSD) -o interpret-d.o interpret.c
 	
 #debug 2
 $(MM)-d2.o: $(MM).c $(MM).h errors.h

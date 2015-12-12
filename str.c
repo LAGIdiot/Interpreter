@@ -169,6 +169,13 @@ int charToInt(char * c)
 
 int strCompare(string s1, string s2)
 {
+	if(s1 == NULL && s2 == NULL)	//bacha na prazdny stringy
+		return 0;
+	else if(s1 == NULL)
+		return 1;
+	else if(s2 == NULL)
+		return -1;
+
 	if ( s1->length == s2->length )
 	for( int i = 0 ; i < s1->length; i++ )
 		{
