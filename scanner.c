@@ -67,8 +67,6 @@ void T_Get(tTokenPtr tokenPtr)
 
 		switch (state)
 		{
-//TODO: prerovnat stavy atomatu at je nabeh co nejrychlejsi
-//TODO: doplnit dalsi stavy a rozpoznani tokenu
 			//-----------------------------------------------------------------------
 			
 			/////////////////////////////////////////////////////////////////////////
@@ -191,7 +189,6 @@ void T_Get(tTokenPtr tokenPtr)
 			/////////////////////////////////////////////////////////////////////////
 			// DALŠÍ STAVY 
 			/////////////////////////////////////////////////////////////////////////
-			//TODO PŘETOVNAT ZA ÚČELEM ZVÝŠENÍ RYCHLOSTI KA
 			
 			case FM_PAR_L:
 			{
