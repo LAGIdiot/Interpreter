@@ -16,7 +16,7 @@ string strInit()
 #endif
 	string s = MM_Malloc(sizeof(struct stringStruct));
 
-#if DEBUG
+#if DEBUG2
 	printf("Allocating memory for char array\n");
 #endif
 	s->str = MM_Malloc(sizeof(char)*stringSizeBase);
@@ -39,7 +39,7 @@ void strFree(string s)
 //Nemusi byt vzdy nejlepsim resenim, zanechava bordel...
 void strClear(string s)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Clearing content of string container\n");
 #endif
    s->str[0] = '\0';
@@ -49,7 +49,7 @@ void strClear(string s)
 int strInsert(string s, char *text)
 {
 #if DEBUG
-	printf("Inserting content to string container\n");
+	printf("Inserting content: %s to string container\n", text);
 #endif
   size_t length = strlen(text);
 
@@ -63,7 +63,7 @@ int strInsert(string s, char *text)
 
 	  s->length = length;
 
-	  strncpy(s->str, text, length);
+	  strcpy(s->str, text);
 
 	  return 0;
   }
@@ -85,10 +85,12 @@ string concat (string s1, string s2)
 	for (; i != s1->length; i++ )
 		{
 			pom[i] = s1->str[i];
+			pom[i + 1] = '\0';
 		}
 	for (int j = 0; j != s2->length; j++ )
 		{
 			pom[i] = s2->str[j];
+			pom[i + 1] = '\0';
 			i++;
 		}
 	if( strInsert(s3, pom) == -1 )
@@ -109,27 +111,31 @@ if ( s->length < i+n )
 		{
 			char * pom;
 			int dlzka = s->length - i + 1 ;
-			pom = MM_Malloc(sizeof(char)*dlzka); //alokacia miesta
+			pom = MM_Malloc(sizeof(char)*(dlzka + 1)); //alokacia miesta
 			for ( int x = 0 ; x != dlzka ; x++ )
 				{
 					pom[x] = s->str[i+x];		//zapis na pomocnu
+					pom[x + 1] = '\0';
 				}
 			if( strInsert(substr,pom) == -1 )
 				mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
 
+			MM_Free(pom);
 		}
-else if ( s->length > i+n )
+else if ( s->length >= i+n )
 			{
 
 					char * pom;
-					pom = MM_Malloc(sizeof(char)*n); //alokacia miesta
+					pom = MM_Malloc(sizeof(char)*(n+1)); //alokacia miesta
 					for ( int x = 0 ; x != n ; x++ )
 					{
 						pom[x] = s->str[i+x];		//zapis na pomocnu
+						pom[x + 1] = '\0';
 					}
 					if( strInsert(substr,pom) == -1 )
 						mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
 
+					MM_Free(pom);
 			}
 
 return substr;
@@ -244,7 +250,7 @@ string strRNG()
 			rng[i] = (rand() % 26) + 97; //generuje pouze maly pismena
 		}
 
-		rng[rngSizeBase +1] = '\0';
+		rng[rngSizeBase] = '\0';
 
 		str = charToStr(rng);
 	}while(strRNGSearch(str));

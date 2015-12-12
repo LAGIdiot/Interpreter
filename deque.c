@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////
 void S_Push(Deque stack, void * data)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Pushing data to stack: %d\n", stack);
 #endif
 	if(stack != NULL && stack->type == STACK)
@@ -36,7 +36,7 @@ void S_Push(Deque stack, void * data)
 //////////////////////////////////////////////////
 void *S_Pop(Deque stack)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Popping data from stack: %d\n", stack);
 #endif
 	if(stack != NULL && stack->type == STACK)
@@ -72,7 +72,7 @@ void *S_Pop(Deque stack)
 //////////////////////////////////////////////////
 void *S_Top(Deque stack)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Looking at to of stack: %d\n", stack);
 #endif
 	if(stack != NULL && stack->type == STACK)
@@ -174,7 +174,7 @@ Deque D_Init()
 	deque->last = NULL;
 
 #if DEBUG
-	printf("Initializing queue at %d\n", deque);
+	printf("Initializing deque at %d\n", deque);
 	deque->member_counter = 0;
 #endif
 
@@ -210,7 +210,7 @@ void D_Terminate(Deque deque)
 
 void D_PushBack(Deque deque, void * data)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Pushing data to back of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
@@ -246,7 +246,7 @@ void D_PushBack(Deque deque, void * data)
 
 void D_PushFront(Deque deque, void * data)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Pushing data to front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
@@ -282,8 +282,8 @@ void D_PushFront(Deque deque, void * data)
 
 void * D_PopFront(Deque deque)
 {
-#if DEBUG
-	printf("Popping data from deque: %d\n", deque);
+#if DEBUG2
+	printf("Popping data from front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 	{
@@ -314,8 +314,8 @@ void * D_PopFront(Deque deque)
 
 void * D_TopFront(Deque deque)
 {
-#if DEBUG
-	printf("Getting data from top front of deque: %d\n", deque);
+#if DEBUG2
+	printf("Looking on data from front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 		return deque->first->dataPtr;
@@ -326,8 +326,8 @@ void * D_TopFront(Deque deque)
 
 void * D_PopBack(Deque deque)
 {
-#if DEBUG
-	printf("Popping data from deque: %d\n", deque);
+#if DEBUG2
+	printf("Popping data from back of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 	{
@@ -359,7 +359,7 @@ void * D_PopBack(Deque deque)
 void * D_TopBack(Deque deque)
 {
 #if DEBUG
-	printf("Getting data from top front of deque: %d\n", deque);
+	printf("Looking on data from back of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 		return deque->last->dataPtr;

@@ -12,12 +12,13 @@ FILE *file_p;
 
 void Test()
 {
-	nodePtr tree = NULL;
-	treeInit(&tree);
+	string test_str = strInit();
+	strInsert(test_str, "main_DO");
 
-	symbolPackagePtr package = ST_PackageCreate(charToStr("test"), 1, NULL);
+	string test_str2 = charToStr("DO");
 
-	nodeInsert(&tree, package);
+	string sub = substr(test_str, test_str->length - test_str2->length, test_str2->length);
+
 
 }
 

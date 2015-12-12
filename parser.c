@@ -275,6 +275,9 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 //return pointer na tabulku symbolu funkce, pokud prototyp tak NULL
 nodePtr ParseFunctionHead()
 {
+#if DEBUG
+	printf("Starting parsing function head\n");
+#endif
 	int parsing = 1;
 	int rule = 0;
 	int parametr = 0;
@@ -410,6 +413,9 @@ nodePtr ParseFunctionHead()
 
 	if(body)
 	{
+#if DEBUG
+	printf("It seems that had have body too\n");
+#endif
 		functionSymbol->defined++;
 
 		//rozliseni levelu platnosti
@@ -427,6 +433,9 @@ nodePtr ParseFunctionHead()
 
 void ParseVariable(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing variable\n");
+#endif
 	symbolVariablePtr variable = NULL;
 	symbolPackagePtr packedVariable = NULL;
 	nodePtr node = NULL;
@@ -506,6 +515,9 @@ void ParseVariable(nodePtr *localSymbolTable)
 
 void ParsePrirazeni(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing prirazeni\n");
+#endif
 	int rule;
 
 	nodePtr nodeId = NULL;
@@ -552,6 +564,9 @@ void ParsePrirazeni(nodePtr *localSymbolTable)
 
 void ParseIO(nodePtr *localSymbolTable, int keyword, int cin)
 {
+#if DEBUG
+	printf("Starting parsing IO\n");
+#endif
 	int rule;
 
 	nodePtr nodeId = NULL;
@@ -613,6 +628,9 @@ void ParseIO(nodePtr *localSymbolTable, int keyword, int cin)
 
 void ParseReturn(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing RETURN\n");
+#endif
 	int rule;
 
 	//vim ze tu budu potrebovat nejmene 2 tahy a to 0. RETURN, 1. EXP, ;
@@ -650,6 +668,9 @@ void ParseReturn(nodePtr *localSymbolTable)
 
 void ParseIf(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing IF\n");
+#endif
 	int rule;
 
 	//vim ze tu budu potrebovat nejmene 3 tahy a to 0. IF, 1. (, 2. EXP, )
@@ -694,6 +715,9 @@ void ParseIf(nodePtr *localSymbolTable)
 
 void ParseFor(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing FOR\n");
+#endif
 	int rule;
 	nodePtr node = NULL;
 	symbolVariablePtr variable = NULL;
@@ -812,6 +836,9 @@ void ParseFor(nodePtr *localSymbolTable)
 //////////////////////////////////////////////////
 nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 {
+#if DEBUG
+	printf("Starting parsing EXP\n");
+#endif
 	nodePtr nodeLastProcessed = NULL;
 	nodePtr nodeFunction = NULL;
 
@@ -1064,6 +1091,9 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 
 nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing user defined function\n");
+#endif
 	//Battle plan:	get functionSymbol and list of its parametrs -> expecting number of parametrs
 	//				take the deque from end, found PAR_R and take arguments from end and put them to AC_CALL_DUMMYs and AC_CALL
 
@@ -1189,6 +1219,9 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 
 nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing built-in function\n");
+#endif
 	nodePtr nodeFirst = NULL;
 	nodePtr nodeSecond = NULL;
 	nodePtr nodeThird = NULL;
@@ -1364,6 +1397,9 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr *localSymbolT
 
 symbolPackagePtr TokenToSymbol(tTokenPtr token)
 {
+#if DEBUG
+	printf("Converting token to symbol\n");
+#endif
 	symbolVariablePtr symbolVariable = NULL;
 	symbolPackagePtr symbolPackage = NULL;
 
@@ -1399,6 +1435,9 @@ symbolPackagePtr TokenToSymbol(tTokenPtr token)
 
 void ParseDoWhile(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing DO WHILE\n");
+#endif
 	int rule;
 	AC_itemPtr AC_Item = NULL;
 
@@ -1434,6 +1473,9 @@ void ParseDoWhile(nodePtr *localSymbolTable)
 }
 void ParseDoWhilePart2(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing DO WHILE - you know that part down there :P\n");
+#endif
 	int rule;
 	AC_itemPtr AC_Item = NULL;
 
@@ -1487,6 +1529,9 @@ void ParseDoWhilePart2(nodePtr *localSymbolTable)
 
 void ParseWhile(nodePtr *localSymbolTable)
 {
+#if DEBUG
+	printf("Starting parsing WHILE\n");
+#endif
 	int rule;
 	AC_itemPtr AC_Item = NULL;
 
@@ -1665,6 +1710,7 @@ void Rule0(nodePtr *localSymbolTable)
 {
 	int remove = 0;
 	int removeLabel = 1;
+	static int workingOnDO = 0; //last minute brake for never ending cycle in ParseDoWhilePart2
 	AC_itemPtr AC_Item = NULL;
 
 	if(tokenLast->typ == TT_BRACE_R && stackTop->typ == TT_BRACE_R)
@@ -1675,14 +1721,12 @@ void Rule0(nodePtr *localSymbolTable)
 			AC_Item = AC_I_Create(AC_JUMP, NULL, NULL, RozsahPlatnostiBuildStringFromChars("_MODIFICATION"));
 			AC_Add(P_internalCode, AC_Item);
 		}
-
-		if(RozsahPlatnostiLastPart("WHILE"))	//pokud je posledni for cyklus
+		else if(RozsahPlatnostiLastPart("WHILE"))	//pokud je posledni for cyklus
 		{
 			AC_Item = AC_I_Create(AC_JUMP, NULL, NULL, RozsahPlatnostiBuildStringFromChars("_CONDITION"));
 			AC_Add(P_internalCode, AC_Item);
 		}
-
-		if(RozsahPlatnostiLastPart("DO"))
+		else if(RozsahPlatnostiLastPart("DO"))
 			removeLabel = 0;
 
 
@@ -1698,12 +1742,21 @@ void Rule0(nodePtr *localSymbolTable)
 
 		remove = 1;
 	}
+	else if(tokenLast->typ == TT_SEMICOLON && stackTop->typ == TT_SEMICOLON && workingOnDO)	//pouze prvni strednik za do-while TODO: test on do-while in do-while
+	{
+		workingOnDO = 0;
+		remove = 1;
+	}
 	else if(tokenLast->typ == TT_KEYWORD_WHILE)
 	{
-		if(RozsahPlatnostiLastPart("DO"))
+		if(workingOnDO != 1 && RozsahPlatnostiLastPart("DO"))
+		{
+			workingOnDO = 1;
 			ParseDoWhilePart2(localSymbolTable);
-
-		remove = 1;//TODO: Check if this 1 will not affect something
+			remove = 0;
+		}
+		else
+			remove = 1;
 	}
 	else if(tokenLast->typ == TT_KEYWORD_ELSE)
 	{
@@ -1760,21 +1813,26 @@ int RozsahPlatnostiLastPart(char * str)
 {
 	if(str != NULL)
 	{
-		int length;
+		string partToCompare = charToStr(str);
+		string rozsahPlatnosti = RozsahPlatnostiGet();	//pouze zapujcen ne deallokovat
 
-		for(length = 0; str[length] != '\0'; length++); //spociat delku casti kterou hledam
-
-		string rozsahPlatnosti = RozsahPlatnostiGet();
-
-		if(rozsahPlatnosti->length < length)
+		if(rozsahPlatnosti->length < partToCompare->length)
 			return -1;
 
-		string lastPart = substr(rozsahPlatnosti,rozsahPlatnosti->length - length, length);
+		string lastPart = substr(rozsahPlatnosti,(rozsahPlatnosti->length - partToCompare->length), partToCompare->length);
 
-		if(strCompare(lastPart,charToStr(str)) == 0)
+		if(strCompare(lastPart,partToCompare) == 0)
+		{
+			strFree(partToCompare);
+			strFree(lastPart);
 			return 1;
+		}
 		else
+		{
+			strFree(partToCompare);
+			strFree(lastPart);
 			return 0;
+		}
 	}
 	else
 		return -1;
@@ -1824,14 +1882,22 @@ string RozsahPlatnostiBuildStringFromChars(char * newPart)
 //////////////////////////////////////////////////
 void RozsahPlatnostiAddInner(string inner)
 {
-	if(P_platnostStack->last == NULL)
+	if(S_Empty(P_platnostStack))
 		S_Push(P_platnostStack, inner);
 	else
 	{
+		//porovnani zda inner uz nebsahuje v sobe outer
 		string outer = S_Top(P_platnostStack);
-		string innerComplete = concat(outer, inner);
 
-		S_Push(P_platnostStack, innerComplete);
+		string sub = substr(inner, 0, outer->length);
+		if(strCompare(sub, outer) != 0)
+		{
+			string innerComplete = concat(outer, inner);
+
+			S_Push(P_platnostStack, innerComplete);
+		}
+		else
+			S_Push(P_platnostStack, inner);
 	}
 }
 

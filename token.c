@@ -55,8 +55,10 @@ tTokenPtr T_Init()
 	token->typ = 0;
 	token->data = NULL;
 
-#if DEBUG
+#if DEBUG2
 	printf("Token initialized at: %d \n", token);
+#endif
+#if DEBUG
 	tokenCount++;
 #endif
 
@@ -76,8 +78,10 @@ void T_Destroy(tTokenPtr token)
 
 	MM_Free(token);
 
-#if DEBUG
+#if DEBUG2
 	printf("Token destroyed at: %d \n", token);
+#endif
+#if DEBUG
 	tokenCount--;
 #endif
 }
@@ -90,6 +94,9 @@ void T_Destroy(tTokenPtr token)
 //////////////////////////////////////////////////
 void T_Update(char c)
 {
+#if DEBUG2
+	printf("Token updated\n");
+#endif
 	size_t size = strlen(data) + 1;// + 1 is for \0
 
 	if(size == sizeMax)
@@ -117,7 +124,7 @@ void T_Finish(tTokenPtr token)
 
 	strcpy(data,""); //nahradi obsah dat za "" - priprava na dalsi token
 
-#if DEBUG
+#if DEBUG2
 	printf("Token finished at: %d \n", token);
 #endif
 }
