@@ -381,3 +381,104 @@ int D_Empty(Deque deque)
 		mistake(ERR_INTERN, "Problem with size in deque\n");
 	return -1;
 }
+
+int D_ActivateFront(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Activating front of deque: %d\n", deque);
+#endif
+
+	if(deque->first == NULL)
+		return 0;
+	else
+	{
+		deque->active = deque->first;
+		return 1;
+	}
+}
+int D_ActivateBack(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Activating back of deque: %d\n", deque);
+#endif
+
+	if(deque->last == NULL)
+		return 0;
+	else
+	{
+		deque->active = deque->last;
+		return 1;
+	}
+}
+
+int D_IsActive(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Is deque active: %s\n", deque->active == NULL ? "FALSE" : "TRUE");
+#endif
+
+	return deque->active == NULL ? 0 : 1;
+}
+
+int D_ActiveMoveToFront(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Moving activity of deque: %d to front\n", deque);
+#endif
+
+	if(deque->active == deque->first)
+	{
+		deque->active = NULL;
+		return 0;
+	}
+	else
+	{
+		deque->active = deque->active->prevPtr;
+		return 1;
+	}
+}
+
+int D_ActiveMoveToBack(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Moving activity of deque: %d to back\n", deque);
+#endif
+
+	if(deque->active == deque->last)
+	{
+		deque->active = NULL;
+		return 0;
+	}
+	else
+	{
+		deque->active = deque->active->nextPtr;
+		return 1;
+	}
+}
+
+void * D_TopActive(Deque deque)
+{
+	if(deque == NULL)
+		return NULL;
+
+#if DEBUG
+	printf("Looking on data from active member of deque: %d\n", deque);
+#endif
+
+	return deque->active->dataPtr;
+}

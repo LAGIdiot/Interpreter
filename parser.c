@@ -887,7 +887,8 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 
 	//if ohnuti zadani jako krava
 
-	if(tokenTemp->typ == TT_KEYWORD_CONCAT || tokenTemp->typ == TT_KEYWORD_FIND || tokenTemp->typ == TT_KEYWORD_SUBSTRING || tokenTemp->typ == TT_KEYWORD_LENGTH)
+	if(tokenTemp->typ == TT_KEYWORD_CONCAT || tokenTemp->typ == TT_KEYWORD_FIND || tokenTemp->typ == TT_KEYWORD_SUBSTRING ||
+		tokenTemp->typ == TT_KEYWORD_LENGTH || tokenTemp->typ == TT_KEYWORD_SORT)
 		expectingFunction = 2;
 	else if(tokenTemp->typ == TT_IDENTIFIER)
 	{
@@ -1053,24 +1054,24 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 			}
 			else if(tokenTemp->typ == TT_KEYWORD_SUBSTRING)
 			{
-				TokenPusher(P_specialStack, 8, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER,
+				TokenPusher(P_specialStack, 8, TT_PAR_R, TT_S_ID_OR_TYP, TT_COMMA, TT_S_ID_OR_TYP,
 					TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_SUBSTRING);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_SUBSTR, deque, &(*localSymbolTable));
 			}
-			else if(tokenLast->typ == TT_KEYWORD_CONCAT)
+			else if(tokenTemp->typ == TT_KEYWORD_CONCAT)
 			{
 				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_CONCAT);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_CONCAT, deque, &(*localSymbolTable));
 			}
-			else if(tokenLast->typ == TT_KEYWORD_FIND)
+			else if(tokenTemp->typ == TT_KEYWORD_FIND)
 			{
 				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_FIND);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_FIND, deque, &(*localSymbolTable));
 			}
-			else if(tokenLast->typ == TT_KEYWORD_SORT)
+			else if(tokenTemp->typ == TT_KEYWORD_SORT)
 			{
 				TokenPusher(P_specialStack, 4, TT_PAR_R, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_SORT);
 
@@ -1233,6 +1234,7 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr *localSymbolT
 	AC_itemPtr AC_Item = NULL;
 
 	int end = 0;
+	int remove = 0;
 
 	switch(function)
 	{
@@ -1254,6 +1256,8 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr *localSymbolT
 
 	for(int i = 0; i < end; i++)
 	{
+		remove = 0;
+
 		tokenTemp = D_TopFront(dequeExp);
 		stackTop = S_Top(P_specialStack);
 
@@ -1327,6 +1331,12 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr *localSymbolT
 		}
 
 		if(tokenTemp->typ == stackTop->typ)
+			remove = 1;
+		else if(stackTop->typ == TT_S_ID_OR_TYP && (tokenTemp->typ == TT_IDENTIFIER || tokenTemp->typ == TT_INT || tokenTemp->typ == TT_DOUBLE ||
+			tokenTemp->typ == TT_BIN_NUM || tokenTemp->typ == TT_OCT_NUM || tokenTemp->typ == TT_HEX_NUM))
+			remove = 1;
+
+		if(remove)
 		{
 			tokenTemp = D_PopFront(dequeExp);
 			T_Destroy(tokenTemp);

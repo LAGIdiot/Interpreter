@@ -53,4 +53,14 @@ void * D_TopBack(Deque deque);
 
 int D_Empty(Deque deque);
 
+int D_ActivateFront(Deque deque);
+int D_ActivateBack(Deque deque);
+
+int D_IsActive(Deque deque);
+
+int D_ActiveMoveToFront(Deque deque);
+int D_ActiveMoveToBack(Deque deque);
+
+void * D_TopActive(Deque deque);
+
 #endif //DEQUE_Header
