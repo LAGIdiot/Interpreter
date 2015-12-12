@@ -98,7 +98,7 @@ if ( s->length == i ) //generuj prazdny string
 			return  strInit();
 		}
 if ( s->length < i ) return NULL; //out of range
-
+string substr = strInit();
 if ( s->length < i+n )
 		{
 			char * pom;
@@ -108,11 +108,9 @@ if ( s->length < i+n )
 				{
 					pom[x] = s->str[i+x];		//zapis na pomocnu
 				}
-			string substr = strInit();
 			if( strInsert(substr,pom) == -1 )
 				mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
 
-			MM_Free(pom);
 		}
 else if ( s->length > i+n )
 			{
@@ -123,11 +121,9 @@ else if ( s->length > i+n )
 					{
 						pom[x] = s->str[i+x];		//zapis na pomocnu
 					}
-					string substr = strInit();
 					if( strInsert(substr,pom) == -1 )
 						mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
 
-					MM_Free(pom);
 			}
 
 return substr;
@@ -287,4 +283,3 @@ void strRNGTerminate()
 	D_Terminate(rngDeque);
 	rngDeque = NULL;
 }
-
