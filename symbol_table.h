@@ -4,6 +4,7 @@
 #include "str.h"
 #include "errors.h"
 #include "memory_manager.h"
+#include "deque.h"
 
 #include "token.h"
 
@@ -21,12 +22,16 @@ enum variableType{
 	ST_AUTO,
 }variables;
 
+typedef struct symbolParamStruct{
+	string name;
+	int typ;
+}*symbolParamPtr;
+
 typedef struct symbolFunctionStruct{
 	int returnType;
-	string  paramTypes;
 	int defined;
 	int declared;	//prototyp
-	int returnsFound;
+	Deque params;	//params
 	void * symbolTable;	//symbol table pro tuto funkci
 }*symbolFunctionPtr;
 
@@ -48,7 +53,8 @@ void ST_PackageDestroy(symbolPackagePtr symbol);
 
 symbolFunctionPtr ST_FunctionCreate();
 void ST_FunctionDestroy(symbolFunctionPtr symbol);
-void ST_FunctionAddParam(symbolFunctionPtr symbol, int variableType);
+
+void ST_FunctionAddParam(symbolFunctionPtr symbol, string name, int tokenType);
 
 symbolVariablePtr ST_VariableCreate();
 void ST_VariableDestroy(symbolVariablePtr symbol);
@@ -59,9 +65,10 @@ void ST_VariableAddData_DOUBLE(symbolVariablePtr symbol, double data);
 string ST_RandomKeyGenerator();
 
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2);
+int ST_CompareFunctions(symbolFunctionPtr symbol1, symbolFunctionPtr symbol2);
 
-int ST_CompareParamT(symbolFunctionPtr function, int tokenType, int position);
-int ST_CompareParamS(symbolFunctionPtr function, int variableType, int position);
+int ST_ParamOKV(symbolFunctionPtr symbol, int variableType, int position);
+int ST_ParamOKT(symbolFunctionPtr symbol, int tokenType, int position);
 
 int ST_Remap(int tokenTyp);
 

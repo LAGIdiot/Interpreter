@@ -41,7 +41,7 @@ void mistake(int errCode, const char *message, ...)
 
 #endif
 
-	MM_FreeAll(); //Uklizeni pameti
+	MM_Terminate(); //Uklizeni pameti
 
 	exit((int)errCode);
 }

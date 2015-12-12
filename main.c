@@ -10,6 +10,18 @@
 
 FILE *file_p;
 
+void Test()
+{
+	string test_str = strInit();
+	strInsert(test_str, "main_DO");
+
+	string test_str2 = charToStr("DO");
+
+	string sub = substr(test_str, test_str->length - test_str2->length, test_str2->length);
+
+
+}
+
 int main(int argc, char *argv[])
 {
 #if DEBUG
@@ -31,6 +43,8 @@ int main(int argc, char *argv[])
 			MM_Init(); //Initialize memory manager
 			T_SystemInit();
 
+			//Test();
+
 			//Token Queue
 			Deque tokenQueue = D_Init();
 
@@ -40,24 +54,21 @@ int main(int argc, char *argv[])
 				fclose(file_p);
 
 			//BT of global symbols
-			nodePtr globalSymbolTree;
+			nodePtr globalSymbolTree = NULL;;
 			treeInit(&globalSymbolTree);
 
 			//Dequeu of intern code
 			Deque internCode = Parse(tokenQueue, &globalSymbolTree);
-
+			D_Terminate(tokenQueue);
 
 			Interpret(internCode, globalSymbolTree);
 
-
-			D_Terminate(tokenQueue);
 			AC_Terminate(internCode);
 			deleteTree(&globalSymbolTree);
 
-
 			T_SystemTerminate();
 
-			MM_FreeAll(); //TODO: Vymyslet lepsi provedeni na vymazani pameti po ukonceni programu
+			MM_Terminate();
 		}
 	}
 	return 0;

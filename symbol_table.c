@@ -1,6 +1,9 @@
 #include "symbol_table.h"
 
 int ST_Remap(int tokenTyp);
+void ST_DestroyParams(Deque deque);
+int ST_CompareDequeOfParams(Deque params1, Deque params2);
+int ST_CompareParams(symbolParamPtr param1, symbolParamPtr param2);
 
 symbolPackagePtr ST_PackageCreate(string key, int typ, void * symbol)
 {
@@ -30,27 +33,118 @@ symbolFunctionPtr ST_FunctionCreate()
 	symbolFunctionPtr function = MM_Malloc(sizeof(struct symbolFunctionStruct));
 
 	function->returnType = ST_UNDEFINED;
-	function->paramTypes = NULL;
-	function->symbolTable = NULL;
 	function->declared = 0;
 	function->defined = 0;
 
+	function->symbolTable = NULL;
+	function->params = NULL;
+
 	return function;
+}
+
+void ST_FunctionAddParam(symbolFunctionPtr symbol, string name, int tokenType)
+{
+	if(symbol == NULL || name == NULL)
+		mistake(ERR_INTERN, "Problem with adding function param\n");
+
+	int variableType = ST_Remap(tokenType);
+	if(variableType == 0)
+		mistake(ERR_SYN, "Bad token type\n");
+
+	symbolParamPtr param = MM_Malloc(sizeof(struct symbolParamStruct));
+
+	param->name = name;
+	param->typ = variableType;
+
+	if(symbol->params == NULL)
+		symbol->params = D_Init();
+
+	D_PushBack(symbol->params, param);
+}
+
+int ST_CompareDequeOfParams(Deque params1, Deque params2)
+{
+	int params1members = D_MemberCountGet(params1);
+	int params2members = D_MemberCountGet(params2);
+
+	if(params1members == -1 && params2members == -1)//nebyly inicializovany
+		return 0;
+	else if(params1members == 0 && params2members == 0)
+		return 0;
+	else if(params1members > params2members)
+		return -1;
+	else if(params1members < params2members)
+		return 1;
+	else
+	{
+		D_ActivateFront(params1);
+		D_ActivateFront(params2);
+
+		int comp = 0;
+		for(int i = 0; i < params1members; i++)
+		{
+			comp = ST_CompareParams(D_TopActive(params1), D_TopActive(params2));
+
+			if(comp > 0)
+				return 1;
+			else if(comp < 0)
+				return -1;
+
+			D_ActiveMoveToBack(params1);
+			D_ActiveMoveToBack(params2);
+		}
+		return 0;
+	}
+}
+
+int ST_CompareParams(symbolParamPtr param1, symbolParamPtr param2)
+{
+	if(param1 == NULL || param2 == NULL)
+		mistake(ERR_INTERN, "Nothing to compare");
+
+	if(param1->typ > param2->typ)
+		return -1;
+	else if(param1->typ < param2->typ)
+		return 1;
+
+	int comp = strCompare(param1->name, param2->name);
+	if(comp < 0)
+		return -1;
+	else if(comp > 0)
+		return 1;
+	else
+		return 0;
+}
+
+void ST_DestroyParams(Deque deque)
+{
+	if(deque != NULL)
+	{
+		symbolParamPtr param = NULL;
+
+		while(!D_Empty(deque))
+		{
+			param = D_PopFront(deque);
+
+			strFree(param->name);
+			MM_Free(param);
+		}
+		deque = NULL;
+	}
 }
 
 void ST_FunctionDestroy(symbolFunctionPtr symbol)
 {
 	if(symbol != NULL)
 	{
-		if(symbol->paramTypes != NULL)
-			strFree(symbol->paramTypes );
+		if(symbol->params != NULL)
+			ST_DestroyParams(symbol->params);
 		if(symbol->symbolTable != NULL)
 			deleteTree(symbol->symbolTable);//Potrebuje funkci z IAL
 
 		MM_Free(symbol);
 	}
 }
-
 
 //Function for maping datat taypes from token to symbolTbale
 int ST_Remap(int tokenTyp)
@@ -81,38 +175,6 @@ int ST_Remap(int tokenTyp)
 	return ret;
 }
 
-void ST_FunctionAddParam(symbolFunctionPtr symbol, int tokenType)
-{
-	if(symbol != NULL)
-	{
-		string params = strInit();
-		if(symbol->paramTypes == NULL)
-			symbol->paramTypes = params;
-
-		int variableType =  ST_Remap(tokenType);
-
-		switch(variableType)
-		{
-			case ST_INT:
-				strConcatChar(symbol->paramTypes, "i");
-				break;
-			case ST_DOUBLE:
-				strConcatChar(symbol->paramTypes, "d");
-				break;
-			case ST_STRING:
-				strConcatChar(symbol->paramTypes, "s");
-				break;
-			case ST_AUTO:
-				strConcatChar(symbol->paramTypes, "a");
-				break;
-			default:
-				mistake(ERR_INTERN, "Problem with adding param type to function\n");
-		}
-	}
-	else
-		mistake(ERR_INTERN, "Someone call ST_FunctionAddParam on uninitialized symbol\n");
-}
-
 symbolVariablePtr ST_VariableCreate()
 {
 	symbolVariablePtr symbol = MM_Malloc(sizeof(struct symbolVariableStruct));
@@ -120,6 +182,7 @@ symbolVariablePtr ST_VariableCreate()
 	symbol->data = NULL;
 	symbol->defined = 0;
 	symbol->type = ST_UNDEFINED;
+	symbol->labelPlatnosti = NULL;
 
 	return symbol;
 
@@ -140,8 +203,10 @@ int ST_CompareFunctions(symbolFunctionPtr symbol1, symbolFunctionPtr symbol2)
 {
 	if(symbol1->returnType != symbol1->returnType)
 		return -1;
+	else if(ST_CompareDequeOfParams(symbol1->params, symbol2->params) == 0)
+		return 0;
 	else
-		return strCompare(symbol1->paramTypes, symbol2->paramTypes);
+		return 1;
 }
 
 int ST_CompareVariables(symbolVariablePtr symbol1, symbolVariablePtr symbol2)
@@ -154,10 +219,8 @@ int ST_CompareVariables(symbolVariablePtr symbol1, symbolVariablePtr symbol2)
 		return -1;
 }
 
-//Nemuze dojik k rozdilu v symbol->type !!!
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
 {
-	int compareInner = 0;
 	int str = strCompare(symbol1->key, symbol2->key);
 	if(str != 0)
 		return str;
@@ -190,23 +253,27 @@ void ST_VariableAddData_DOUBLE(symbolVariablePtr symbol, double data)
 	symbol->data = doublePtr;
 }
 
-int ST_CompareParamT(symbolFunctionPtr function, int tokenType, int position)
+int ST_ParamOKV(symbolFunctionPtr symbol, int variableType, int position)
 {
-	int variableType = ST_Remap(tokenType);
-	return ST_CompareParamS(function, variableType, position);
+	int symbolMemberCount = D_MemberCountGet(symbol->params);
+	if(symbolMemberCount < position)
+		return 0;
+
+	D_ActivateFront(symbol->params);
+	for(int i = 1; i < position; i++)
+	{
+		D_ActiveMoveToBack(symbol->params);
+	}
+
+	symbolParamPtr symbolInDeque = D_TopActive(symbol->params);
+	if(symbolInDeque->typ != variableType)
+		return 0;
+	else
+		return 1;
 }
 
-int ST_CompareParamS(symbolFunctionPtr function, int variableType, int position)
+
+int ST_ParamOKT(symbolFunctionPtr symbol, int tokenType, int position)
 {
-	if(position > function->paramTypes->length)
-		mistake(ERR_SEM_COMP, "Too much arguments for this function\n");
-
-	int paramType = function->paramTypes->str[position -1];
-
-	if(variableType > paramType)
-		return -1;
-	else if(variableType < paramType)
-		return 1;
-	else
-		return 0;
+	return ST_ParamOKV(symbol, ST_Remap(tokenType), position);
 }

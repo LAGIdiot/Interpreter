@@ -7,6 +7,11 @@
 #include "memory_manager.h"
 #include "str.h"
 #include "symbol_table.h"
+#include <string.h>
+#include "deque.h"
+
+//for sort function
+#define TRUE 1
 
 int find(string s, string search);
 

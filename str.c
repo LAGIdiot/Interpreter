@@ -16,7 +16,11 @@ string strInit()
 #endif
 	string s = MM_Malloc(sizeof(struct stringStruct));
 
+#if DEBUG2
+	printf("Allocating memory for char array\n");
+#endif
 	s->str = MM_Malloc(sizeof(char)*stringSizeBase);
+	s->str[0] = '\0';
 
 	s->length = 0;
 	s->allocSize = stringSizeBase;
@@ -28,14 +32,14 @@ void strFree(string s)
 #if DEBUG
 	printf("Removing string container\n");
 #endif
-	MM_Free(s->str);
+	MM_Free(s->str);	//FIXME: pad pameti
 	MM_Free(s);
 }
 
 //Nemusi byt vzdy nejlepsim resenim, zanechava bordel...
 void strClear(string s)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Clearing content of string container\n");
 #endif
    s->str[0] = '\0';
@@ -45,19 +49,21 @@ void strClear(string s)
 int strInsert(string s, char *text)
 {
 #if DEBUG
-	printf("Inserting content to string container\n");
+	printf("Inserting content: %s to string container\n", text);
 #endif
   size_t length = strlen(text);
 
   if(s->length == 0)
   {
 	  if(length + 1 > s->allocSize)
+	  {
 		  s->str = MM_Realloc(s->str, sizeof(char) * (length + 1));
+		  s->allocSize = length + 1;
+	  }
 
 	  s->length = length;
-	  s->allocSize = length + 1;
 
-	  s->str = text;
+	  strcpy(s->str, text);
 
 	  return 0;
   }
@@ -79,10 +85,12 @@ string concat (string s1, string s2)
 	for (; i != s1->length; i++ )
 		{
 			pom[i] = s1->str[i];
+			pom[i + 1] = '\0';
 		}
 	for (int j = 0; j != s2->length; j++ )
 		{
 			pom[i] = s2->str[j];
+			pom[i + 1] = '\0';
 			i++;
 		}
 	if( strInsert(s3, pom) == -1 )
@@ -98,32 +106,32 @@ if ( s->length == i ) //generuj prazdny string
 			return  strInit();
 		}
 if ( s->length < i ) return NULL; //out of range
-
+string substr = strInit();
 if ( s->length < i+n )
 		{
 			char * pom;
 			int dlzka = s->length - i + 1 ;
-			pom = MM_Malloc(sizeof(char)*dlzka); //alokacia miesta
+			pom = MM_Malloc(sizeof(char)*(dlzka + 1)); //alokacia miesta
 			for ( int x = 0 ; x != dlzka ; x++ )
 				{
 					pom[x] = s->str[i+x];		//zapis na pomocnu
+					pom[x + 1] = '\0';
 				}
-			string substr = strInit();
 			if( strInsert(substr,pom) == -1 )
 				mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
 
 			MM_Free(pom);
 		}
-else if ( s->length > i+n )
+else if ( s->length >= i+n )
 			{
 
 					char * pom;
-					pom = MM_Malloc(sizeof(char)*n); //alokacia miesta
+					pom = MM_Malloc(sizeof(char)*(n+1)); //alokacia miesta
 					for ( int x = 0 ; x != n ; x++ )
 					{
 						pom[x] = s->str[i+x];		//zapis na pomocnu
+						pom[x + 1] = '\0';
 					}
-					string substr = strInit();
 					if( strInsert(substr,pom) == -1 )
 						mistake (ERR_INTERN,"Intern error in substr funcion in str.c after strInsert\n");
 
@@ -161,6 +169,13 @@ int charToInt(char * c)
 
 int strCompare(string s1, string s2)
 {
+	if(s1 == NULL && s2 == NULL)	//bacha na prazdny stringy
+		return 0;
+	else if(s1 == NULL)
+		return 1;
+	else if(s2 == NULL)
+		return -1;
+
 	if ( s1->length == s2->length )
 	for( int i = 0 ; i < s1->length; i++ )
 		{
@@ -177,9 +192,9 @@ char *strGetStr(string s)
    return s->str;
 }
 
-size_t strGetLength(string s)
+int length(string s)
 {
-   return s->length;
+   return (int)s->length;
 }
 string charToStr (char *c)
 {
@@ -221,6 +236,12 @@ void strConcatChar(string s1, char * s2)
 
 	s1 = final;
 }
+
+void strRNGInit()
+{
+	srand(time(NULL));
+}
+
 string strRNG()
 {
 	char rng[rngSizeBase + 1];
@@ -233,11 +254,10 @@ string strRNG()
 
 		for(int i = 0; i < rngSizeBase; i++)
 		{
-			srand(time(NULL));
-			rng[i] = rand() % 26 + 97; //generuje pouze maly pismena
+			rng[i] = (rand() % 26) + 97; //generuje pouze maly pismena
 		}
 
-		rng[rngSizeBase +1] = '\0';
+		rng[rngSizeBase] = '\0';
 
 		str = charToStr(rng);
 	}while(strRNGSearch(str));
@@ -287,4 +307,3 @@ void strRNGTerminate()
 	D_Terminate(rngDeque);
 	rngDeque = NULL;
 }
-

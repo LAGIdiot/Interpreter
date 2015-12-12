@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////
 void S_Push(Deque stack, void * data)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Pushing data to stack: %d\n", stack);
 #endif
 	if(stack != NULL && stack->type == STACK)
@@ -19,9 +19,7 @@ void S_Push(Deque stack, void * data)
 		container->dataPtr = data;
 
 		stack->last = container;
-#if DEBUG
 		stack->member_counter++;
-#endif
 	}
 	else
 		mistake(ERR_INTERN, "You can't be serious about pushing thinks on uninitialized stack? OR Using wrongly initialized deque as stack\n");
@@ -36,7 +34,7 @@ void S_Push(Deque stack, void * data)
 //////////////////////////////////////////////////
 void *S_Pop(Deque stack)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Popping data from stack: %d\n", stack);
 #endif
 	if(stack != NULL && stack->type == STACK)
@@ -44,6 +42,7 @@ void *S_Pop(Deque stack)
 		if(stack->last != NULL)
 		{
 			DequeContainer container = stack->last;
+			stack->member_counter--;
 
 			stack->last = container->prevPtr;
 
@@ -52,9 +51,6 @@ void *S_Pop(Deque stack)
 			MM_Free(container);
 
 			return data;
-#if DEBUG
-		stack->member_counter--;
-#endif
 		}
 	}
 	else
@@ -71,7 +67,7 @@ void *S_Pop(Deque stack)
 //////////////////////////////////////////////////
 void *S_Top(Deque stack)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Looking at to of stack: %d\n", stack);
 #endif
 	if(stack != NULL && stack->type == STACK)
@@ -102,10 +98,10 @@ Deque S_Init()
 	stack->last = NULL;
 	stack->active = NULL;
 	stack->first = NULL;
+	stack->member_counter = 0;
 
 #if DEBUG
 	printf("Stack initialized at: %d\n", stack);
-	stack->member_counter = 0;
 #endif
 	return stack;
 }
@@ -138,9 +134,8 @@ void S_Terminate(Deque stack)
 	}
 	else
 		mistake(ERR_INTERN, "Stack for terminating doesn't exist\n");
-#if DEBUG
+
 	stack->member_counter = 0;
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -164,17 +159,17 @@ int S_Empty(Deque stack)
 
 Deque D_Init()
 {
-	Deque deque = MM_Malloc(sizeof(struct dequeContainerStruct));
+	Deque deque = MM_Malloc(sizeof(struct dequeStruct));
 
 	deque->type = DEQUE;
 
 	deque->active = NULL;
 	deque->first = NULL;
 	deque->last = NULL;
+	deque->member_counter = 0;
 
 #if DEBUG
-	printf("Initializing queue at %d\n", deque);
-	deque->member_counter = 0;
+	printf("Initializing deque at %d\n", deque);
 #endif
 
 	return deque;
@@ -202,19 +197,20 @@ void D_Terminate(Deque deque)
 	}
 	else
 		mistake(ERR_INTERN, "Deque for terminating doesn't exist\n");
-#if DEBUG
+
 	deque->member_counter = 0;
-#endif
+
 }
 
 void D_PushBack(Deque deque, void * data)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Pushing data to back of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 	{
 		DequeContainer container = MM_Malloc(sizeof(struct dequeContainerStruct));
+		deque->member_counter++;
 
 		container->dataPtr = data;
 		container->nextPtr = NULL;
@@ -241,12 +237,14 @@ void D_PushBack(Deque deque, void * data)
 
 void D_PushFront(Deque deque, void * data)
 {
-#if DEBUG
+#if DEBUG2
 	printf("Pushing data to front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 	{
 		DequeContainer container = MM_Malloc(sizeof(struct dequeContainerStruct));
+		deque->member_counter++;
+
 
 		container->dataPtr = data;
 		container->prevPtr = NULL;
@@ -273,12 +271,14 @@ void D_PushFront(Deque deque, void * data)
 
 void * D_PopFront(Deque deque)
 {
-#if DEBUG
-	printf("Popping data from deque: %d\n", deque);
+#if DEBUG2
+	printf("Popping data from front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 	{
 		DequeContainer container = deque->first;
+		deque->member_counter--;
+
 
 		if(deque->active == deque->first)
 			deque->active = NULL;
@@ -301,8 +301,8 @@ void * D_PopFront(Deque deque)
 
 void * D_TopFront(Deque deque)
 {
-#if DEBUG
-	printf("Getting data from top front of deque: %d\n", deque);
+#if DEBUG2
+	printf("Looking on data from front of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 		return deque->first->dataPtr;
@@ -313,12 +313,14 @@ void * D_TopFront(Deque deque)
 
 void * D_PopBack(Deque deque)
 {
-#if DEBUG
-	printf("Popping data from deque: %d\n", deque);
+#if DEBUG2
+	printf("Popping data from back of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 	{
 		DequeContainer container = deque->last;
+		deque->member_counter--;
+
 
 		if(deque->last == deque->first)
 			deque->last = NULL;
@@ -342,7 +344,7 @@ void * D_PopBack(Deque deque)
 void * D_TopBack(Deque deque)
 {
 #if DEBUG
-	printf("Getting data from top front of deque: %d\n", deque);
+	printf("Looking on data from back of deque: %d\n", deque);
 #endif
 	if(deque != NULL && deque->type == DEQUE)
 		return deque->last->dataPtr;
@@ -363,4 +365,115 @@ int D_Empty(Deque deque)
 	else
 		mistake(ERR_INTERN, "Problem with size in deque\n");
 	return -1;
+}
+
+int D_ActivateFront(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Activating front of deque: %d\n", deque);
+#endif
+
+	if(deque->first == NULL)
+		return 0;
+	else
+	{
+		deque->active = deque->first;
+		return 1;
+	}
+}
+int D_ActivateBack(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Activating back of deque: %d\n", deque);
+#endif
+
+	if(deque->last == NULL)
+		return 0;
+	else
+	{
+		deque->active = deque->last;
+		return 1;
+	}
+}
+
+int D_IsActive(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Is deque active: %s\n", deque->active == NULL ? "FALSE" : "TRUE");
+#endif
+
+	return deque->active == NULL ? 0 : 1;
+}
+
+int D_ActiveMoveToFront(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Moving activity of deque: %d to front\n", deque);
+#endif
+
+	if(deque->active == deque->first)
+	{
+		deque->active = NULL;
+		return 0;
+	}
+	else
+	{
+		deque->active = deque->active->prevPtr;
+		return 1;
+	}
+}
+
+int D_ActiveMoveToBack(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+
+#if DEBUG2
+	printf("Moving activity of deque: %d to back\n", deque);
+#endif
+
+	if(deque->active == deque->last)
+	{
+		deque->active = NULL;
+		return 0;
+	}
+	else
+	{
+		deque->active = deque->active->nextPtr;
+		return 1;
+	}
+}
+
+void * D_TopActive(Deque deque)
+{
+	if(deque == NULL)
+		return NULL;
+
+#if DEBUG
+	printf("Looking on data from active member of deque: %d\n", deque);
+#endif
+
+	return deque->active->dataPtr;
+}
+
+int D_MemberCountGet(Deque deque)
+{
+	if(deque == NULL)
+		return -1;
+#if DEBUG
+	printf("Member count in deque: %d is \n", deque, deque->member_counter);
+#endif
+	return deque->member_counter;
 }
