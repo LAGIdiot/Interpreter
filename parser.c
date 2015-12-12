@@ -1155,7 +1155,7 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 
 		if ((i % 2) == 1) //jede se po lichych protoze na 0 je PAR_R
 		{
-			if((numberOfArguments % 2) == 1)	//uklada se na adress 1 - zde taky dochazi k volani funcke dummy
+			if((numberOfArguments % 2) == 0)	//uklada se na adress 1 - zde taky dochazi k volani funcke dummy
 			{
 				if(tokenTemp->typ == TT_IDENTIFIER)
 				{
@@ -1172,7 +1172,7 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 				else
 					mistake(ERR_SEM_COMP, "Bad token type\n");
 
-				if(numberOfArguments > 2)	//volani funkce dummy - volani funkce je az za cyklem
+				if(numberOfArguments > 1)	//volani funkce dummy - volani funkce je az za cyklem
 				{
 					AC_Item = AC_I_Create(AC_CALL_DUMMY, nodeFirst, nodeSecond, NULL);
 					AC_Add(P_internalCode, AC_Item);
@@ -1220,7 +1220,7 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 
 	//volani funkce
 
-	AC_Item = AC_I_Create(AC_CALL, nodeFirst, nodeSecond, nodeRet);
+	AC_Item = AC_I_Create(AC_CALL, nodeFunction->data->key, nodeSecond, nodeRet);
 	AC_Add(P_internalCode, AC_Item);
 
 	//odstraneni bordelu
