@@ -100,6 +100,7 @@ enum TokenType{
 
 	TT_S_EXP,
 	TT_S_TYP_UNIVERSAL,
+	TT_S_ID_OR_TYP,
 }Typ;
 
 //Function prototypes

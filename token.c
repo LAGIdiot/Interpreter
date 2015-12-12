@@ -52,8 +52,13 @@ tTokenPtr T_Init()
 {
 	tTokenPtr token = MM_Malloc(sizeof(struct TokenStruct));
 
-#if DEBUG
+	token->typ = 0;
+	token->data = NULL;
+
+#if DEBUG2
 	printf("Token initialized at: %d \n", token);
+#endif
+#if DEBUG
 	tokenCount++;
 #endif
 
@@ -68,12 +73,15 @@ tTokenPtr T_Init()
 //////////////////////////////////////////////////
 void T_Destroy(tTokenPtr token)
 {
-	/*Token and its data deallocating must be done in this order otherwise there will be memory leak*/
-	MM_Free(token->data);
+	if(token->data != NULL)
+		MM_Free(token->data);
+
 	MM_Free(token);
 
-#if DEBUG
+#if DEBUG2
 	printf("Token destroyed at: %d \n", token);
+#endif
+#if DEBUG
 	tokenCount--;
 #endif
 }
@@ -86,6 +94,9 @@ void T_Destroy(tTokenPtr token)
 //////////////////////////////////////////////////
 void T_Update(char c)
 {
+#if DEBUG2
+	printf("Token updated\n");
+#endif
 	size_t size = strlen(data) + 1;// + 1 is for \0
 
 	if(size == sizeMax)
@@ -113,7 +124,7 @@ void T_Finish(tTokenPtr token)
 
 	strcpy(data,""); //nahradi obsah dat za "" - priprava na dalsi token
 
-#if DEBUG
+#if DEBUG2
 	printf("Token finished at: %d \n", token);
 #endif
 }

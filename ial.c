@@ -24,7 +24,7 @@ nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol)
 
 nodePtr searchNodeByKey (nodePtr *Root, string key)
 {
-	if(Root != NULL)
+	if(*Root != NULL)
 	{
 		int i = strCompare((*Root)->data->key, key);
 		if(i == 0)
@@ -42,11 +42,12 @@ nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
 {	
 	if(*Root == NULL)
 	{
-		*Root = MM_Malloc(sizeof(struct binaryTree));
+		nodePtr node = MM_Malloc(sizeof(struct binaryTree));
+		node->data = symbol;
+		node->lChild = NULL;
+		node->rChild = NULL;
 
-        (*Root)->data = symbol;
-        (*Root)->lChild = NULL;
-        (*Root)->rChild = NULL;
+		*Root = node;
 
         return *Root;
 	}

@@ -24,9 +24,7 @@ typedef struct dequeStruct{
 	DequeContainer last;
 	DequeContainer first;
 	DequeContainer active;
-#if DEBUG
 	int member_counter;
-#endif
 }*Deque;
 
 //Functions
@@ -52,5 +50,16 @@ void * D_PopBack(Deque deque);
 void * D_TopBack(Deque deque);
 
 int D_Empty(Deque deque);
+int D_MemberCountGet(Deque deque);
+
+int D_ActivateFront(Deque deque);
+int D_ActivateBack(Deque deque);
+
+int D_IsActive(Deque deque);
+
+int D_ActiveMoveToFront(Deque deque);
+int D_ActiveMoveToBack(Deque deque);
+
+void * D_TopActive(Deque deque);
 
 #endif //DEQUE_Header

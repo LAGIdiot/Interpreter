@@ -12,8 +12,14 @@ typedef struct MemoryBlockStruct{
 	void * dataPtr;
 }*MemoryBlockPtr;
 
+typedef struct MemoryManagerStruct{
+	void * last;
+	int numberOfAllocatedBlocks;
+}*MemoryManagerPtr;
+
 //Function prototypes
 void MM_Init();
+void MM_Terminate();
 void * MM_Malloc(size_t size);
 void * MM_Realloc(void* oldPtr, size_t size);
 void MM_Free(void* ptr);
