@@ -30,7 +30,6 @@ void strFree(string s);
 void strClear(string s);
 int strInsert(string s, char *text);
 char *strGetStr(string s);
-size_t strGetLength(string s);
 double charToDouble(char * c);
 int charToInt(char * c);
 
@@ -40,6 +39,7 @@ string strRNG();
 //Vestavene funkce - dle zadani
 string concat(string s1, string s2);
 string substr(string s, int i, int n);
+int length(string s);
 
 int strCompare(string s1, string s2);
 

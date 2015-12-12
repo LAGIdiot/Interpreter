@@ -185,9 +185,9 @@ char *strGetStr(string s)
    return s->str;
 }
 
-size_t strGetLength(string s)
+int length(string s)
 {
-   return s->length;
+   return (int)s->length;
 }
 string charToStr (char *c)
 {
