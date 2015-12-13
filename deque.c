@@ -4,11 +4,10 @@
 //
 //	AUTOŘI:
 //
-//	xbedna57 	ADAM BEDNÁRIK 	()
-//	xmacha63 	ERIK MACHÁČEK 	()
-//	xmalar02 	MARTIN MALÁRIK 	()
-//	xklaci00 	MICHAL KLACIK 	()
-//	xlengu00 	MANH LE NGUYEN 	()
+//	xbedna57 	ADAM BEDNÁRIK
+//	xmacha63 	ERIK MACHÁČEK
+//	xmalar02 	MARTIN MALÁRIK
+//	xlengu00 	MANH LE NGUYEN
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -171,6 +170,11 @@ int S_Empty(Deque stack)
 	return -1;
 }
 
+//////////////////////////////////////////////////
+// Deque D_Init()
+////////////////////
+// deque inicialization, function returns deque
+//////////////////////////////////////////////////
 Deque D_Init()
 {
 	Deque deque = MM_Malloc(sizeof(struct dequeStruct));
@@ -189,6 +193,12 @@ Deque D_Init()
 	return deque;
 }
 
+//////////////////////////////////////////////////
+// void D_Terminate(Deque deque)
+// deque - deque for termination
+////////////////////
+// terminates deque
+//////////////////////////////////////////////////
 void D_Terminate(Deque deque)
 {
 #if DEBUG
@@ -216,6 +226,13 @@ void D_Terminate(Deque deque)
 
 }
 
+//////////////////////////////////////////////////
+// void D_PushBack(Deque deque, void * data)
+// deque - deque of data
+// *data - data to be pushed
+////////////////////
+// pushes data to the tail of deque
+//////////////////////////////////////////////////
 void D_PushBack(Deque deque, void * data)
 {
 #if DEBUG2
@@ -249,6 +266,13 @@ void D_PushBack(Deque deque, void * data)
 		mistake(ERR_INTERN,"Pushing back to uninitialized deque\n");
 }
 
+//////////////////////////////////////////////////
+// void D_PushFront(Deque deque, void * data)
+// deque - deque of data
+// *data - data to be pushed
+////////////////////
+// pushes data to the beginning of deque
+//////////////////////////////////////////////////
 void D_PushFront(Deque deque, void * data)
 {
 #if DEBUG2
@@ -283,6 +307,12 @@ void D_PushFront(Deque deque, void * data)
 		mistake(ERR_INTERN,"Pushing back to uninitialized deque\n");
 }
 
+//////////////////////////////////////////////////
+// void * D_PopFront(Deque deque)
+// deque - deque of data
+////////////////////
+// pops data from the beginning of deque
+//////////////////////////////////////////////////
 void * D_PopFront(Deque deque)
 {
 #if DEBUG2
@@ -313,6 +343,12 @@ void * D_PopFront(Deque deque)
 	return NULL;
 }
 
+//////////////////////////////////////////////////
+// void * D_TopFront(Deque deque)
+// deque - deque of data
+////////////////////
+// returns data from the beginning of deque
+//////////////////////////////////////////////////
 void * D_TopFront(Deque deque)
 {
 #if DEBUG2
@@ -325,6 +361,12 @@ void * D_TopFront(Deque deque)
 	return NULL;
 }
 
+//////////////////////////////////////////////////
+// void * D_PopBack(Deque deque)
+// deque - deque of data
+////////////////////
+// pops data from the end of deque
+//////////////////////////////////////////////////
 void * D_PopBack(Deque deque)
 {
 #if DEBUG2
@@ -355,6 +397,12 @@ void * D_PopBack(Deque deque)
 	return NULL;
 }
 
+//////////////////////////////////////////////////
+// void * D_TopBack(Deque deque)
+// deque - deque of data
+////////////////////
+// returns data from the end of deque
+//////////////////////////////////////////////////
 void * D_TopBack(Deque deque)
 {
 #if DEBUG
@@ -367,6 +415,12 @@ void * D_TopBack(Deque deque)
 	return NULL;
 }
 
+//////////////////////////////////////////////////
+// int D_Empty(Deque deque)
+// deque - deque of data
+////////////////////
+// asks if the deque is empty
+//////////////////////////////////////////////////
 int D_Empty(Deque deque)
 {
 	if(deque != NULL && deque->type == DEQUE)
@@ -381,6 +435,12 @@ int D_Empty(Deque deque)
 	return -1;
 }
 
+//////////////////////////////////////////////////
+// int D_ActivateFront(Deque deque)
+// deque - deque of data
+////////////////////
+// sets active to the first item of deque
+//////////////////////////////////////////////////
 int D_ActivateFront(Deque deque)
 {
 	if(deque == NULL)
@@ -398,6 +458,13 @@ int D_ActivateFront(Deque deque)
 		return 1;
 	}
 }
+
+//////////////////////////////////////////////////
+// int D_ActivateBack(Deque deque)
+// deque - deque of data
+////////////////////
+// sets active to the last item of deque
+//////////////////////////////////////////////////
 int D_ActivateBack(Deque deque)
 {
 	if(deque == NULL)
@@ -416,6 +483,12 @@ int D_ActivateBack(Deque deque)
 	}
 }
 
+//////////////////////////////////////////////////
+// int D_IsActive(Deque deque)
+// deque - deque of data
+////////////////////
+// asks if deque is active
+//////////////////////////////////////////////////
 int D_IsActive(Deque deque)
 {
 	if(deque == NULL)
@@ -428,6 +501,12 @@ int D_IsActive(Deque deque)
 	return deque->active == NULL ? 0 : 1;
 }
 
+//////////////////////////////////////////////////
+// int D_ActiveMoveToFront(Deque deque)
+// deque - deque of data
+////////////////////
+// Moves activity of deque to front
+//////////////////////////////////////////////////
 int D_ActiveMoveToFront(Deque deque)
 {
 	if(deque == NULL)
@@ -449,6 +528,12 @@ int D_ActiveMoveToFront(Deque deque)
 	}
 }
 
+//////////////////////////////////////////////////
+// int D_ActiveMoveToBack(Deque deque)
+// deque - deque of data
+////////////////////
+// Moves activity of deque to back
+//////////////////////////////////////////////////
 int D_ActiveMoveToBack(Deque deque)
 {
 	if(deque == NULL)
@@ -470,6 +555,12 @@ int D_ActiveMoveToBack(Deque deque)
 	}
 }
 
+//////////////////////////////////////////////////
+// void * D_TopActive(Deque deque)
+// deque - deque of data
+////////////////////
+// Looks for data from active member of deque
+//////////////////////////////////////////////////
 void * D_TopActive(Deque deque)
 {
 	if(deque == NULL)
@@ -482,6 +573,12 @@ void * D_TopActive(Deque deque)
 	return deque->active->dataPtr;
 }
 
+//////////////////////////////////////////////////
+// int D_MemberCountGet(Deque deque)
+// deque - deque of data
+////////////////////
+// counts members in deque
+//////////////////////////////////////////////////
 int D_MemberCountGet(Deque deque)
 {
 	if(deque == NULL)
