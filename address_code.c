@@ -14,6 +14,11 @@
 
 #include "address_code.h"
 
+//////////////////////////////////////////////////
+// Deque AC_Init()
+////////////////////
+// initialization of address code
+//////////////////////////////////////////////////
 Deque AC_Init()
 {
 #if DEBUG
@@ -23,6 +28,11 @@ Deque AC_Init()
 	return deque;
 }
 
+//////////////////////////////////////////////////
+// void AC_Terminate(Deque deque)
+////////////////////
+// terminates adress code
+//////////////////////////////////////////////////
 void AC_Terminate(Deque deque)
 {
 #if DEBUG
@@ -31,6 +41,15 @@ void AC_Terminate(Deque deque)
 	D_Terminate(deque);
 }
 
+//////////////////////////////////////////////////
+// AC_itemPtr AC_I_Create(int op, void * source1, void * source2, void * destination)
+// op - operation which is in use
+// *source1 - package of data
+// *source2 - package of data
+// *destination - package of data
+////////////////////
+// creates package of three address code
+//////////////////////////////////////////////////
 AC_itemPtr AC_I_Create(int op, void * source1, void * source2, void * destination)
 {
 #if DEBUG
@@ -43,8 +62,15 @@ AC_itemPtr AC_I_Create(int op, void * source1, void * source2, void * destinatio
 	item->source2 = source2;
 
 	return item;
-}
 
+	
+//////////////////////////////////////////////////
+// void AC_Add(Deque deque, AC_itemPtr item)
+// deque - deque of data
+// item - package of three address code
+////////////////////
+// adds package of three address code to deque
+//////////////////////////////////////////////////
 void AC_Add(Deque deque, AC_itemPtr item)
 {
 #if DEBUG
