@@ -1439,9 +1439,9 @@ symbolPackagePtr TokenToSymbol(tTokenPtr token)
 		symbolVariable->labelPlatnosti = RozsahPlatnostiGet();
 
 		if(token->typ == TT_INT || token->typ == TT_BIN_NUM || token->typ == TT_OCT_NUM || token->typ == TT_HEX_NUM)
-			ST_VariableAddData_INT(symbolVariable, charToInt(token->data));
+			symbolVariable->dataInt = charToInt(token->data);
 		else if(token->typ == TT_DOUBLE)
-			ST_VariableAddData_INT(symbolVariable, charToDouble(token->data));
+			symbolVariable->dataDouble = charToDouble(token->data);
 		else if(token->typ == TT_STRING)
 			symbolVariable->data = charToStr(token->data);
 		else

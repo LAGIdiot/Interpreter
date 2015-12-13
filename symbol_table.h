@@ -40,6 +40,8 @@ typedef struct symbolVariableStruct{
 	int defined; 	//defined
 	string labelPlatnosti; //label ve kterem nejpozdeji plati dana promena
 	void *data;		//pointer to memory
+	int dataInt;
+	double dataDouble;
 }*symbolVariablePtr;
 
 typedef struct symbolPackegeStruct{
@@ -58,9 +60,6 @@ void ST_FunctionAddParam(symbolFunctionPtr symbol, string name, int tokenType);
 
 symbolVariablePtr ST_VariableCreate();
 void ST_VariableDestroy(symbolVariablePtr symbol);
-
-void ST_VariableAddData_INT(symbolVariablePtr symbol, int data);
-void ST_VariableAddData_DOUBLE(symbolVariablePtr symbol, double data);
 
 string ST_RandomKeyGenerator();
 

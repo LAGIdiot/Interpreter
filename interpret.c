@@ -269,8 +269,6 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				{
 					temp3->type == ST_DOUBLE;
 				}
-				//double i = ( temp1->data + temp2->data);
-				printf("%lf %lf\n",temp1->data, temp2->data);
 				break;
 				#if fuck_off
         ///////////////////////////////////////
