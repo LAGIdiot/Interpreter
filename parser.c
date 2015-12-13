@@ -1970,10 +1970,7 @@ void RozsahPlatnostiAddInner(string inner)
 void RozsahPlatnostiRemoveInner()
 {
 	if(!S_Empty(P_platnostStack))
-	{
-		string temp = S_Pop(P_platnostStack);
-		//strFree(temp); // nesmi se odtranit protoze se jedna zaroven o nazev funkce
-	}
+		S_Pop(P_platnostStack);
 }
 
 //////////////////////////////////////////////////
