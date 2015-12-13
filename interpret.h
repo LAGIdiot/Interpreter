@@ -22,10 +22,10 @@
  *	AC_LABEL_END		STRING						NULL				NULL --
  *
  * lable pouivaj na jump
- *  AC_JUMP						NULL						NULL				STRING --
- *	AC_JUMP_C_TRUE		INT/DOUBLE,			NULL				STRING --
- *	AC_JUMP_C_FALSE		INT/DOUBLE,			NULL				STRING --
- *	AC_JUMP_C_FALSE_E	INT/DOUBLE,			NULL				STRING --
+ *  AC_JUMP						NULL						NULL				STRING -- Mam
+ *	AC_JUMP_C_TRUE		INT/DOUBLE,			NULL				STRING -- Mam
+ *	AC_JUMP_C_FALSE		INT/DOUBLE,			NULL				STRING -- Mam
+ *	AC_JUMP_C_FALSE_E	INT/DOUBLE,			NULL				STRING -- Mam
  *
  *	Vzdycky pude o to ze source1 je <nazev oprece> source2 a vysledek je typu int (1 pokud pravda, 0 pokud ne)
  *	AC_GREATER				INT/DOUBLE/STRING	INT/DOUBLE/STRING	INT --	Mam
@@ -52,7 +52,7 @@
  *	AC_CALL_FIND			STRING (s1)			STRING (search)		INT -- Mam
  *
  *		string sort(string s)
- *	AC_CALL_SORT			STRING (s)			NULL				STRING -- ++
+ *	AC_CALL_SORT			STRING (s)			NULL				STRING -- Mam
  *
  *	Casem doplnim dalsi az rozhodnu o jejich implementaci
  *
