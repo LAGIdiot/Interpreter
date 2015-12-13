@@ -249,7 +249,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				///////////////////////////////////////
 				default : break;
 		}
-#if fuck_off
+
 		switch (Label)
 			{
 				case AC_OP_ADD: //ok
@@ -269,9 +269,10 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				{
 					temp3->type == ST_DOUBLE;
 				}
-				temp3->data = (temp1->data + temp2->data);
-
+				//double i = ( temp1->data + temp2->data);
+				printf("%lf %lf\n",temp1->data, temp2->data);
 				break;
+				#if fuck_off
         ///////////////////////////////////////
 				case AC_OP_SUB:
 				if ( !(temp1->type == ST_INT || temp1->type == ST_DOUBLE ) ||
@@ -692,10 +693,10 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 						}
 					else mistake(ERR_INTERN,"AC_CALL_FIND input is wrong");
 				break;
-
+#endif
 				default: break;
 		}
-#endif
+
 		#if DEBUG
 			printf("do_instr done\n");
 		#endif
