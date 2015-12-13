@@ -4,21 +4,33 @@
 //
 //	AUTOŘI:
 //
-//	xbedna57 	ADAM BEDNÁRIK 	()
-//	xmacha63 	ERIK MACHÁČEK 	()
-//	xmalar02 	MARTIN MALÁRIK 	()
-//	xklaci00 	MICHAL KLACIK 	()
-//	xlengu00 	MANH LE NGUYEN 	()
+//	xbedna57 	ADAM BEDNÁRIK
+//	xmacha63 	ERIK MACHÁČEK
+//	xmalar02 	MARTIN MALÁRIK
+//	xlengu00 	MANH LE NGUYEN
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "ial.h"
 
+//////////////////////////////////////////////////
+// void treeInit(nodePtr *Root)
+// *Root - root of the binary tree
+////////////////////
+// Tree inicialization 
+//////////////////////////////////////////////////
 void treeInit (nodePtr *Root)
 {
 	*Root = NULL;
 }
 
+//////////////////////////////////////////////////
+// nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol)
+// *Root - root of the binary tree
+// symbol - symbol from symbolPackagePtr
+////////////////////
+// Search node by symbol
+//////////////////////////////////////////////////
 nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol)
 {
 
@@ -36,6 +48,13 @@ nodePtr searchNodeBySymbol (nodePtr *Root, symbolPackagePtr symbol)
 		return NULL;
 }
 
+//////////////////////////////////////////////////
+// nodePtr searchNodeByKey (nodePtr *Root, string key)
+// *Root - root of the binary tree
+// key - key of the node
+////////////////////
+// Search node by its key
+//////////////////////////////////////////////////
 nodePtr searchNodeByKey (nodePtr *Root, string key)
 {
 	if(*Root != NULL)
@@ -52,6 +71,13 @@ nodePtr searchNodeByKey (nodePtr *Root, string key)
 		return NULL;
 }
 
+//////////////////////////////////////////////////
+// nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
+// *Root - root of the binary tree
+// symbol - symbol from symbolPackagePtr
+////////////////////
+// Insert node into tree
+//////////////////////////////////////////////////
 nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
 {
 	if(*Root == NULL)
@@ -84,6 +110,12 @@ nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
 	}
 }
 
+//////////////////////////////////////////////////
+// void deleteTree (nodePtr *RootPtr)
+// *RootPtr - pointer of root of the binary tree
+////////////////////
+// Delete whole binary tree
+//////////////////////////////////////////////////
 void deleteTree (nodePtr *RootPtr)
 {
 	if(*RootPtr != NULL)
@@ -95,6 +127,13 @@ void deleteTree (nodePtr *RootPtr)
 	}
 }
 
+//////////////////////////////////////////////////
+// int find(string s, string search)
+// s - string in which we are finding
+// search - string which we are finding
+////////////////////
+// Finding string search in string s
+//////////////////////////////////////////////////
 int find(string s, string search)
 {
 	int i	, k = -1, tsize = s->length , psize = search->length ;
@@ -120,7 +159,12 @@ int find(string s, string search)
 	return -1;
 }
 
-
+//////////////////////////////////////////////////
+// string sort (string s)
+// s - string which we get from deque
+////////////////////
+// sort strings returns the sorted string
+//////////////////////////////////////////////////
 string sort (string s) {
 	Deque List_Deque = NULL;
 	Deque item_L_Deque = NULL;
