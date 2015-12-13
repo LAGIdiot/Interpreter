@@ -501,6 +501,10 @@ void ParseVariable(nodePtr *localSymbolTable)
 			if(tokenLast->typ != TT_IDENTIFIER)
 				mistake(ERR_SYN,"Bad token type in parsing variable");
 
+			node = searchNodeByKey(&(*localSymbolTable), charToStr(tokenLast->data));
+			if(node != NULL)
+				mistake(ERR_SEM_UND, "Redefination of something\n");
+
 			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
 			node = nodeInsert(&(*localSymbolTable), packedVariable);
 		}
@@ -1083,32 +1087,32 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 		{
 			if(tokenTemp->typ == TT_KEYWORD_LENGTH)
 			{
-				TokenPusher(P_specialStack, 4, TT_PAR_R, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_LENGTH);
+				TokenPusher(P_specialStack, 4, TT_PAR_R, TT_S_ID_OR_TYP, TT_PAR_L, TT_KEYWORD_LENGTH);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_LENGTH, deque, &(*localSymbolTable));
 			}
 			else if(tokenTemp->typ == TT_KEYWORD_SUBSTRING)
 			{
 				TokenPusher(P_specialStack, 8, TT_PAR_R, TT_S_ID_OR_TYP, TT_COMMA, TT_S_ID_OR_TYP,
-					TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_SUBSTRING);
+					TT_COMMA, TT_S_ID_OR_TYP, TT_PAR_L, TT_KEYWORD_SUBSTRING);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_SUBSTR, deque, &(*localSymbolTable));
 			}
 			else if(tokenTemp->typ == TT_KEYWORD_CONCAT)
 			{
-				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_CONCAT);
+				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_S_ID_OR_TYP, TT_COMMA, TT_S_ID_OR_TYP, TT_PAR_L, TT_KEYWORD_CONCAT);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_CONCAT, deque, &(*localSymbolTable));
 			}
 			else if(tokenTemp->typ == TT_KEYWORD_FIND)
 			{
-				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_IDENTIFIER, TT_COMMA, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_FIND);
+				TokenPusher(P_specialStack, 6, TT_PAR_R, TT_S_ID_OR_TYP, TT_COMMA, TT_S_ID_OR_TYP, TT_PAR_L, TT_KEYWORD_FIND);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_FIND, deque, &(*localSymbolTable));
 			}
 			else if(tokenTemp->typ == TT_KEYWORD_SORT)
 			{
-				TokenPusher(P_specialStack, 4, TT_PAR_R, TT_IDENTIFIER, TT_PAR_L, TT_KEYWORD_SORT);
+				TokenPusher(P_specialStack, 4, TT_PAR_R, TT_S_ID_OR_TYP, TT_PAR_L, TT_KEYWORD_SORT);
 
 				nodeLastProcessed = ParseBuiltinFunction(BF_SORT, deque, &(*localSymbolTable));
 			}
@@ -1371,7 +1375,7 @@ nodePtr ParseBuiltinFunction(int function, Deque dequeExp, nodePtr *localSymbolT
 		if(tokenTemp->typ == stackTop->typ)
 			remove = 1;
 		else if(stackTop->typ == TT_S_ID_OR_TYP && (tokenTemp->typ == TT_IDENTIFIER || tokenTemp->typ == TT_INT || tokenTemp->typ == TT_DOUBLE ||
-			tokenTemp->typ == TT_BIN_NUM || tokenTemp->typ == TT_OCT_NUM || tokenTemp->typ == TT_HEX_NUM))
+			tokenTemp->typ == TT_BIN_NUM || tokenTemp->typ == TT_OCT_NUM || tokenTemp->typ == TT_HEX_NUM || tokenTemp->typ == TT_STRING))
 			remove = 1;
 
 		if(remove)
@@ -1970,10 +1974,7 @@ void RozsahPlatnostiAddInner(string inner)
 void RozsahPlatnostiRemoveInner()
 {
 	if(!S_Empty(P_platnostStack))
-	{
-		string temp = S_Pop(P_platnostStack);
-		//strFree(temp); // nesmi se odtranit protoze se jedna zaroven o nazev funkce
-	}
+		S_Pop(P_platnostStack);
 }
 
 //////////////////////////////////////////////////

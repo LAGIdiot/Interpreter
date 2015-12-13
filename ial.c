@@ -128,8 +128,6 @@ string sort (string s) {
 	Deque List_1 = NULL;
 	Deque List_new = NULL;
 
-	int dequeN = 0;
-
 	//seznam zacatku
 	List_Deque = D_Init();
 
