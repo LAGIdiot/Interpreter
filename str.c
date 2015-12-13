@@ -151,7 +151,7 @@ string concat (string s1, string s2)
 //////////////////////////////////////////////////
 string substr(string s, int i, int n)
 {
-if ( s->length == i ) //generuj prazdny string
+if ( s->length == i) //generuj prazdny string
 		{
 			return  strInit();
 		}
@@ -162,6 +162,7 @@ if ( s->length < i+n )
 			char * pom;
 			int dlzka = s->length - i + 1 ;
 			pom = MM_Malloc(sizeof(char)*(dlzka + 1)); //alokacia miesta
+			pom[0] = '\0';
 			for ( int x = 0 ; x != dlzka ; x++ )
 				{
 					pom[x] = s->str[i+x];		//zapis na pomocnu
@@ -177,6 +178,7 @@ else if ( s->length >= i+n )
 
 					char * pom;
 					pom = MM_Malloc(sizeof(char)*(n+1)); //alokacia miesta
+					pom[0] = '\0';
 					for ( int x = 0 ; x != n ; x++ )
 					{
 						pom[x] = s->str[i+x];		//zapis na pomocnu
