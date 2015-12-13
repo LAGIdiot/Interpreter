@@ -4,11 +4,10 @@
 //
 //	AUTOŘI:
 //
-//	xbedna57 	ADAM BEDNÁRIK 	()
-//	xmacha63 	ERIK MACHÁČEK 	()
-//	xmalar02 	MARTIN MALÁRIK 	()
-//	xklaci00 	MICHAL KLACIK 	()
-//	xlengu00 	MANH LE NGUYEN 	()
+//	xbedna57 	ADAM BEDNÁRIK
+//	xmacha63 	ERIK MACHÁČEK
+//	xmalar02 	MARTIN MALÁRIK
+//	xlengu00 	MANH LE NGUYEN
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -23,6 +22,11 @@ int strRNGSearch(string data);
 void strRNGAdd(string data);
 void strRNGTerminate();
 
+//////////////////////////////////////////////////
+// string strInit()
+////////////////////
+// string inicialization
+//////////////////////////////////////////////////
 string strInit()
 {
 #if DEBUG
@@ -41,6 +45,12 @@ string strInit()
 	return s;
 }
 
+//////////////////////////////////////////////////
+// void strFree(string s)
+// s - string to be freed
+////////////////////
+// frees the string using MM_Free
+//////////////////////////////////////////////////
 void strFree(string s)
 {
 #if DEBUG
@@ -50,7 +60,12 @@ void strFree(string s)
 	MM_Free(s);
 }
 
-//Nemusi byt vzdy nejlepsim resenim, zanechava bordel...
+//////////////////////////////////////////////////
+// void strClear(string s)
+// s - string to be cleared
+////////////////////
+// clears the string
+//////////////////////////////////////////////////
 void strClear(string s)
 {
 #if DEBUG2
@@ -60,6 +75,13 @@ void strClear(string s)
    s->length = 0;
 }
 
+//////////////////////////////////////////////////
+// int strInsert(string s, char *text)
+// s - string to which we insert text
+// *text - text to be inserted
+////////////////////
+// inserts text to string s
+//////////////////////////////////////////////////
 int strInsert(string s, char *text)
 {
 #if DEBUG
@@ -85,7 +107,13 @@ int strInsert(string s, char *text)
 	  return -1; //standartni praktikou je vracet -1 v pripade chyby tohoto typu
 }
 
-
+//////////////////////////////////////////////////
+// string concat (string s1, string s2)
+// s1 - string to be concatenated
+// s2 - string to be concatenated
+////////////////////
+// concatenates s2 to s1
+//////////////////////////////////////////////////
 string concat (string s1, string s2)
 {
 	string s3;
@@ -113,6 +141,14 @@ string concat (string s1, string s2)
 	return s3;
 }
 
+//////////////////////////////////////////////////
+// string substr(string s, int i, int n)
+// s - string
+// i - position of first char of substring
+// n - length of substring
+////////////////////
+// gets substring from string
+//////////////////////////////////////////////////
 string substr(string s, int i, int n)
 {
 if ( s->length == i ) //generuj prazdny string
@@ -155,6 +191,12 @@ else if ( s->length >= i+n )
 return substr;
 }
 
+//////////////////////////////////////////////////
+// double charToDouble(char * c)
+// c - char to be coverted to double
+////////////////////
+// converts char to double
+//////////////////////////////////////////////////
 double charToDouble(char * c)
 {
 	double cislo;
@@ -168,6 +210,12 @@ double charToDouble(char * c)
 	return cislo;
 }
 
+//////////////////////////////////////////////////
+// int charToInt(char * c)
+// c - char to be coverted to integer
+////////////////////
+// converts char to integer
+//////////////////////////////////////////////////
 int charToInt(char * c)
 {
 	int  cislo, chyba;
@@ -180,7 +228,13 @@ int charToInt(char * c)
 	return cislo;
 }
 
-
+//////////////////////////////////////////////////
+// int strCompare(string s1, string s2)
+// s1 - string to be compared
+// s2 - string to be compared
+////////////////////
+// compares two strings according to its' lengths
+//////////////////////////////////////////////////
 int strCompare(string s1, string s2)
 {
 	if(s1 == NULL && s2 == NULL)	//bacha na prazdny stringy
@@ -201,15 +255,34 @@ int strCompare(string s1, string s2)
 	return 0;
 }
 
+//////////////////////////////////////////////////
+// char *strGetStr(string s)
+// s - structure of string
+////////////////////
+// returns array of chars
+//////////////////////////////////////////////////
 char *strGetStr(string s)
 {
    return s->str;
 }
 
+//////////////////////////////////////////////////
+// int length(string s)
+// s - structure of string
+////////////////////
+// returns length of string
+//////////////////////////////////////////////////
 int length(string s)
 {
    return (int)s->length;
 }
+
+//////////////////////////////////////////////////
+// string charToStr (char *c)
+// c - char to be coverted to string
+////////////////////
+// converts char to string
+//////////////////////////////////////////////////
 string charToStr (char *c)
 {
 	string s;
@@ -220,6 +293,12 @@ string charToStr (char *c)
 	return s;
 }
 
+//////////////////////////////////////////////////
+// int *prefix_to_FIND (string search)
+// search - string which we are finding
+////////////////////
+// makes table of options of movement if error appears
+//////////////////////////////////////////////////
 int *prefix_to_FIND (string search)
 {
 	int k = -1, i = 1, size = search->length;
@@ -237,7 +316,13 @@ int *prefix_to_FIND (string search)
 	return pi;
 }
 
-//TODO:Test this! Mozny problem s praci s pointery
+//////////////////////////////////////////////////
+// void strConcatChar(string s1, char * s2)
+// s1 - string to be concatenated
+// *s2 - char to be concatenated
+////////////////////
+// concatenates char to string
+//////////////////////////////////////////////////
 void strConcatChar(string s1, char * s2)
 {
 	string temp = strInit();
@@ -251,11 +336,21 @@ void strConcatChar(string s1, char * s2)
 	s1 = final;
 }
 
+//////////////////////////////////////////////////
+// void strRNGInit()
+////////////////////
+// inicialization of generator of random numbers
+//////////////////////////////////////////////////
 void strRNGInit()
 {
 	srand(time(NULL));
 }
 
+//////////////////////////////////////////////////
+// string strRNG()
+////////////////////
+// generator of random numbers
+//////////////////////////////////////////////////
 string strRNG()
 {
 	char rng[rngSizeBase + 1];
@@ -281,6 +376,12 @@ string strRNG()
 	return str;
 }
 
+//////////////////////////////////////////////////
+// int strRNGSearch(string data)
+// data - data to be find
+////////////////////
+// finds data in deque of random numbers
+//////////////////////////////////////////////////
 int strRNGSearch(string data)
 {
 	if(rngDeque != NULL)
@@ -302,7 +403,12 @@ int strRNGSearch(string data)
 	return 0;
 }
 
-
+//////////////////////////////////////////////////
+// void strRNGAdd(string data)
+// data - data to be find
+////////////////////
+// pushes data to the tail of deque
+//////////////////////////////////////////////////
 void strRNGAdd(string data)
 {
 	if(rngDeque == NULL)
@@ -311,6 +417,11 @@ void strRNGAdd(string data)
 	D_PushBack(rngDeque, data);
 }
 
+//////////////////////////////////////////////////
+// void strRNGTerminate()
+////////////////////
+// terminates deque of random numbers
+//////////////////////////////////////////////////
 void strRNGTerminate()
 {
 	while(!D_Empty(rngDeque))
