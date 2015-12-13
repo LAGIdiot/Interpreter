@@ -1,3 +1,17 @@
+///////////////////////////////////////////////////////////////////////////////
+/* ---------- IMPLEMENTACE INTERPRETU IMPERATIVNÍHO JAZYKA IFJ15 ----------- */
+///////////////////////////////////////////////////////////////////////////////
+
+AUTOŘI:
+
+xbedna57 	ADAM BEDNÁRIK 	()
+xmacha63 	ERIK MACHÁČEK 	()
+xmalar02 	MARTIN MALÁRIK 	()
+xklaci00 	MICHAL KLACIK 	()
+xlengu00 	MANH LE NGUYEN 	()
+
+///////////////////////////////////////////////////////////////////////////////
+
 #include "scanner.h"
 
 static int keyword_type = 0;
@@ -67,8 +81,6 @@ void T_Get(tTokenPtr tokenPtr)
 
 		switch (state)
 		{
-//TODO: prerovnat stavy atomatu at je nabeh co nejrychlejsi
-//TODO: doplnit dalsi stavy a rozpoznani tokenu
 			//-----------------------------------------------------------------------
 			
 			/////////////////////////////////////////////////////////////////////////
@@ -191,7 +203,6 @@ void T_Get(tTokenPtr tokenPtr)
 			/////////////////////////////////////////////////////////////////////////
 			// DALŠÍ STAVY 
 			/////////////////////////////////////////////////////////////////////////
-			//TODO PŘETOVNAT ZA ÚČELEM ZVÝŠENÍ RYCHLOSTI KA
 			
 			case FM_PAR_L:
 			{
@@ -466,12 +477,12 @@ void T_Get(tTokenPtr tokenPtr)
 					
 			case FM_CODEWORD:
 			{
-				if (((read_char >= LETTER_A) && (read_char <= LETTER_Z))
-					|| ((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z)))
+				if ((read_char >= LETTER_A) && (read_char <= LETTER_Z))
 				{
 					T_Update(read_char);
 				}
 				else if (((read_char >= ZERO) && (read_char <= NINE))
+					|| ((read_char >= CAPITAL_A) && (read_char <= CAPITAL_Z))
 					|| (read_char == '_'))
 				{
 					T_Update(read_char);
@@ -599,7 +610,7 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			case FM_DOUBLE:
 			{
-				if ((read_char > ZERO) && (read_char < NINE))
+				if ((read_char >= ZERO) && (read_char <= NINE))
 				{
 					T_Update(read_char);
 				}
@@ -747,12 +758,13 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			default:	//special case - zatim nezaregistrovany znaky/slova -> system je bude flusat po jednom ven;
 			{
-				tokenPtr->typ = TT_UNDEFINED;
+				mistake(ERR_LEX, "Token není povolen v rámci jazyka IFJ15!\n");
+				/*tokenPtr->typ = TT_UNDEFINED;
 
 				if(!whiteSpace)
 					T_Update(read_char);
 				else
-					state = FM_END;
+					state = FM_END;*/
 			} break;
 		}	//switch
 	}	//while
