@@ -1,7 +1,20 @@
+///////////////////////////////////////////////////////////////////////////////
+/* ---------- IMPLEMENTACE INTERPRETU IMPERATIVNÍHO JAZYKA IFJ15 ----------- */
+///////////////////////////////////////////////////////////////////////////////
+//
+//	AUTOŘI:
+//
+//	xbedna57 	ADAM BEDNÁRIK 	
+//	xmacha63 	ERIK MACHÁČEK
+//	xmalar02 	MARTIN MALÁRIK
+//	xlengu00 	MANH LE NGUYEN
+//
+///////////////////////////////////////////////////////////////////////////////
 #ifndef INTERPRET_Header
 #define INTERPRET_Header
 
 #include <stdio.h>
+#include <string.h>
 
 #include "deque.h"
 #include "ial.h"
@@ -59,5 +72,6 @@
  */
 //Functions
 void Interpret(Deque internalCode, nodePtr symboltable);
-int searchLABEL();
+int do_instr( Deque internalCode );
+
 #endif
