@@ -17,7 +17,7 @@
 const char *errMessage[11] = {
 	"Error : internal mistake of interpreter\n",
 	"Error : mistake in lex\n",
-	"Error : mistake in syntax",
+	"Error : mistake in syntax\n",
 	"Error : undefined function/variable.\n",
 	"Error : incompatible types \n",
 	"Error : unknown definition of type\n",
