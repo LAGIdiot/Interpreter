@@ -9,7 +9,8 @@
 #include "memory_manager.h"
 #include "symbol_table.h"
 #include "address_code.h"
-#include "str.h" 
+#include "str.h"
+
 /*	Operations - vsechno jsou odkazy do tabulky symbolu (krome LABEL, LABEL_END a vsechny JUMP - zde jde o string v pameti)
  *	AC_OP_ADD,			INT/DOUBLE			INT/DOUBLE 			INT/DOUBLE (vysledek) -- Mam
  *	AC_OP_SUB, 			INT/DOUBLE 			INT/DOUBLE			INT/DOUBLE (vysledek)	-- Mam
@@ -19,8 +20,9 @@
  *	AC_OP_ASSIGN		INT/DOUBLE/STRING		NULL				INT/DOUBLE/STRING (vysledek) --	Mam
  *	AC_LABEL				STRING						NULL				NULL --
  *	AC_LABEL_END		STRING						NULL				NULL --
+ *
  * lable pouivaj na jump
- *  AC_JUMP						NULL						NULL				STRING -- oprav
+ *  AC_JUMP						NULL						NULL				STRING --
  *	AC_JUMP_C_TRUE		INT/DOUBLE,			NULL				STRING --
  *	AC_JUMP_C_FALSE		INT/DOUBLE,			NULL				STRING --
  *	AC_JUMP_C_FALSE_E	INT/DOUBLE,			NULL				STRING --
