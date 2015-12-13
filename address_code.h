@@ -105,8 +105,8 @@ enum operatinType{
  *	AC_CALL_DUMMY		INT (y)				INT (z)				NULL
  *	AC_CALL				STRING (label)		INT (x)				INT
  *
- *	Casem doplnim dalsi az rozhodnu o jejich implementaci
- *
+ *	return x;
+ *	AC_RETURN			INT/DOUBLE/STRING	NULL				NULL
  */
 
 typedef struct AC_ItemStruct{
