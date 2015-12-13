@@ -263,80 +263,144 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				if (temp1->type == ST_INT && temp2->type == ST_INT )
 				{
 					temp3->type == ST_INT;
-
+					temp3->dataInt = (temp1->dataInt + temp2->dataInt);
 				}
-				else
+				else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
 				{
 					temp3->type == ST_DOUBLE;
+					temp3->dataDouble = (temp1->dataDouble + temp2->dataDouble);
 				}
+				else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+				{
+					temp3->type == ST_DOUBLE;
+					temp3->dataDouble = (temp1->dataDouble + temp2->dataInt);
+				}
+				else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+				{
+					temp3->type == ST_DOUBLE;
+					temp3->dataDouble = (temp1->dataInt + temp2->dataDouble);
+				}
+
 				break;
-				#if fuck_off
+
         ///////////////////////////////////////
 				case AC_OP_SUB:
-				if ( !(temp1->type == ST_INT || temp1->type == ST_DOUBLE ) ||
-				 !(temp2->type == ST_INT || temp2->type == ST_INT))
+				if ( (temp1->type == ST_STRING || temp2->type == ST_STRING ) ||
+				 (temp1->type == ST_UNDEFINED || temp2->type == ST_UNDEFINED))
 				{
 					#if DEBUG
 						mistake(ERR_RUN_OTH,"cant Sub without int or real variables");
 					#endif
 				}
-				if (temp1->type == ST_INT && temp2->type == ST_INT ) temp3->type == ST_INT;
-					else temp3->type == ST_DOUBLE;
-				temp3->data = (temp1->data - temp2->data );
+					if (temp1->type == ST_INT && temp2->type == ST_INT )
+					{
+						temp3->type == ST_INT;
+						temp3->dataInt = (temp1->dataInt - temp2->dataInt);
+					}
+					else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+					{
+						temp3->type == ST_DOUBLE;
+						temp3->dataDouble = (temp1->dataDouble - temp2->dataDouble);
+					}
+					else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+					{
+						temp3->type == ST_DOUBLE;
+						temp3->dataDouble = (temp1->dataDouble - temp2->dataInt);
+					}
+					else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+					{
+						temp3->type == ST_DOUBLE;
+						temp3->dataDouble = (temp1->dataInt - temp2->dataDouble);
+					}
 				break;
         ///////////////////////////////////////
 				case AC_OP_DIV:
-				if ( !(temp1->type == ST_INT || temp1->type == ST_DOUBLE ) ||
-				 !(temp2->type == ST_INT || temp2->type == ST_DOUBLE))
+				if ( (temp1->type == ST_STRING || temp2->type == ST_STRING ) ||
+				 (temp1->type == ST_UNDEFINED || temp2->type == ST_UNDEFINED))
 				{
 					#if DEBUG
 						mistake(ERR_RUN_OTH,"cant Divide without int or real variables");
 					#endif
 				}
+				if (temp2->dataInt == 0 || temp2->dataDouble == 0)
 				if (temp1->type == ST_INT && temp2->type == ST_INT )
 				{
-					int i = temp2->data
+					if (temp2->dataInt == 0 )
+					{mistake(ERR_ZERO,"cant divide with 0");}
 					temp3->type == ST_INT;
+					temp3->dataInt = (temp1->dataInt / temp2->dataInt);
 				}
-				else temp3->type == ST_DOUBLE;
-				if (temp2->data == 0 ) mistake(ERR_ZERO,"Dividing by zero is not possible");
-				temp3->data = (temp1->data / temp2->data);
+				else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+				{
+					if (temp2->dataDouble == 0 )
+					{mistake(ERR_ZERO,"cant divide with 0");}
+					temp3->type == ST_DOUBLE;
+					temp3->dataDouble = (temp1->dataDouble / temp2->dataDouble);
+				}
+				else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+				{
+					if (temp2->dataInt == 0 )
+					{mistake(ERR_ZERO,"cant divide with 0");}
+					temp3->type == ST_DOUBLE;
+					temp3->dataDouble = (temp1->dataDouble / temp2->dataInt);
+				}
+				else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+				{
+					if (temp2->dataDouble == 0 )
+					{mistake(ERR_ZERO,"cant divide with 0");}
+					temp3->type == ST_DOUBLE;
+					temp3->dataDouble = (temp1->dataInt / temp2->dataDouble);
+				}
 				break;
         ///////////////////////////////////////
 				case	AC_OP_MUL:
-				if ( !(temp1->type == ST_INT || temp1->type == ST_DOUBLE ) ||
-				 !(temp2->type == ST_INT || temp2->type == ST_DOUBLE))
+				if ( (temp1->type == ST_STRING || temp2->type == ST_STRING ) ||
+				 (temp1->type == ST_UNDEFINED || temp2->type == ST_UNDEFINED))
 				{
 					#if DEBUG
 						mistake(ERR_RUN_OTH,"cant MULTI without int or real variables");
 					#endif
 				}
-				if (temp1->type == ST_INT && temp2->type == ST_INT ) temp3->type == ST_INT;
-					else temp3->type == ST_DOUBLE;
-				temp3->data = (temp1->data * temp2->data);
-
+					if (temp1->type == ST_INT && temp2->type == ST_INT )
+					{
+						temp3->type == ST_INT;
+						temp3->dataInt = (temp1->dataInt - temp2->dataInt);
+					}
+					else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+					{
+						temp3->type == ST_DOUBLE;
+						temp3->dataDouble = (temp1->dataDouble - temp2->dataDouble);
+					}
+					else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+					{
+						temp3->type == ST_DOUBLE;
+						temp3->dataDouble = (temp1->dataDouble - temp2->dataInt);
+					}
+					else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+					{
+						temp3->type == ST_DOUBLE;
+						temp3->dataDouble = (temp1->dataInt - temp2->dataDouble);
+					}
 				break;
         ///////////////////////////////////////
 				case	AC_OP_ASSIGN:
-				if ( temp1->type == ST_INT ||
-					temp1->type == ST_DOUBLE  ||
-					temp1->type == ST_STRING ) {
-				if ( temp1->type == ST_INT ) temp3->type = ST_INT;
-				if ( temp1->type == ST_DOUBLE ) temp3->type = ST_DOUBLE;
-				if ( temp1->type == ST_STRING ) temp3->type = ST_STRING;
+				if ( temp1->type == ST_INT ||	temp1->type == ST_DOUBLE  || temp1->type == ST_STRING )
+				{
+					if ( temp1->type == ST_INT ) temp3->type = ST_INT;
+					if ( temp1->type == ST_DOUBLE ) temp3->type = ST_DOUBLE;
+					if ( temp1->type == ST_STRING ) temp3->type = ST_STRING;
 				temp3->data = temp1->data;
 				}
 				else mistake(ERR_INTERN,"error in AC_OP_ASSIGN");
 				break;
         ///////////////////////////////////////
 				case AC_LABEL:
-
 				break;
         ///////////////////////////////////////
 				case AC_LABEL_END:
-
 				break;
         ///////////////////////////////////////
+				#if fuck_off
 				case AC_JUMP:
 					string s = NULL;
 					s = tmp->destination->data->key;
@@ -611,30 +675,34 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				else mistake(ERR_INTERN,"different combination is not tolerated in AC_NOT_EQUAL");
 				break;
         ///////////////////////////////////////
+#endif
 				case AC_CALL_CIN:
 
 				break;
         ///////////////////////////////////////
-				case AC_CALL_COUT: {
-				//vypis hmmm
-					switch (temp1->type)
-						//-----------------------
-						case ST_INT: printf("%d", temp1->data );
-						break;
-						//-----------------------
-						case ST_DOUBLE: printf("%lf",temp1->data );
-						break;
-						//-----------------------
-						case ST_STRING: printf("%s",temp1->data->str );
-						break;
-						//-----------------------
-					}
+				case AC_CALL_COUT:
+				{
+						switch (temp1->type)
+						{
+							//-----------------------
+							case ST_INT: printf("%d", temp1->dataInt );
+							break;
+							//-----------------------
+							case ST_DOUBLE: printf("%lf",temp1->dataDouble );
+							break;
+							//-----------------------
+							//case ST_STRING: printf("%s",temp1->data->str );
+							//break;
+							//-----------------------
+						}
+
+				}
 				break;
         ///////////////////////////////////////
 				case	AC_CALL_LENGTH:
 				if ( temp1->type == ST_STRING)
 				{ int i;
-					i = strGetLength(temp1->data);
+					i = length(temp1->data);
 					temp3->data = i;
 				}
 				break;
@@ -654,7 +722,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				case AC_CALL_SORT:
 				if( temp1->type == ST_STRING )
 				{
-					temp3->data = sort( temp1->data);
+					temp3->data = sort(temp1->data);
 				}
 				break;
         ///////////////////////////////////////
@@ -691,7 +759,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 						}
 					else mistake(ERR_INTERN,"AC_CALL_FIND input is wrong");
 				break;
-#endif
+
 				default: break;
 		}
 
