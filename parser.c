@@ -513,7 +513,7 @@ void ParseVariable(nodePtr *localSymbolTable)
 		{
 			nodePtr nodeExp = ParseExp(&(*localSymbolTable), TT_SEMICOLON);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN, node, nodeExp, node);
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN, nodeExp, NULL, node);
 			AC_Add(P_internalCode, AC_Item);
 
 			stackTop = S_Top(P_specialStack);
@@ -580,7 +580,7 @@ void ParsePrirazeni(nodePtr *localSymbolTable)
 		{
 			nodePtr nodeExp = ParseExp(&(*localSymbolTable), TT_SEMICOLON);
 
-			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN, nodeId, nodeExp, nodeId);
+			AC_itemPtr AC_Item = AC_I_Create(AC_OP_ASSIGN, nodeExp, NULL, nodeId);
 			AC_Add(P_internalCode, AC_Item);
 
 			stackTop = S_Top(P_specialStack);
