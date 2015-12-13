@@ -346,10 +346,11 @@ nodePtr ParseFunctionHead()
 			parametr++;
 			break;
 		case 2:
-			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
+			paramName = charToStr(tokenLast->data);
+			packedVariable = ST_PackageCreate(paramName, ST_VARIABLE, variable);
 
 			//add param to function
-			ST_FunctionAddParam(functionSymbol, charToStr(tokenLast->data), tokenType);
+			ST_FunctionAddParam(functionSymbol, paramName, tokenType);
 
 			//ohnuti (pretypovani) pointeru pro zapis do lokalni tabulky symbolu
 			nodePtr temp = (nodePtr)functionSymbol->symbolTable;
@@ -1123,7 +1124,6 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 	symbolFunctionPtr function = NULL;
 	symbolVariablePtr variable = NULL;
 	symbolPackagePtr package = NULL;
-	symbolPackagePtr packageParam = NULL;
 
 	nodePtr nodeFunction = NULL;
 	nodePtr nodeFirst = NULL;
