@@ -2,7 +2,7 @@
 #Date: 07.10.2015, 21.10.2015
 
 CC=gcc
-CFLAGS=-c -O2 -std=c99 -Wall -pedantic
+CFLAGS=-c -O0 -std=c99 -Wall -pedantic
 CFLAGSD=-c -g -O0 -std=c99 -DDEBUG
 
 PARTS=errors.o $(MM).o token.o str.o deque.o ial.o $(AC).o $(ST).o scanner.o parser.o interpret.o main.o 
