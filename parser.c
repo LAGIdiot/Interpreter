@@ -501,6 +501,10 @@ void ParseVariable(nodePtr *localSymbolTable)
 			if(tokenLast->typ != TT_IDENTIFIER)
 				mistake(ERR_SYN,"Bad token type in parsing variable");
 
+			node = searchNodeByKey(&(*localSymbolTable), charToStr(tokenLast->data));
+			if(node != NULL)
+				mistake(ERR_SEM_UND, "Redefination of something\n");
+
 			packedVariable = ST_PackageCreate(charToStr(tokenLast->data), ST_VARIABLE, variable);
 			node = nodeInsert(&(*localSymbolTable), packedVariable);
 		}
