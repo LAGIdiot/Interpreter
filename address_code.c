@@ -62,7 +62,7 @@ AC_itemPtr AC_I_Create(int op, void * source1, void * source2, void * destinatio
 
 	return item;
 
-	
+}	
 //////////////////////////////////////////////////
 // void AC_Add(Deque deque, AC_itemPtr item)
 // deque - deque of data
