@@ -296,22 +296,22 @@ int do_instr ( Deque internalCode)
 					if (temp1->type == ST_INT && temp2->type == ST_INT )
 					{
 						temp3->type = ST_INT;
-						temp3->dataInt = (temp1->dataInt - temp2->dataInt);
+						temp3->dataInt = (temp1->dataInt * temp2->dataInt);
 					}
 					else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
 					{
 						temp3->type = ST_DOUBLE;
-						temp3->dataDouble = (temp1->dataDouble - temp2->dataDouble);
+						temp3->dataDouble = (temp1->dataDouble * temp2->dataDouble);
 					}
 					else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
 					{
 						temp3->type = ST_DOUBLE;
-						temp3->dataDouble = (temp1->dataDouble - temp2->dataInt);
+						temp3->dataDouble = (temp1->dataDouble * temp2->dataInt);
 					}
 					else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
 					{
 						temp3->type = ST_DOUBLE;
-						temp3->dataDouble = (temp1->dataInt - temp2->dataDouble);
+						temp3->dataDouble = (temp1->dataInt * temp2->dataDouble);
 					}
 				break;
         ///////////////////////////////////////
@@ -742,7 +742,7 @@ int do_instr ( Deque internalCode)
 							case ST_INT: printf("%d", temp1->dataInt );
 							break;
 							//-----------------------
-							case ST_DOUBLE: printf("%lf",temp1->dataDouble );
+							case ST_DOUBLE: printf("%g",temp1->dataDouble );
 							break;
 							//-----------------------
 							case ST_STRING:
