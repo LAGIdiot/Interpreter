@@ -1,15 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 /* ---------- IMPLEMENTACE INTERPRETU IMPERATIVNÍHO JAZYKA IFJ15 ----------- */
 ///////////////////////////////////////////////////////////////////////////////
-
-AUTOŘI:
-
-xbedna57 	ADAM BEDNÁRIK 	()
-xmacha63 	ERIK MACHÁČEK 	()
-xmalar02 	MARTIN MALÁRIK 	()
-xklaci00 	MICHAL KLACIK 	()
-xlengu00 	MANH LE NGUYEN 	()
-
+//
+//	AUTOŘI:
+//
+//	xbedna57 	ADAM BEDNÁRIK 	()
+//	xmacha63 	ERIK MACHÁČEK 	()
+//	xmalar02 	MARTIN MALÁRIK 	()
+//	xklaci00 	MICHAL KLACIK 	()
+//	xlengu00 	MANH LE NGUYEN 	()
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef PARSER_Header
