@@ -13,9 +13,10 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 	#if DEBUG
 		printf("Starting executing instruction \n");
 	#endif
+  static DequeContainer kontajner = NULL;
 	symbolVariablePtr temp1 = NULL /*source 1*/, temp2 = NULL/*source 2 */, temp3 = NULL/* destination*/, temp4 = NULL/* pre call dummy*/;
 	nodePtr temporaryNode = NULL;
-
+	string s = NULL;
 
 	AC_itemPtr tmp = D_TopActive(internalCode);
 	int Label = tmp->operation;
@@ -35,10 +36,9 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				temp3 = (symbolVariablePtr) temporaryNode->data->data;
 
 				break;
-
 				///////////////////////////////////////
-				case	AC_OP_ASSIGN:
-				case AC_RETURN:
+				case AC_OP_ASSIGN:
+
 
 				temporaryNode = (nodePtr) tmp->source1;
 				temp1 = (symbolVariablePtr) temporaryNode->data->data;
@@ -130,6 +130,13 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				break;
 				///////////////////////////////////////
 				case AC_CALL:
+
+				break;
+				///////////////////////////////////////
+				case AC_RETURN:
+
+				temporaryNode = (nodePtr) tmp->source1;
+				temp1 = (symbolVariablePtr) temporaryNode->data->data;
 
 				break;
 				///////////////////////////////////////
@@ -322,119 +329,73 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
         ///////////////////////////////////////
 				case AC_LABEL_END:
 				break;
-        ///////////////////////////////////////
-				#if fuck_off
+      	///////////////////////////////////////
 				case AC_JUMP:
-					string s = NULL;
-					s = tmp->destination->data->key;
-					DequeContainer pom = NULL;
-					DequeContainer pom = tmp->data;
-					internalCode->active = internalCode->first;
+					s = temp3->data;
+					D_ActivateFront(internalCode);
 
-					while (internalCode->active != NULL )
+					while (1)
 						{
-							internalCodeNext(Deque * internalCode);
-							if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-								 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-								{
-									mistake(ERR_INTERN,"there is no-where to jump");
-								}
-
-							else
-							{
-								if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-							}
+							D_ActiveMoveToBack(internalCode);
+							tmp = D_TopActive(internalCode);
+							if (tmp->operation == AC_LABEL && (strCompare(tmp->source1,s) == 0 ))
+							break;
+							else if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
 						}
 				break;
         ///////////////////////////////////////
 				case AC_JUMP_C_TRUE:
-				if (temp1->type == ST_INT || temp1->type == ST_DOUBLE )
+
+				s = temp3->data;
+				if (temp1->dataInt == 1)
 				{
-					if (temp1->data == 1 )
+				D_ActivateFront(internalCode);
+				while (1)
 					{
-						string s = NULL;
-						s = tmp->destination->data->key;
-						DequeContainer pom = NULL;
-						DequeContainer pom = tmp->data;
-						internalCode->active = internalCode->first;
-
-						while (internalCode->active != NULL )
-							{
-								internalCodeNext(Deque * internalCode);
-								if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-									 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-									{
-										return 0;
-									}
-
-								else
-								{
-									if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-								}
-							}
+						D_ActiveMoveToBack(internalCode);
+						tmp = D_TopActive(internalCode);
+						if (tmp->operation == AC_LABEL && (strCompare(tmp->source1,s) == 0 ))
+						break;
+						else if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
 					}
 				}
+
 				break;
         ///////////////////////////////////////
 				case AC_JUMP_C_FALSE:
-				if (temp1->type == ST_INT || temp1->type == ST_DOUBLE )
+				s = temp3->data;
+				if (temp1->dataInt == 0)
 				{
-					if (temp1->data == 0 )
+				D_ActivateFront(internalCode);
+				while (1)
 					{
-						string s = NULL;
-						s = tmp->destination->data->key;
-						DequeContainer pom = NULL;
-						DequeContainer pom = tmp->data;
-						internalCode->active = internalCode->first;
-
-						while (internalCode->active != NULL )
-							{
-								internalCodeNext(Deque * internalCode);
-								if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-									 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-									{
-										return 0;
-									}
-
-								else
-								{
-									if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-								}
-							}
+						D_ActiveMoveToBack(internalCode);
+						tmp = D_TopActive(internalCode);
+						if (tmp->operation == AC_LABEL && (strCompare(tmp->source1,s) == 0 ))
+						break;
+						else if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
 					}
 				}
+
 				break;
         ///////////////////////////////////////
 				case AC_JUMP_C_FALSE_E:	 	//skace na konec IF-u;
-				if (temp1->type == ST_INT || temp1->type == ST_DOUBLE )
+
+				s = temp3->data;
+				if (temp1->dataInt == 1)
 				{
-					if (temp1->data == 0 )
+				D_ActivateFront(internalCode);
+				while (1)
 					{
-						string s = NULL;
-						s = tmp->destination->data->key;
-						DequeContainer pom = NULL;
-						DequeContainer pom = tmp->data;
-						internalCode->active = internalCode->first;
-
-						while (internalCode->active != NULL )
-							{
-								internalCodeNext(Deque * internalCode);
-								if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-									 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-									{
-										return 0;
-									}
-
-								else
-								{
-									if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-								}
-							}
+						D_ActiveMoveToBack(internalCode);
+						tmp = D_TopActive(internalCode);
+						if (tmp->operation == AC_LABEL_END && (strCompare(tmp->source1,s) == 0 ))
+						break;
+						else if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
 					}
 				}
 
 				break;
-#endif
         ///////////////////////////////////////
 				case AC_GREATER://cisla
 				if ((temp1->type == ST_DOUBLE && temp2->type == ST_INT)||
@@ -720,7 +681,21 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
         ///////////////////////////////////////
 
 				case AC_CALL_CIN:
-
+				switch (temp1->type)
+				{
+					//-----------------------
+					case ST_INT:
+					if (scanf("%d",&temp1->dataInt ) != 1 ) mistake(ERR_LOAD,"didn't loaded int");
+					break;
+					//-----------------------
+					case ST_DOUBLE:
+					if (scanf("%lf",&temp1->dataDouble) != 1 ) mistake(ERR_LOAD,"didn't loaded double");
+					break;
+					//-----------------------
+					case ST_STRING:
+					break;
+					//-----------------------
+				}
 				break;
         ///////////////////////////////////////
 				case AC_CALL_COUT:
@@ -734,8 +709,10 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 							case ST_DOUBLE: printf("%lf",temp1->dataDouble );
 							break;
 							//-----------------------
-							//case ST_STRING: printf("%s",temp1->data->str );
-							//break;
+							case ST_STRING:
+							s = temp1->data;
+							printf("%s",s->str );
+							break;
 							//-----------------------
 						}
 
@@ -752,15 +729,33 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				break;
         ///////////////////////////////////////
 				case AC_CALL_DUMMY:	//slouzi k posilani parametru ktere by se nevesly
-
 				break;
         ///////////////////////////////////////
 				case AC_CALL:
-
 				break;
         ///////////////////////////////////////
 				case AC_RETURN:
-
+				if (kontajner == NULL ) return 42;
+				else
+				{
+					internalCode->active = kontajner;
+					tmp = D_TopActive(internalCode);
+					temporaryNode = (nodePtr) tmp->destination;
+					temp3 = (symbolVariablePtr) temporaryNode->data->data;
+					if ( temp3->type == temp1->type)
+						switch (temp3->type)
+						{
+							case ST_INT:
+							temp3->dataInt = temp1->dataInt;
+							break;
+							case ST_DOUBLE:
+							temp3->dataDouble = temp1->dataDouble;
+							break;
+							case ST_STRING:
+							temp3->data = temp1->data;
+							break;
+						}
+				}
 				break;
         ///////////////////////////////////////
 				case AC_CALL_SORT:
@@ -846,7 +841,7 @@ while (internalCode->active != NULL)
 	{	//odkazuje sa na AC_itemPtr;
 
 		int i = do_instr(internalCode);
-		if ( i != 0 ) mistake(i,"Error in do_instr");
+		if ( i == 42 ) break;
 		internalCode->active = internalCode->active->nextPtr;
 		if(internalCode->active == NULL)
 			mistake(ERR_RUN_OTH, "No return in code\n");
