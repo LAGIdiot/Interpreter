@@ -1,13 +1,26 @@
+///////////////////////////////////////////////////////////////////////////////
+/* ---------- IMPLEMENTACE INTERPRETU IMPERATIVNÍHO JAZYKA IFJ15 ----------- */
+///////////////////////////////////////////////////////////////////////////////
+//
+//	AUTOŘI:
+//
+//	xbedna57 	ADAM BEDNÁRIK
+//	xmacha63 	ERIK MACHÁČEK
+//	xmalar02 	MARTIN MALÁRIK
+//	xlengu00 	MANH LE NGUYEN
+//
+///////////////////////////////////////////////////////////////////////////////
 #include "interpret.h"
 
 
 
+///////////
+// int do_instr( Deque internalCode ) is executing instructions
+//  Deque internalCode	-	 is standard Queue with 3 adrress code
+///////////
+//vstup je tmp->data ukazujuci na obsah dequecontainer
 
-
-
-
-int do_instr( Deque internalCode )	//vykonava instrukcie
-//vstup je tmp->data ukazujuci na obsah dequecontainer;
+int do_instr ( Deque internalCode)
 {
 
 	#if DEBUG
@@ -693,6 +706,29 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					break;
 					//-----------------------
 					case ST_STRING:
+					{
+						char * c,znak;
+						int size = 1;
+						c = MM_Malloc(sizeof(char));
+						znak = getchar();
+						if ( znak != '\v' || znak != ' ' || znak != '\f' || znak != '\n' || znak != '\r' || znak != '\t' )
+						{
+							c[0] = znak;
+
+							while(1)
+							{
+								size = size + 1 ;
+								znak = getchar();
+								if ( znak == '\v' || znak == ' ' || znak == '\f' || znak == '\n' || znak == '\r' || znak == '\t' )	{break;}
+								MM_Realloc(c, size);
+								c[size-1] = znak;
+							}
+
+							s = strInit();
+							if (strInsert(s, c) == -1 ) {mistake(ERR_LOAD,"didn't loaded string");}
+							temp1->data = s;
+						}
+					}
 					break;
 					//-----------------------
 				}
@@ -732,6 +768,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				break;
         ///////////////////////////////////////
 				case AC_CALL:
+
 				break;
         ///////////////////////////////////////
 				case AC_RETURN:
@@ -810,7 +847,11 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 		#endif
 		return 0;
 }
-
+///////////
+// void Interpret(Deque internalCode, nodePtr symbolTable) main funkcion of interpreter
+// Deque internalCode		-	 is standard Queue with 3 adrress code
+// nodePtr symbolTable 	-	 binaryTree
+///////////
 void Interpret(Deque internalCode, nodePtr symbolTable)
 {
 #if DEBUG
