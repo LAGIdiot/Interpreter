@@ -10,18 +10,6 @@
 
 FILE *file_p;
 
-void Test()
-{
-	string test_str = strInit();
-	strInsert(test_str, "main_DO");
-
-	string test_str2 = charToStr("DO");
-
-	string sub = substr(test_str, test_str->length - test_str2->length, test_str2->length);
-
-
-}
-
 int main(int argc, char *argv[])
 {
 #if DEBUG
@@ -42,8 +30,6 @@ int main(int argc, char *argv[])
 		{
 			MM_Init(); //Initialize memory manager
 			T_SystemInit();
-
-			//Test();
 
 			//Token Queue
 			Deque tokenQueue = D_Init();

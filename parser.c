@@ -856,7 +856,6 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 
 	Deque deque = D_Init();
 
-	AC_itemPtr AC_Item = NULL;
 	symbolPackagePtr symbolPackage = NULL;
 	symbolVariablePtr symbolVariable = NULL;
 
@@ -1012,7 +1011,7 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 		//druhy ID/cislo
 		if(tokenTemp->typ == TT_IDENTIFIER)
 		{
-			nodeFirst = searchNodeByKey(&(*localSymbolTable), charToStr(tokenTemp->data));
+			nodeSecond = searchNodeByKey(&(*localSymbolTable), charToStr(tokenTemp->data));
 
 			//zabiti tokenu
 			tokenTemp = D_PopFront(deque);
@@ -1032,7 +1031,7 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 			if(symbolPackage == NULL)
 				mistake(ERR_SYN, "Problem with only argument in EXP\n");
 
-			nodeFirst = nodeInsert(&(*localSymbolTable), symbolPackage);
+			nodeSecond = nodeInsert(&(*localSymbolTable), symbolPackage);
 		}
 
 		//AC a operace a navrat
@@ -1046,7 +1045,8 @@ nodePtr ParseExp(nodePtr *localSymbolTable, int exitSymbolType)
 
 		nodeLastProcessed = nodeInsert(&(*localSymbolTable), symbolPackage);
 
-		AC_Item = AC_I_Create(AC_Operation, nodeFirst, nodeSecond, nodeLastProcessed);
+		AC_itemPtr AC_Item = AC_I_Create(AC_Operation, nodeFirst, nodeSecond, nodeLastProcessed);
+		AC_Add(P_internalCode, AC_Item);
 	}
 	else
 	{
@@ -1120,7 +1120,6 @@ nodePtr ParseUserDefinedFunction(Deque dequeExp, nodePtr *localSymbolTable)
 
 	int numberOfArguments = 0;
 	int tokenCount = 0;
-	int remove = 0;
 
 	tokenTemp = D_TopFront(dequeExp);
 

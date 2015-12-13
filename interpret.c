@@ -179,7 +179,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				temp2 = (symbolVariablePtr) temporaryNode->data->data;
 				temporaryNode = (nodePtr) tmp->destination;
 				temp3 = (symbolVariablePtr) temporaryNode->data->data;
-
+				break;
 				///////////////////////////////////////
 				case AC_CALL_CIN:
 
@@ -249,7 +249,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				///////////////////////////////////////
 				default : break;
 		}
-
+#if fuck_off
 		switch (Label)
 			{
 				case AC_OP_ADD: //ok
@@ -695,6 +695,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 
 				default: break;
 		}
+#endif
 		#if DEBUG
 			printf("do_instr done\n");
 		#endif
@@ -713,10 +714,11 @@ while(1) // nastav active na main
 	{
 		if (internalCode->active == internalCode->last )
 		{
-			mistake(ERR_INTERN,"there is no main in program");
+			mistake(ERR_SEM_UND,"there is no main in program");
 		}
 AC_itemPtr tmp =  D_TopActive(internalCode);
-		if (strcmp(tmp->source1->data->key->str,"main") == 0 )
+string str_main = charToStr("main");
+		if (strCompare(str_main, tmp->source1) == 0 )
 			{
 				#if DEBUG
 					printf("I have main\n");
@@ -732,6 +734,8 @@ while (internalCode->active != NULL)
 		int i = do_instr(internalCode);
 		if ( i != 0 ) mistake(i,"Error in do_instr");
 		internalCode->active = internalCode->active->nextPtr;
+		if(internalCode->active == NULL)
+			mistake(ERR_RUN_OTH, "No return in code\n");
 
 	}
 #if DEBUG

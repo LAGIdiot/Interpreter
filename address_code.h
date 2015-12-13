@@ -87,6 +87,10 @@ enum operatinType{
  *	string sort(string s)
  *	AC_CALL_SORT		STRING (s)			NULL				STRING
  *
+ *	int box(int x, int y, int z)
+ *	AC_CALL_DUMMY		INT (y)				INT (z)				NULL
+ *	AC_CALL				STRING (label)		INT (x)				INT
+ *
  *	Casem doplnim dalsi az rozhodnu o jejich implementaci
  *
  */

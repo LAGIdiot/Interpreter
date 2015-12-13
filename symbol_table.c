@@ -139,8 +139,6 @@ void ST_FunctionDestroy(symbolFunctionPtr symbol)
 	{
 		if(symbol->params != NULL)
 			ST_DestroyParams(symbol->params);
-		if(symbol->symbolTable != NULL)
-			deleteTree(symbol->symbolTable);//Potrebuje funkci z IAL
 
 		MM_Free(symbol);
 	}
