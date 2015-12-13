@@ -53,7 +53,7 @@ nodePtr searchNodeByKey (nodePtr *Root, string key)
 }
 
 nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
-{	
+{
 	if(*Root == NULL)
 	{
 		nodePtr node = MM_Malloc(sizeof(struct binaryTree));
@@ -76,7 +76,7 @@ nodePtr nodeInsert (nodePtr* Root, symbolPackagePtr symbol)
 		{
 			return nodeInsert(&(*Root)->rChild,symbol);
 		}
-		else 
+		else
 		{
 			(*Root)->data = symbol;
 			return *Root;
@@ -101,20 +101,25 @@ int find(string s, string search)
 	int *pi = prefix_to_FIND(search);
 	if (!pi)
 		{				//chyba v pridelovaní pamete v compute_prefix_function
-    printf("error\n");
+    mistake (ERR_INTERN,"couldn`t get memory for prefix_to_FIND");
 		}
-	for (i = 0; i < tsize; i++) {
-		while (k > -1 && search->str[k+1] != s->str[i])
-			k = pi[k];
-		if ( s->str[i] == search->str[k+1])
-			k++;
-		if (k == psize - 1) {
-			MM_Free(pi);		//kontrola
-			return i-k;			//vracia poziciu
-		}
+		if ( search == NULL || search->length == 0 ) return 0;
+
+	for (i = 0; i < tsize; i++)
+	{
+		while (k > -1 && search->str[k+1] != s->str[i]) k = pi[k];
+		if ( s->str[i] == search->str[k+1]) k++;
+		if (k == psize - 1)
+			{
+				MM_Free(pi);		//kontrola
+				return i-k;			//true ak nasel
+			}
+
 	}
 	MM_Free(pi);				//kontrola
+	return -1;
 }
+
 
 string sort (string s) {
 	Deque List_Deque = NULL;
@@ -122,12 +127,12 @@ string sort (string s) {
 	Deque List_0 = NULL;
 	Deque List_1 = NULL;
 	Deque List_new = NULL;
-	
+
 	//seznam zacatku
 	List_Deque = D_Init();
-	
+
 	char *curr, *prev;
-	
+
 	for (int i = 0; i < (int)s->length; i++) {
 		curr = &s->str[i];
 		if (i == 0) {	//prvni polozka ve stringu se stane zacatkem prvniho listu
@@ -153,10 +158,10 @@ string sort (string s) {
 	//--------------------------------------------------------------------------------------------------
 	//--sorting string--
 	char *L0, *L1;
-	
+
 	while (TRUE) {
 		List_0 = D_PopFront(List_Deque);	//popovani prvniho horniho listu
-		
+
 		if (D_Empty(List_Deque)) {	//pokud seznam ma jen jeden list
 			break;
 		}
@@ -164,16 +169,16 @@ string sort (string s) {
 			List_1 = D_PopFront(List_Deque);
 			List_new = D_Init();
 		}
-		
+
 		while (TRUE) {
 			int em_0 = 0, em_1 = 0;
-			
+
 			if (D_Empty(List_0))
 				em_0 = 1;
-			
+
 			if (D_Empty(List_1))
 				em_1 = 1;
-			
+
 			if (em_0 && em_1)	//oba seznamy jsou prazdne
 				break;
 			else if (em_0){	//pokud prvni uz neobsahuje dalsi prvky pushuji zbytek z 2. listu
@@ -200,31 +205,31 @@ string sort (string s) {
 				}
 			}
 		}
-		
+
 		//terminatuji prvni 2 listy
 		D_Terminate(List_0);
 		D_Terminate(List_1);
-		
+
 		//spojeny list vlozim na konec seznamu
 		D_PushBack(List_Deque, List_new);
 	}
-	
+
 	D_Terminate(List_Deque);	//v seznamu zustal jen jeden list
-	
+
 	char str_s[s->length + 1];
 
 	//vytahnu sortovany string a vratim ho
 	int i = 0;
 	while (!D_Empty(List_0)) {
 		L0 = D_PopFront(List_0);
-		
+
 		str_s[i] = (char)*L0;
 		i++;
 	}
 	str_s[i] = '\0';
 
 	string sorted_str = charToStr(str_s);
-	
+
 	return sorted_str;
-	
+
 }

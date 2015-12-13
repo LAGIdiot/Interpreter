@@ -13,8 +13,8 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 	#if DEBUG
 		printf("Starting executing instruction \n");
 	#endif
-	symbolVariablePtr temp1 /*source 1*/, temp2 /*source 2 */, temp3 /* destination*/, temp4 /* pre call dummy*/;
-	nodePtr temporaryNode;
+	symbolVariablePtr temp1 = NULL /*source 1*/, temp2 = NULL/*source 2 */, temp3 = NULL/* destination*/, temp4 = NULL/* pre call dummy*/;
+	nodePtr temporaryNode = NULL;
 
 
 	AC_itemPtr tmp = D_TopActive(internalCode);
@@ -55,116 +55,37 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 
 				break;
 				///////////////////////////////////////
-				/*case AC_JUMP:
-					string s = NULL;
-					s = tmp->destination->data->key;
-					DequeContainer pom = NULL;
-					DequeContainer pom = tmp->data;
-					internalCode->active = internalCode->first;
+				case AC_JUMP:
+				temporaryNode = (nodePtr) tmp->destination;
+				temp3 = (symbolVariablePtr) temporaryNode->data->data;
 
-					while (internalCode->active != NULL )
-						{
-							internalCodeNext(Deque * internalCode);
-							if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-								 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-								{
-									return 0;
-								}
-
-							else
-							{
-								if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-							}
-						}
 				break;
 				///////////////////////////////////////
 				case AC_JUMP_C_TRUE:
-				if (temp1->type == ST_INT || temp1->type == ST_DOUBLE )
-				{
-					if (temp1->data == 1 )
-					{
-						string s = NULL;
-						s = tmp->destination->data->key;
-						DequeContainer pom = NULL;
-						DequeContainer pom = tmp->data;
-						internalCode->active = internalCode->first;
+				temporaryNode = (nodePtr) tmp->source1;
+				temp1 = (symbolVariablePtr) temporaryNode->data->data;
 
-						while (internalCode->active != NULL )
-							{
-								internalCodeNext(Deque * internalCode);
-								if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-									 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-									{
-										return 0;
-									}
+				temporaryNode = (nodePtr) tmp->destination;
+				temp3 = (symbolVariablePtr) temporaryNode->data->data;
 
-								else
-								{
-									if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-								}
-							}
-					}
-				}
 				break;
 				///////////////////////////////////////
 				case AC_JUMP_C_FALSE:
-				if (temp1->type == ST_INT || temp1->type == ST_DOUBLE )
-				{
-					if (temp1->data == 0 )
-					{
-						string s = NULL;
-						s = tmp->destination->data->key;
-						DequeContainer pom = NULL;
-						DequeContainer pom = tmp->data;
-						internalCode->active = internalCode->first;
+				temporaryNode = (nodePtr) tmp->source1;
+				temp1 = (symbolVariablePtr) temporaryNode->data->data;
 
-						while (internalCode->active != NULL )
-							{
-								internalCodeNext(Deque * internalCode);
-								if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-									 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-									{
-										return 0;
-									}
+				temporaryNode = (nodePtr) tmp->destination;
+				temp3 = (symbolVariablePtr) temporaryNode->data->data;
 
-								else
-								{
-									if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-								}
-							}
-					}
-				}
 				break;
 				///////////////////////////////////////
 				case AC_JUMP_C_FALSE_E:	 	//skace na konec IF-u;
-				if (temp1->type == ST_INT || temp1->type == ST_DOUBLE )
-				{
-					if (temp1->data == 0 )
-					{
-						string s = NULL;
-						s = tmp->destination->data->key;
-						DequeContainer pom = NULL;
-						DequeContainer pom = tmp->data;
-						internalCode->active = internalCode->first;
+				temporaryNode = (nodePtr) tmp->source1;
+				temp1 = (symbolVariablePtr) temporaryNode->data->data;
 
-						while (internalCode->active != NULL )
-							{
-								internalCodeNext(Deque * internalCode);
-								if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
-									 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
-									{
-										return 0;
-									}
-
-								else
-								{
-									if (internalCode->active == internalCode->last) mistake(ERR_RUN_OTH,"AC_JUMP is not working correctly");
-								}
-							}
-					}
-				}
-
-				break; */
+				temporaryNode = (nodePtr) tmp->destination;
+				temp3 = (symbolVariablePtr) temporaryNode->data->data;
+				break;
 				///////////////////////////////////////
 				case AC_GREATER://cisla
 				case AC_GREATER_EQUAL:
@@ -226,14 +147,6 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				temp2 = (symbolVariablePtr) temporaryNode->data->data;
 				temporaryNode = (nodePtr) tmp->destination;
 				temp3 = (symbolVariablePtr) temporaryNode->data->data;
-
-				D_ActiveMoveToBack(internalCode);
-
-				AC_itemPtr tmp2 = D_TopActive(internalCode);
-				temporaryNode = (nodePtr) tmp2->source1;
-				temp4 = (symbolVariablePtr) temporaryNode->data->data;
-
-				D_ActiveMoveToFront(internalCode);
 				break;
 				///////////////////////////////////////
 				case AC_CALL_CONCAT:
@@ -262,22 +175,22 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				}
 				if (temp1->type == ST_INT && temp2->type == ST_INT )
 				{
-					temp3->type == ST_INT;
+					temp3->type = ST_INT;
 					temp3->dataInt = (temp1->dataInt + temp2->dataInt);
 				}
 				else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
 				{
-					temp3->type == ST_DOUBLE;
+					temp3->type = ST_DOUBLE;
 					temp3->dataDouble = (temp1->dataDouble + temp2->dataDouble);
 				}
 				else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
 				{
-					temp3->type == ST_DOUBLE;
+					temp3->type = ST_DOUBLE;
 					temp3->dataDouble = (temp1->dataDouble + temp2->dataInt);
 				}
 				else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
 				{
-					temp3->type == ST_DOUBLE;
+					temp3->type = ST_DOUBLE;
 					temp3->dataDouble = (temp1->dataInt + temp2->dataDouble);
 				}
 
@@ -294,22 +207,22 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				}
 					if (temp1->type == ST_INT && temp2->type == ST_INT )
 					{
-						temp3->type == ST_INT;
+						temp3->type = ST_INT;
 						temp3->dataInt = (temp1->dataInt - temp2->dataInt);
 					}
 					else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
 					{
-						temp3->type == ST_DOUBLE;
+						temp3->type = ST_DOUBLE;
 						temp3->dataDouble = (temp1->dataDouble - temp2->dataDouble);
 					}
 					else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
 					{
-						temp3->type == ST_DOUBLE;
+						temp3->type = ST_DOUBLE;
 						temp3->dataDouble = (temp1->dataDouble - temp2->dataInt);
 					}
 					else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
 					{
-						temp3->type == ST_DOUBLE;
+						temp3->type = ST_DOUBLE;
 						temp3->dataDouble = (temp1->dataInt - temp2->dataDouble);
 					}
 				break;
@@ -322,33 +235,32 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 						mistake(ERR_RUN_OTH,"cant Divide without int or real variables");
 					#endif
 				}
-				if (temp2->dataInt == 0 || temp2->dataDouble == 0)
 				if (temp1->type == ST_INT && temp2->type == ST_INT )
 				{
 					if (temp2->dataInt == 0 )
 					{mistake(ERR_ZERO,"cant divide with 0");}
-					temp3->type == ST_INT;
+					temp3->type = ST_INT;
 					temp3->dataInt = (temp1->dataInt / temp2->dataInt);
 				}
 				else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
 				{
 					if (temp2->dataDouble == 0 )
 					{mistake(ERR_ZERO,"cant divide with 0");}
-					temp3->type == ST_DOUBLE;
+					temp3->type = ST_DOUBLE;
 					temp3->dataDouble = (temp1->dataDouble / temp2->dataDouble);
 				}
 				else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
 				{
 					if (temp2->dataInt == 0 )
 					{mistake(ERR_ZERO,"cant divide with 0");}
-					temp3->type == ST_DOUBLE;
+					temp3->type = ST_DOUBLE;
 					temp3->dataDouble = (temp1->dataDouble / temp2->dataInt);
 				}
 				else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
 				{
 					if (temp2->dataDouble == 0 )
 					{mistake(ERR_ZERO,"cant divide with 0");}
-					temp3->type == ST_DOUBLE;
+					temp3->type = ST_DOUBLE;
 					temp3->dataDouble = (temp1->dataInt / temp2->dataDouble);
 				}
 				break;
@@ -363,22 +275,22 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				}
 					if (temp1->type == ST_INT && temp2->type == ST_INT )
 					{
-						temp3->type == ST_INT;
+						temp3->type = ST_INT;
 						temp3->dataInt = (temp1->dataInt - temp2->dataInt);
 					}
 					else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
 					{
-						temp3->type == ST_DOUBLE;
+						temp3->type = ST_DOUBLE;
 						temp3->dataDouble = (temp1->dataDouble - temp2->dataDouble);
 					}
 					else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
 					{
-						temp3->type == ST_DOUBLE;
+						temp3->type = ST_DOUBLE;
 						temp3->dataDouble = (temp1->dataDouble - temp2->dataInt);
 					}
 					else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
 					{
-						temp3->type == ST_DOUBLE;
+						temp3->type = ST_DOUBLE;
 						temp3->dataDouble = (temp1->dataInt - temp2->dataDouble);
 					}
 				break;
@@ -386,10 +298,21 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				case	AC_OP_ASSIGN:
 				if ( temp1->type == ST_INT ||	temp1->type == ST_DOUBLE  || temp1->type == ST_STRING )
 				{
-					if ( temp1->type == ST_INT ) temp3->type = ST_INT;
-					if ( temp1->type == ST_DOUBLE ) temp3->type = ST_DOUBLE;
-					if ( temp1->type == ST_STRING ) temp3->type = ST_STRING;
-				temp3->data = temp1->data;
+					if ( temp1->type == ST_INT )
+					{
+						temp3->type = ST_INT;
+						temp3->dataInt = temp1->dataInt;
+					}
+					if ( temp1->type == ST_DOUBLE )
+					{
+						temp3->type = ST_DOUBLE;
+						temp3->dataDouble = temp1->dataDouble;
+					}
+					if ( temp1->type == ST_STRING )
+					{
+						temp3->type = ST_STRING;
+						temp3->data = temp1->data;
+					}
 				}
 				else mistake(ERR_INTERN,"error in AC_OP_ASSIGN");
 				break;
@@ -414,7 +337,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 							if ((internalCode->active != pom ) && (s == tmp->destination->data->key ||
 								 s == tmp->source1->data->key ||  s == tmp->source2->data->key))
 								{
-									return 0;
+									mistake(ERR_INTERN,"there is no-where to jump");
 								}
 
 							else
@@ -511,6 +434,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				}
 
 				break;
+#endif
         ///////////////////////////////////////
 				case AC_GREATER://cisla
 				if ((temp1->type == ST_DOUBLE && temp2->type == ST_INT)||
@@ -522,18 +446,38 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					temp3->type = ST_INT;
 					if(temp1->type != ST_STRING)
 					{
-						if (temp1->data > temp2->data) temp3->data = 1;
-						else  temp3->data = 0;
+						if (temp1->type == ST_INT && temp2->type == ST_INT)
+						{
+							if (temp1->dataInt > temp2->dataInt) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+						{
+							if (temp1->dataDouble > temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+						{
+							temp1->dataDouble = temp1->dataInt;
+							if (temp1->dataDouble > temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+						{
+							temp2->dataDouble = temp2->dataInt;
+							if (temp1->dataDouble > temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
 					}
 					else
 					{
 						int i = 0;
-						i = strcmp(temp1->data->str,temp2->data->str);
+						i = strCompare(temp1->data,temp2->data);
 						if(i > 0)
 							{
-								temp3->data = 1;
+								temp3->dataInt = 1;
 							}
-						else temp3->data = 0;
+						else temp3->dataInt = 0;
 					}
 				}
 				else mistake(ERR_INTERN,"different combination is not tolerated in AC_GREATER");
@@ -549,21 +493,41 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					temp3->type = ST_INT;
 					if(temp1->type != ST_STRING)
 					{
-						if (temp1->data >= temp2->data) temp3->data = 1;
-						else  temp3->data = 0;
+						if (temp1->type == ST_INT && temp2->type == ST_INT)
+						{
+							if (temp1->dataInt >= temp2->dataInt) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+						{
+							if (temp1->dataDouble >= temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+						{
+							temp1->dataDouble = temp1->dataInt;
+							if (temp1->dataDouble >= temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+						{
+							temp2->dataDouble = temp2->dataInt;
+							if (temp1->dataDouble >= temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
 					}
 					else
 					{
 						int i = 0;
-						i = strcmp(temp1->data->str,temp2->data->str);
+						i = strCompare(temp1->data,temp2->data);
 						if(i >= 0)
 							{
-								temp3->data = 1;
+								temp3->dataInt = 1;
 							}
-						else temp3->data = 0;
+						else temp3->dataInt = 0;
 					}
 				}
-				else mistake(ERR_INTERN,"different combination is not tolerated in AC_GREATER_EQUAL");
+				else mistake(ERR_INTERN,"different combination is not tolerated in AC_GREATER");
 				break;
         ///////////////////////////////////////
 				case AC_LESS:
@@ -576,21 +540,41 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					temp3->type = ST_INT;
 					if(temp1->type != ST_STRING)
 					{
-						if (temp1->data < temp2->data) temp3->data = 1;
-						else  temp3->data = 0;
+						if (temp1->type == ST_INT && temp2->type == ST_INT)
+						{
+							if (temp1->dataInt < temp2->dataInt) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+						{
+							if (temp1->dataDouble < temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+						{
+							temp1->dataDouble = temp1->dataInt;
+							if (temp1->dataDouble < temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+						{
+							temp2->dataDouble = temp2->dataInt;
+							if (temp1->dataDouble < temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
 					}
 					else
 					{
 						int i = 0;
-						i = strcmp(temp1->data->str,temp2->data->str);
+						i = strCompare(temp1->data,temp2->data);
 						if(i < 0)
 							{
-								temp3->data = 1;
+								temp3->dataInt = 1;
 							}
-						else temp3->data = 0;
+						else temp3->dataInt = 0;
 					}
 				}
-				else mistake(ERR_INTERN,"different combination is not tolerated in AC_LESS");
+				else mistake(ERR_INTERN,"different combination is not tolerated in AC_GREATER");
 				break;
         ///////////////////////////////////////
 				case AC_LESS_EQUAL:
@@ -603,22 +587,41 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					temp3->type = ST_INT;
 					if(temp1->type != ST_STRING)
 					{
-						if (temp1->data <= temp2->data) temp3->data = 1;
-						else  temp3->data = 0;
+						if (temp1->type == ST_INT && temp2->type == ST_INT)
+						{
+							if (temp1->dataInt <= temp2->dataInt) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+						{
+							if (temp1->dataDouble <= temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+						{
+							temp1->dataDouble = temp1->dataInt;
+							if (temp1->dataDouble <= temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+						{
+							temp2->dataDouble = temp2->dataInt;
+							if (temp1->dataDouble <= temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
 					}
 					else
 					{
 						int i = 0;
-						i = strcmp(temp1->data->str,temp2->data->str);
+						i = strCompare(temp1->data,temp2->data);
 						if(i <= 0)
 							{
-								temp3->data = 1;
+								temp3->dataInt = 1;
 							}
-						else temp3->data = 0;
+						else temp3->dataInt = 0;
 					}
 				}
-				else mistake(ERR_INTERN,"different combination is not tolerated in AC_LESS_EQUAL");
-
+				else mistake(ERR_INTERN,"different combination is not tolerated in AC_GREATER");
 				break;
         ///////////////////////////////////////
 				case AC_EQUAL:
@@ -631,21 +634,41 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					temp3->type = ST_INT;
 					if(temp1->type != ST_STRING)
 					{
-						if (temp1->data == temp2->data) temp3->data = 1;
-						else  temp3->data = 0;
+						if (temp1->type == ST_INT && temp2->type == ST_INT)
+						{
+							if (temp1->dataInt == temp2->dataInt) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+						{
+							if (temp1->dataDouble == temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+						{
+							temp1->dataDouble = temp1->dataInt;
+							if (temp1->dataDouble == temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+						{
+							temp2->dataDouble = temp2->dataInt;
+							if (temp1->dataDouble == temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
 					}
 					else
 					{
 						int i = 0;
-						i = strcmp(temp1->data->str,temp2->data->str);
+						i = strCompare(temp1->data,temp2->data);
 						if(i == 0)
 							{
-								temp3->data = 1;
+								temp3->dataInt = 1;
 							}
-						else temp3->data = 0;
+						else temp3->dataInt = 0;
 					}
 				}
-				else mistake(ERR_INTERN,"different combination is not tolerated in AC_EQUAL");
+				else mistake(ERR_INTERN,"different combination is not tolerated in AC_GREATER");
 				break;
         ///////////////////////////////////////
 				case AC_NOT_EQUAL:
@@ -658,24 +681,44 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					temp3->type = ST_INT;
 					if(temp1->type != ST_STRING)
 					{
-						if (temp1->data != temp2->data) temp3->data = 1;
-						else  temp3->data = 0;
+						if (temp1->type == ST_INT && temp2->type == ST_INT)
+						{
+							if (temp1->dataInt != temp2->dataInt) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_DOUBLE )
+						{
+							if (temp1->dataDouble != temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_INT && temp2->type == ST_DOUBLE)
+						{
+							temp1->dataDouble = temp1->dataInt;
+							if (temp1->dataDouble != temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
+						else if (temp1->type == ST_DOUBLE && temp2->type == ST_INT)
+						{
+							temp2->dataDouble = temp2->dataInt;
+							if (temp1->dataDouble != temp2->dataDouble) temp3->dataInt = 1;
+							else  temp3->dataInt = 0;
+						}
 					}
 					else
 					{
 						int i = 0;
-						i = strcmp(temp1->data->str,temp2->data->str);
+						i = strCompare(temp1->data,temp2->data);
 						if(i != 0)
 							{
-								temp3->data = 1;
+								temp3->dataInt = 1;
 							}
-						else temp3->data = 0;
+						else temp3->dataInt = 0;
 					}
 				}
-				else mistake(ERR_INTERN,"different combination is not tolerated in AC_NOT_EQUAL");
+				else mistake(ERR_INTERN,"different combination is not tolerated in AC_GREATER");
 				break;
         ///////////////////////////////////////
-#endif
+
 				case AC_CALL_CIN:
 
 				break;
@@ -701,9 +744,10 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
         ///////////////////////////////////////
 				case	AC_CALL_LENGTH:
 				if ( temp1->type == ST_STRING)
-				{ int i;
+				{
+					int i;
 					i = length(temp1->data);
-					temp3->data = i;
+					temp3->dataInt = i;
 				}
 				break;
         ///////////////////////////////////////
@@ -715,7 +759,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 
 				break;
         ///////////////////////////////////////
-				case AC_RETURN:	// vrati
+				case AC_RETURN:
 
 				break;
         ///////////////////////////////////////
@@ -726,26 +770,29 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 				}
 				break;
         ///////////////////////////////////////
-			/*	case AC_CALL_SUBSTR:
-				  if (internalCode->active->prevPtr->dataPtr->data->operation == AC_CALL_DUMMY &&
-					internalCode->active->prevPtr->dataPtr->data->source1->data->type == ST_INT )
+				case AC_CALL_SUBSTR:
+					D_ActiveMoveToFront(internalCode);
+					tmp = D_TopActive(internalCode);
+
+					temporaryNode = (nodePtr) tmp->source1;
+					temp4 = (symbolVariablePtr) temporaryNode->data->data;
+
+				  if (tmp->operation == AC_CALL_DUMMY && temp4->type == ST_INT )
 					{
 						if ( temp1->type == ST_STRING && temp2->type == ST_INT )
 							{
-								temp3->type == ST_STRING;
-								int n = internalCode->active->prevPtr->dataPtr->data->source1->data->data;
-								int i = temp2->data;
-								temp3->data = substr( temp1->data,  temp2->data, n);
+								temp3->type = ST_STRING;
+								temp3->data = substr( temp1->data, temp2->dataInt, temp4->dataInt);
 							}
 					}
-				break;*/
+					D_ActiveMoveToBack(internalCode);
+				break;
         ///////////////////////////////////////
 				case AC_CALL_CONCAT:
 					if( temp1->type == ST_STRING && temp2->type == ST_STRING )
 					{
 						temp3->type = ST_STRING;
-						temp3->data = concat(temp1->data,temp2->data);
-
+						temp3->data = concat(temp1->data, temp2->data);
 					}
 					else mistake(ERR_INTERN,"AC_CALL_CONCAT input is wrong");
 				break;
@@ -754,7 +801,7 @@ int do_instr( Deque internalCode )	//vykonava instrukcie
 					if( temp1->type == ST_STRING && temp2->type == ST_STRING )
 						{
 							temp3->type = ST_INT;
-							temp3->data = find(temp1->data,temp2->data);
+							temp3->dataInt = find(temp1->data, temp2->data);
 
 						}
 					else mistake(ERR_INTERN,"AC_CALL_FIND input is wrong");
