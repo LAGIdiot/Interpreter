@@ -1,3 +1,17 @@
+///////////////////////////////////////////////////////////////////////////////
+/* ---------- IMPLEMENTACE INTERPRETU IMPERATIVNÍHO JAZYKA IFJ15 ----------- */
+///////////////////////////////////////////////////////////////////////////////
+//
+//	AUTOŘI:
+//
+//	xbedna57 	ADAM BEDNÁRIK 	()
+//	xmacha63 	ERIK MACHÁČEK 	()
+//	xmalar02 	MARTIN MALÁRIK 	()
+//	xklaci00 	MICHAL KLACIK 	()
+//	xlengu00 	MANH LE NGUYEN 	()
+//
+///////////////////////////////////////////////////////////////////////////////
+
 #ifndef IAL_Header
 #define IAL_Header
 
@@ -7,6 +21,11 @@
 #include "memory_manager.h"
 #include "str.h"
 #include "symbol_table.h"
+#include <string.h>
+#include "deque.h"
+
+//for sort function
+#define TRUE 1
 
 int find(string s, string search);
 
