@@ -17,6 +17,7 @@
 const char *errMessage[11] = {
 	"Error : internal mistake of interpreter\n",
 	"Error : mistake in lex\n",
+	"Error : mistake in syntax",
 	"Error : undefined function/variable.\n",
 	"Error : incompatible types \n",
 	"Error : unknown definition of type\n",
@@ -25,7 +26,6 @@ const char *errMessage[11] = {
 	"Error : variable wasn't initialized\n",
 	"Error : dividing with zero\n",
 	"Error : mistake in interpreter\n",
-	"Error : mistake in interpreter\n"
 };
 
 //////////////////

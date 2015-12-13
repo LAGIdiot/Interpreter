@@ -19,6 +19,15 @@ void ST_DestroyParams(Deque deque);
 int ST_CompareDequeOfParams(Deque params1, Deque params2);
 int ST_CompareParams(symbolParamPtr param1, symbolParamPtr param2);
 
+//////////////////////////////////////////////////
+// symbolPackagePtr ST_PackageCreate(string key, int typ, void * symbol)
+// return symbolPackagePtr - packed and named variable
+// key - name for searching
+// typ - symbolType of symbol
+// symbol - pointer to symbolPtr
+////////////////////
+// Allocate memory for package and packed it
+//////////////////////////////////////////////////
 symbolPackagePtr ST_PackageCreate(string key, int typ, void * symbol)
 {
 	symbolPackagePtr symbolPackage = MM_Malloc(sizeof(struct symbolPackegeStruct));
@@ -30,6 +39,12 @@ symbolPackagePtr ST_PackageCreate(string key, int typ, void * symbol)
 	return symbolPackage;
 }
 
+//////////////////////////////////////////////////
+// void ST_PackageDestroy(symbolPackagePtr symbol)
+// symbol - package to destroy
+////////////////////
+// Destroy package of symbol and deallocate its memory
+//////////////////////////////////////////////////
 void ST_PackageDestroy(symbolPackagePtr symbol)
 {
 	strFree(symbol->key);
@@ -42,6 +57,12 @@ void ST_PackageDestroy(symbolPackagePtr symbol)
 	MM_Free(symbol);
 }
 
+//////////////////////////////////////////////////
+// symbolFunctionPtr ST_FunctionCreate()
+// return - new symbolFunctionPtr
+////////////////////
+// Allocate memory for symbolFunction
+//////////////////////////////////////////////////
 symbolFunctionPtr ST_FunctionCreate()
 {
 	symbolFunctionPtr function = MM_Malloc(sizeof(struct symbolFunctionStruct));
@@ -56,6 +77,14 @@ symbolFunctionPtr ST_FunctionCreate()
 	return function;
 }
 
+//////////////////////////////////////////////////
+// void ST_FunctionAddParam(symbolFunctionPtr symbol, string name, int tokenType)
+// symbol - symbolFunctionPtr where will be param added
+// name - name of param
+// tokenType - type of token
+////////////////////
+// Add param to deque in symbolFunctionPtr
+//////////////////////////////////////////////////
 void ST_FunctionAddParam(symbolFunctionPtr symbol, string name, int tokenType)
 {
 	if(symbol == NULL || name == NULL)
@@ -76,6 +105,14 @@ void ST_FunctionAddParam(symbolFunctionPtr symbol, string name, int tokenType)
 	D_PushBack(symbol->params, param);
 }
 
+//////////////////////////////////////////////////
+// int ST_CompareDequeOfParams(Deque params1, Deque params2)
+// return - bool of success
+// params1 - first deque for comparing
+// params2 - second deque for comparing
+////////////////////
+// Compare two deque of params
+//////////////////////////////////////////////////
 int ST_CompareDequeOfParams(Deque params1, Deque params2)
 {
 	int params1members = D_MemberCountGet(params1);
@@ -111,6 +148,14 @@ int ST_CompareDequeOfParams(Deque params1, Deque params2)
 	}
 }
 
+//////////////////////////////////////////////////
+// int ST_CompareParams(symbolParamPtr param1, symbolParamPtr param2)
+// return - bool of success
+// params1 - first param for comparing
+// params2 - second param for comparing
+////////////////////
+// Compare two params
+//////////////////////////////////////////////////
 int ST_CompareParams(symbolParamPtr param1, symbolParamPtr param2)
 {
 	if(param1 == NULL || param2 == NULL)
@@ -130,6 +175,12 @@ int ST_CompareParams(symbolParamPtr param1, symbolParamPtr param2)
 		return 0;
 }
 
+//////////////////////////////////////////////////
+// void ST_DestroyParams(Deque deque)
+// deque - for destroing
+////////////////////
+// Destroy and deallocate deque of params
+//////////////////////////////////////////////////
 void ST_DestroyParams(Deque deque)
 {
 	if(deque != NULL)
@@ -147,6 +198,12 @@ void ST_DestroyParams(Deque deque)
 	}
 }
 
+//////////////////////////////////////////////////
+// void ST_FunctionDestroy(symbolFunctionPtr symbol)
+// symbol - for destroying
+////////////////////
+// Destroy and deallocate symbolFunctionPtr of params
+//////////////////////////////////////////////////
 void ST_FunctionDestroy(symbolFunctionPtr symbol)
 {
 	if(symbol != NULL)
@@ -158,7 +215,13 @@ void ST_FunctionDestroy(symbolFunctionPtr symbol)
 	}
 }
 
-//Function for maping datat taypes from token to symbolTbale
+//////////////////////////////////////////////////
+// int ST_Remap(int tokenTyp)
+// return - variableType
+// tokenType - token->typ
+////////////////////
+// Function for maping datat taypes from token to symbolTbale
+//////////////////////////////////////////////////
 int ST_Remap(int tokenTyp)
 {
 	int ret = 0;
@@ -187,6 +250,12 @@ int ST_Remap(int tokenTyp)
 	return ret;
 }
 
+//////////////////////////////////////////////////
+// symbolVariablePtr ST_VariableCreate()
+// return - new symbolVariable
+////////////////////
+// Create new symblVariablePtr
+//////////////////////////////////////////////////
 symbolVariablePtr ST_VariableCreate()
 {
 	symbolVariablePtr symbol = MM_Malloc(sizeof(struct symbolVariableStruct));
@@ -199,6 +268,13 @@ symbolVariablePtr ST_VariableCreate()
 	return symbol;
 
 }
+
+//////////////////////////////////////////////////
+// void ST_VariableDestroy(symbolVariablePtr symbol)
+// symbol - symboVariablePtr to destroy
+////////////////////
+// Destroy symblVariablePtr
+//////////////////////////////////////////////////
 void ST_VariableDestroy(symbolVariablePtr symbol)
 {
 	if(symbol->data != NULL)
@@ -206,11 +282,25 @@ void ST_VariableDestroy(symbolVariablePtr symbol)
 	MM_Free(symbol);
 }
 
+//////////////////////////////////////////////////
+// string ST_RandomKeyGenerator()
+// return - random key
+////////////////////
+// Generate random key
+//////////////////////////////////////////////////
 string ST_RandomKeyGenerator()
 {
 	return strRNG(8);
 }
 
+//////////////////////////////////////////////////
+// int ST_CompareFunctions(symbolFunctionPtr symbol1, symbolFunctionPtr symbol2)
+// return - bool
+// symbol1 - symbolFunctionPtr for comparing
+// symbol2 - symbolFunctionPtr for comparing
+////////////////////
+// Compare two symbolFunctionStructs
+//////////////////////////////////////////////////
 int ST_CompareFunctions(symbolFunctionPtr symbol1, symbolFunctionPtr symbol2)
 {
 	if(symbol1->returnType != symbol1->returnType)
@@ -221,6 +311,14 @@ int ST_CompareFunctions(symbolFunctionPtr symbol1, symbolFunctionPtr symbol2)
 		return 1;
 }
 
+//////////////////////////////////////////////////
+// int ST_CompareVariables(symbolVariablePtr symbol1, symbolVariablePtr symbol2)
+// return - bool
+// symbol1 - symbolVariablePtr for comparing
+// symbol2 - symbolVariablePtr for comparing
+////////////////////
+// Compare two symbolVariableStructs
+//////////////////////////////////////////////////
 int ST_CompareVariables(symbolVariablePtr symbol1, symbolVariablePtr symbol2)
 {
 	if(symbol1->type == symbol2->type)
@@ -231,6 +329,14 @@ int ST_CompareVariables(symbolVariablePtr symbol1, symbolVariablePtr symbol2)
 		return -1;
 }
 
+//////////////////////////////////////////////////
+// int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
+// return - bool
+// symbol1 - symbolPackagePtr for comparing
+// symbol2 - symbolpackagePtr for comparing
+////////////////////
+// Compare two symbolPackageStructs
+//////////////////////////////////////////////////
 int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
 {
 	int str = strCompare(symbol1->key, symbol2->key);
@@ -250,6 +356,15 @@ int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
 	return 0;
 }
 
+//////////////////////////////////////////////////
+// int ST_ParamOKV(symbolFunctionPtr symbol, int variableType, int position)
+// return - bool
+// symbol - symbolFunctionPtr for comparing
+// variableType - variableType
+// position - position of variable
+////////////////////
+// Compare variableType on position with variableType of symbol
+//////////////////////////////////////////////////
 int ST_ParamOKV(symbolFunctionPtr symbol, int variableType, int position)
 {
 	int symbolMemberCount = D_MemberCountGet(symbol->params);
@@ -269,7 +384,15 @@ int ST_ParamOKV(symbolFunctionPtr symbol, int variableType, int position)
 		return 1;
 }
 
-
+//////////////////////////////////////////////////
+// int ST_ParamOKT(symbolFunctionPtr symbol, int tokenType, int position)
+// return - bool
+// symbol - symbolFunctionPtr for comparing
+// tokenType - tokenType
+// position - position of variable
+////////////////////
+// Compare tokenType on position with variableType of symbol
+//////////////////////////////////////////////////
 int ST_ParamOKT(symbolFunctionPtr symbol, int tokenType, int position)
 {
 	return ST_ParamOKV(symbol, ST_Remap(tokenType), position);
