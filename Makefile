@@ -33,7 +33,7 @@ interpret_d2: $(PARTS-d2)
 	$(CC) -o interpret_d $(PARTS-d2)
 
 #compiling
-main.o: main.c errors.h $(MM).h parser.h str.h $(ST).h token.h scanner.h interpret.h
+main.o: main.c errors.h $(MM).h scanner.h token.h deque.h parser.h ial.h str.h $(ST).h $(AC).h interpret.h
 	$(CC) $(CFLAGS) -o main.o main.c
 
 errors.o: errors.c errors.h $(MM).h
@@ -45,33 +45,33 @@ $(MM).o: $(MM).c $(MM).h errors.h
 token.o: token.c token.h $(MM).h errors.h
 	$(CC) $(CFLAGS) -o token.o token.c
 
-parser.o: parser.c parser.h errors.h $(MM).h str.h $(ST).h token.h 
+parser.o: parser.c parser.h deque.h errors.h $(MM).h ial.h str.h $(ST).h token.h $(AC).h
 	$(CC) $(CFLAGS) -o parser.o parser.c
 
-scanner.o: scanner.c scanner.h errors.h token.h $(MM).h
+scanner.o: scanner.c scanner.h errors.h $(MM).h token.h deque.h
 	$(CC) $(CFLAGS) -o scanner.o scanner.c
 
-ial.o: ial.c ial.h errors.h $(MM).h str.h
+ial.o: ial.c ial.h errors.h $(MM).h str.h deque.h symbol_table.h token.h
 	$(CC) $(CFLAGS) -o ial.o ial.c
 
-$(AC).o: $(AC).c $(AC).h
+$(AC).o: $(AC).c $(AC).h errors.h memory_manager.h symbol_table.h str.h deque.h token.h
 	$(CC) $(CFLAGS) -o $(AC).o $(AC).c
 
-str.o: str.c str.h errors.h $(MM).h
+str.o: str.c str.h errors.h $(MM).h deque.h
 	$(CC) $(CFLAGS) -o str.o str.c
 
-$(ST).o: $(ST).c $(ST).h $(MM).h errors.h str.h deque.h
+$(ST).o: $(ST).c $(ST).h str.h errors.h $(MM).h deque.h token.h
 	$(CC) $(CFLAGS) -o $(ST).o $(ST).c
 	
 deque.o: deque.c deque.h errors.h $(MM).h
 	$(CC) $(CFLAGS) -o deque.o deque.c
 	
-interpret.o: interpret.c interpret.h errors.h deque.h ial.h
+interpret.o: interpret.c interpret.h deque.h errors.h $(MM).h ial.h str.h symbol_table.h $(AC).h
 	$(CC) $(CFLAGS) -o interpret.o interpret.c
 
 #Pomyslna delici cara mezi normal a debug
 
-main-d.o: main.c errors.h $(MM).h parser.h str.h $(ST).h token.h scanner.h interpret.h
+main-d.o: main.c errors.h $(MM).h scanner.h token.h deque.h parser.h ial.h str.h $(ST).h $(AC).h interpret.h
 	$(CC) $(CFLAGSD) -o main-d.o main.c
 
 errors-d.o: errors.c errors.h $(MM).h
@@ -83,30 +83,30 @@ $(MM)-d.o: $(MM).c $(MM).h errors.h
 token-d.o: token.c token.h $(MM).h errors.h
 	$(CC) $(CFLAGSD) -o token-d.o token.c
 
-parser-d.o: parser.c parser.h errors.h  str.h $(ST).h token.h deque.h ial.h
+parser-d.o: parser.c parser.h deque.h errors.h $(MM).h ial.h str.h $(ST).h token.h $(AC).h
 	$(CC) $(CFLAGSD) -o parser-d.o parser.c
 
-scanner-d.o: scanner.c scanner.h errors.h token.h $(MM).h
+scanner-d.o: scanner.c scanner.h errors.h $(MM).h token.h deque.h
 	$(CC) $(CFLAGSD) -o scanner-d.o scanner.c
 
-ial-d.o: ial.c ial.h errors.h $(MM).h str.h
+ial-d.o: ial.c ial.h errors.h $(MM).h str.h deque.h symbol_table.h token.h
 	$(CC) $(CFLAGSD) -o ial-d.o ial.c
 
-$(AC)-d.o: $(AC).c $(AC).h
+$(AC)-d.o: $(AC).c $(AC).h errors.h memory_manager.h symbol_table.h str.h deque.h token.h
 	$(CC) $(CFLAGSD) -o $(AC)-d.o $(AC).c
 
-str-d.o: str.c str.h errors.h $(MM).h
+str-d.o: str.c str.h errors.h $(MM).h deque.h
 	$(CC) $(CFLAGSD) -o str-d.o str.c
 
-$(ST)-d.o: $(ST).c $(ST).h $(MM).h errors.h str.h deque.h
+$(ST)-d.o: $(ST).c $(ST).h str.h errors.h $(MM).h deque.h token.h
 	$(CC) $(CFLAGSD) -o $(ST)-d.o $(ST).c
 	
 deque-d.o: deque.c deque.h errors.h $(MM).h
 	$(CC) $(CFLAGSD) -o deque-d.o deque.c
 
-interpret-d.o: interpret.c interpret.h errors.h deque.h ial.h
+interpret-d.o: interpret.c interpret.h deque.h errors.h $(MM).h ial.h str.h symbol_table.h $(AC).h
 	$(CC) $(CFLAGSD) -o interpret-d.o interpret.c
-	
+
 #debug 2
 $(MM)-d2.o: $(MM).c $(MM).h errors.h
 	$(CC) $(CFLAGSD) -DDEBUG2 -o $(MM)-d2.o $(MM).c
