@@ -610,7 +610,7 @@ void T_Get(tTokenPtr tokenPtr)
 			
 			case FM_DOUBLE:
 			{
-				if ((read_char > ZERO) && (read_char < NINE))
+				if ((read_char >= ZERO) && (read_char <= NINE))
 				{
 					T_Update(read_char);
 				}
