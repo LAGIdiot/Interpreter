@@ -153,8 +153,6 @@ void ST_FunctionDestroy(symbolFunctionPtr symbol)
 	{
 		if(symbol->params != NULL)
 			ST_DestroyParams(symbol->params);
-		if(symbol->symbolTable != NULL)
-			deleteTree(symbol->symbolTable);//Potrebuje funkci z IAL
 
 		MM_Free(symbol);
 	}
@@ -250,21 +248,6 @@ int ST_Compare(symbolPackagePtr symbol1, symbolPackagePtr symbol2)
 	}
 
 	return 0;
-}
-
-//TODO: test this 2 functions
-void ST_VariableAddData_INT(symbolVariablePtr symbol, int data)
-{
-	int *intPtr = MM_Malloc(sizeof(int));
-	intPtr = &data;
-	symbol->data = intPtr;
-
-}
-void ST_VariableAddData_DOUBLE(symbolVariablePtr symbol, double data)
-{
-	double *doublePtr = MM_Malloc(sizeof(double));
-	doublePtr = &data;
-	symbol->data = doublePtr;
 }
 
 int ST_ParamOKV(symbolFunctionPtr symbol, int variableType, int position)

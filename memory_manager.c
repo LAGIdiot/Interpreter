@@ -138,7 +138,6 @@ void MM_FreeAll()
 #endif
 
 	MemoryBlockPtr temp = NULL;
-	MemoryBlockPtr tempPrev = NULL;
 
 	while(MM->numberOfAllocatedBlocks != 0)
 	{
