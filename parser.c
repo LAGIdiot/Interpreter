@@ -1,15 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 /* ---------- IMPLEMENTACE INTERPRETU IMPERATIVNÍHO JAZYKA IFJ15 ----------- */
 ///////////////////////////////////////////////////////////////////////////////
-
-AUTOŘI:
-
-xbedna57 	ADAM BEDNÁRIK 	()
-xmacha63 	ERIK MACHÁČEK 	()
-xmalar02 	MARTIN MALÁRIK 	()
-xklaci00 	MICHAL KLACIK 	()
-xlengu00 	MANH LE NGUYEN 	()
-
+//
+//	AUTOŘI:
+//
+//	xbedna57 	ADAM BEDNÁRIK 	()
+//	xmacha63 	ERIK MACHÁČEK 	()
+//	xmalar02 	MARTIN MALÁRIK 	()
+//	xklaci00 	MICHAL KLACIK 	()
+//	xlengu00 	MANH LE NGUYEN 	()
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "parser.h"
@@ -26,6 +26,13 @@ static tTokenPtr tokenLast = NULL;
 static tTokenPtr stackTop = NULL;
 
 static Deque P_platnostStack = NULL;
+
+static int numberOfUsesFor = 1;
+static int numberOfUsesIf = 1;
+static int numberOfUsesElse = 0;
+static int numberOfUsesBrace = 0;
+static int numberOfUsesWhile = 1;
+static int numberOfUsesDo = 1;
 
 //Function prototypes - private
 nodePtr ParseFunctionHead();
@@ -62,6 +69,8 @@ void RozsahPlatnostiInit();
 int RozsahPlatnostiLastPart(char * str);
 
 void TokenPusher(Deque stack, int tokensPushed, ...);
+
+string  BuildStringFromNumberAndChars(int number, char *str);
 
 Deque Parse(Deque tokens, nodePtr *symbolTable)
 {
@@ -229,7 +238,7 @@ Deque Parse(Deque tokens, nodePtr *symbolTable)
 			TokenPusher(P_specialStack, 3, TT_BRACE_R, TT_S_STAT_LS, TT_BRACE_L);
 
 			//posunuti rozsahu platnosti
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_BRACE"));
+			RozsahPlatnostiAddInner(BuildStringFromNumberAndChars(numberOfUsesBrace, "_BRACE"));
 
 			//label pro novou platnost
 			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(), NULL, NULL);
@@ -709,7 +718,7 @@ void ParseIf(nodePtr *localSymbolTable)
 
 		if(i == 0)
 		{
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_IF"));
+			RozsahPlatnostiAddInner(BuildStringFromNumberAndChars(numberOfUsesIf, "_IF"));
 			AC_itemPtr AC_Item = AC_I_Create(AC_LABEL, RozsahPlatnostiGet(), NULL, NULL);
 			AC_Add(P_internalCode, AC_Item);
 		}
@@ -734,6 +743,7 @@ void ParseIf(nodePtr *localSymbolTable)
 			break;
 		}
 	}
+	numberOfUsesIf++;
 }
 
 void ParseFor(nodePtr *localSymbolTable)
@@ -765,7 +775,8 @@ void ParseFor(nodePtr *localSymbolTable)
 				mistake(ERR_SYN,"Bad token type in parsing variable");
 
 			//label for FOR - must be there because of rozsah platnosti
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_FOR"));
+			//RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_FOR"));
+			RozsahPlatnostiAddInner(BuildStringFromNumberAndChars(numberOfUsesFor, "_FOR"));
 
 			variable = ST_VariableCreate();
 			variable->type = ST_Remap(tokenLast->typ);
@@ -847,6 +858,7 @@ void ParseFor(nodePtr *localSymbolTable)
 			break;
 		}
 	}
+	numberOfUsesFor++;
 }
 
 //////////////////////////////////////////////////
@@ -1490,7 +1502,7 @@ void ParseDoWhile(nodePtr *localSymbolTable)
 
 		if(i == 0)
 		{
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_DO"));	//label je pouze DO aby se nekomplikovalo hledani
+			RozsahPlatnostiAddInner(BuildStringFromNumberAndChars(numberOfUsesDo, "_DO"));	//label je pouze DO aby se nekomplikovalo hledani
 			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(),NULL,NULL);
 			AC_Add(P_internalCode, AC_Item);
 
@@ -1507,6 +1519,7 @@ void ParseDoWhile(nodePtr *localSymbolTable)
 			break;
 		}
 	}
+	numberOfUsesDo++;
 }
 void ParseDoWhilePart2(nodePtr *localSymbolTable)
 {
@@ -1584,7 +1597,7 @@ void ParseWhile(nodePtr *localSymbolTable)
 
 		if(i == 2)
 		{
-			RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_WHILE"));
+			RozsahPlatnostiAddInner(BuildStringFromNumberAndChars(numberOfUsesWhile, "_WHILE"));
 			AC_Item = AC_I_Create(AC_LABEL,RozsahPlatnostiGet(),NULL,NULL);
 			AC_Add(P_internalCode, AC_Item);
 
@@ -1618,6 +1631,18 @@ void ParseWhile(nodePtr *localSymbolTable)
 			break;
 		}
 	}
+	numberOfUsesWhile++;
+}
+
+string  BuildStringFromNumberAndChars(int number, char *str)
+{
+	char buffer[32] = "";
+
+	sprintf(buffer, "%d", number);
+
+	strcat(buffer, str);
+
+	return charToStr(buffer);
 }
 
 //////////////////////////////////////////////////
@@ -1797,7 +1822,7 @@ void Rule0(nodePtr *localSymbolTable)
 	}
 	else if(tokenLast->typ == TT_KEYWORD_ELSE)
 	{
-		RozsahPlatnostiAddInner(RozsahPlatnostiBuildStringFromChars("_ELSE"));
+		RozsahPlatnostiAddInner(BuildStringFromNumberAndChars(numberOfUsesElse, "_ELSE"));
 		remove = 1;
 	}
 	else if((tokenLast->typ == TT_KEYWORD_INT || tokenLast->typ == TT_KEYWORD_DOUBLE || tokenLast->typ == TT_KEYWORD_STRING) && stackTop->typ == TT_S_TYP_UNIVERSAL)
